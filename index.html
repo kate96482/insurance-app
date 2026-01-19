@@ -3,194 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>小邦手 完整工具箱</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <title>小邦手 - 數位工具箱</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { 
-            --primary-blue: #005a92; --bg-gray: #f4f7f9; --accent-red: #d9534f; 
-            --m-blue: #4CC9F0; --m-pink: #F72585; --m-purple: #7209B7; --m-mint: #B5EAD7;
-            --soft-yellow: #FCF6BD; --soft-blue: #99C1DE; --text-dark: #2B2D42;
+        :root {
+            --primary-color: #4CC9F0;
+            --secondary-color: #7209B7;
+            --bg-color: #F8F9FA;
+            --text-color: #333;
         }
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg-gray); padding-bottom: 80px; color: var(--text-dark); }
 
-        .page { display: none; padding: 10px; }
-        .page.active { display: block; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        h2 { color: var(--primary-blue); text-align: center; margin: 10px 0; font-size: 1.3rem; }
-        
-        /* 導覽列 */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 9999; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; cursor: pointer; font-size: 12px; }
-        .nav-item.active { color: var(--primary-blue); font-weight: bold; }
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        /* [功能1] 防癌試算 - 強制水平並排且標籤完整 */
-        .chart-wrapper { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; gap: 5px; margin: 15px auto; justify-content: center; width: 100%; }
-        .chart-box { flex: 1; min-width: 0; background: #fff; padding: 5px; border-radius: 8px; border: 1px solid #eee; display: flex; flex-direction: column; }
-        .chart-label { font-size: 0.75rem; font-weight: bold; color: var(--primary-blue); text-align: center; margin-bottom: 5px; }
-        .chart-container { position: relative; width: 100%; aspect-ratio: 1 / 1.1; }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
 
-        /* [功能2] 貸款試算 - 馬卡龍風格 */
-        .type-tabs { display: flex; background: #F1F3F5; padding: 5px; border-radius: 15px; margin-bottom: 15px; }
-        .tab { flex: 1; padding: 10px 2px; text-align: center; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 0.85rem; color: #ADB5BD; }
-        .tab.active { background: #FFFFFF; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-        #tab-personal.active { color: var(--m-pink); }
-        #tab-mortgage.active { color: var(--m-blue); }
-        #tab-revolving.active { color: var(--m-purple); }
-        .amt-section { background: var(--soft-yellow); padding: 15px; border-radius: 20px; border: 2px solid #EEE; margin-bottom: 10px; text-align: center;}
-        .amt-input-big { width: 120px; font-size: 1.5rem; border: 3px solid var(--m-blue); border-radius: 12px; text-align: center; color: var(--m-blue); font-weight: 900; }
-        .loan-summary { display: flex; gap: 8px; margin-top: 15px; }
-        .loan-sum-item { flex: 1; padding: 10px 5px; border-radius: 12px; text-align: center; color: white; font-weight: bold; }
-        .loan-sum-item span { display: block; font-size: 0.7rem; }
-        .loan-sum-item strong { font-size: 0.9rem; }
+        .header h1 {
+            color: var(--secondary-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
 
-        /* [功能3] 生命靈數 - 九宮格與畫線 */
-        .grid-wrapper { position: relative; width: 85%; margin: 15px auto; }
-        .num-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
-        .grid-item { background: #FFF; border-radius: 15px; border: 2px solid #F1F3F5; display: flex; align-items: center; justify-content: center; position: relative; aspect-ratio: 1/1; }
-        .num-label { font-size: 1.5rem; font-weight: 900; color: #ced4da; }
-        .active-num .num-label { color: var(--m-purple); }
-        .circles-wrap { position: absolute; width: 100%; height: 100%; top:0; left:0; }
-        .circle { position: absolute; border: 2px solid var(--m-pink); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.6; }
-        .c1 { width: 45%; height: 45%; } .c2 { width: 65%; height: 65%; } .c3 { width: 85%; height: 85%; }
-        #line-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        .header p {
+            color: #666;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* 網格佈局：手機 1 欄，平板以上 2 欄 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        @media (min-width: 600px) {
+            .grid-container {
+                max-width: 800px;
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* 卡片樣式 */
+        .tool-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            text-decoration: none;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #eee;
+        }
+
+        .tool-card:active {
+            transform: scale(0.98);
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .info-box h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            color: #222;
+        }
+
+        .info-box p {
+            margin: 5px 0 0 0;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* 不同功能的專屬顏色 */
+        .bg-cancer { background: linear-gradient(135deg, #FF6B6B, #EE5253); }
+        .bg-numerology { background: linear-gradient(135deg, #4CC9F0, #4895EF); }
+        .bg-new-tool { background: linear-gradient(135deg, #B5EAD7, #88D8B0); } /* 預留給新功能 */
+
+        .footer {
+            margin-top: 50px;
+            font-size: 0.75rem;
+            color: #BBB;
+        }
     </style>
 </head>
 <body>
 
-    <div id="home-page" class="page active">
-        <h2 style="margin-top:50px;">小邦手 工具箱</h2>
-        <div style="max-width: 400px; margin: auto; padding:20px; display: grid; gap: 15px;">
-            <div class="card" onclick="switchPage('calc-page', 1)" style="background:white; padding:25px; border-radius:15px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05); cursor:pointer;">
-                <i class="fa-solid fa-chart-pie" style="font-size:30px; color:var(--primary-blue);"></i><p>防癌試算</p>
-            </div>
-            <div class="card" onclick="switchPage('loan-page', 2)" style="background:white; padding:25px; border-radius:15px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05); cursor:pointer;">
-                <i class="fa-solid fa-hand-holding-dollar" style="font-size:30px; color:var(--m-blue);"></i><p>貸款試算</p>
-            </div>
-            <div class="card" onclick="switchPage('numer-page', 3)" style="background:white; padding:25px; border-radius:15px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05); cursor:pointer;">
-                <i class="fa-solid fa-star-and-crescent" style="font-size:30px; color:var(--m-purple);"></i><p>生命靈數</p>
-            </div>
-        </div>
+    <div class="header">
+        <h1>數位工具箱</h1>
+        <p>提供您專業且便捷的試算服務</p>
     </div>
 
-    <div id="calc-page" class="page">
-        <div class="container">
-            <h2>防癌無憂即時試算</h2>
-            <div class="chart-wrapper">
-                <div class="chart-box">
-                    <div class="chart-label">存活率對比</div>
-                    <div class="chart-container"><canvas id="survivalChart"></canvas></div>
-                </div>
-                <div class="chart-box">
-                    <div class="chart-label" id="cancerChartTitle">男性前十大癌症</div>
-                    <div class="chart-container"><canvas id="cancerChart"></canvas></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="loan-page" class="page">
-        <div class="container">
-            <h2>馬卡龍貸款試算</h2>
-            <div class="type-tabs">
-                <div class="tab" onclick="setLoanMode('personal')" id="tab-personal">信用貸款</div>
-                <div class="tab active" onclick="setLoanMode('mortgage')" id="tab-mortgage">一般房貸</div>
-                <div class="tab" onclick="setLoanMode('revolving')" id="tab-revolving">理財房貸</div>
-            </div>
-            <div class="amt-section">
-                <span>貸款金額 (萬)</span><br>
-                <input type="number" id="loanAmtInp" class="amt-input-big" value="500" oninput="updateLoanAll()">
-            </div>
-            <div class="loan-summary">
-                <div class="loan-sum-item" style="background:var(--m-blue);"><span>首期月付</span><strong id="resFirstPmt">0</strong></div>
-                <div class="loan-sum-item" style="background:var(--m-pink);"><span>總利息</span><strong id="resTotalInt">0</strong></div>
-                <div class="loan-sum-item" style="background:var(--m-purple);"><span>本利總和</span><strong id="resTotalAll">0</strong></div>
-            </div>
-            </div>
-    </div>
-
-    <div id="numer-page" class="page">
-        <div class="container">
-            <h2>生命靈數全解析</h2>
-            <div style="text-align:center; margin-bottom:15px;">
-                生日：<input type="tel" id="birthDate" placeholder="YYYYMMDD" style="padding:10px; width:60%;" oninput="numCalculate()">
-            </div>
-            <div class="grid-wrapper">
-                <svg id="line-canvas" viewBox="0 0 300 300"></svg>
-                <div class="num-grid-container" id="num-grid">
-                    <script>
-                        for(let i=1; i<=9; i++) {
-                            document.write(`<div class="grid-item" id="grid-${i}"><span class="num-label">${i}</span><div class="circles-wrap"></div></div>`);
-                        }
-                    </script>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchPage('home-page', 0)"><i class="fa-solid fa-house"></i><span>首頁</span></div>
-        <div class="nav-item" onclick="switchPage('calc-page', 1)"><i class="fa-solid fa-chart-pie"></i><span>防癌試算</span></div>
-        <div class="nav-item" onclick="switchPage('loan-page', 2)"><i class="fa-solid fa-hand-holding-dollar"></i><span>貸款試算</span></div>
-        <div class="nav-item" onclick="switchPage('numer-page', 3)"><i class="fa-solid fa-star-and-crescent"></i><span>靈數</span></div>
-    </nav>
-
-    <script>
-        Chart.register(ChartDataLabels);
-
-        function switchPage(pageId, idx) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach((n, i) => n.classList.toggle('active', i === idx));
-            if(pageId === 'calc-page') initCancerCharts();
-        }
-
-        function initCancerCharts() {
-            // 保留完整標籤與圖上顯示名稱邏輯
-            const ctx = document.getElementById('cancerChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['大腸癌','肺癌','肝癌','口腔癌','攝護腺癌','食道癌','胃癌','皮膚癌','非何杰金氏淋巴瘤','膀胱癌'],
-                    datasets: [{ data: [15,14,12,10,9,8,7,6,5,4], backgroundColor: ['#003f5c','#2f4b7c','#665191','#a05195','#d45087','#f95d6a','#ff7c43','#ffa600','#488f31','#de425b'] }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        datalabels: { color: '#fff', font: { weight: 'bold', size: 10 }, formatter: (v, c) => c.chart.data.labels[c.dataIndex].substring(0,2) }
-                    }
-                }
-            });
-        }
-
-        function numCalculate() {
-            // 保留完整生命靈數圈圈邏輯
-            const dateStr = document.getElementById('birthDate').value;
-            if(dateStr.length < 8) return;
-            document.querySelectorAll('.grid-item').forEach(el => {
-                el.classList.remove('active-num');
-                el.querySelector('.circles-wrap').innerHTML = '';
-            });
-            const nums = dateStr.split('').map(Number);
-            const counts = {};
-            nums.forEach(n => {
-                if(n > 0) {
-                    counts[n] = (counts[n] || 0) + 1;
-                    const item = document.getElementById('grid-' + n);
-                    item.classList.add('active-num');
-                    const wrap = item.querySelector('.circles-wrap');
-                    const c = document.createElement('div');
-                    c.className = 'circle c' + Math.min(counts[n], 3);
-                    wrap.appendChild(c);
-                }
-            });
-        }
+    <div class="grid-container">
         
-        // 貸款邏輯與其餘初始化...
-        window.onload = () => { updateLoanAll(); };
-    </script>
+        <a href="cancer_calc.html" class="tool-card">
+            <div class="icon-box bg-cancer">
+                <i class="fa-solid fa-file-medical"></i>
+            </div>
+            <div class="info-box">
+                <h3>防癌無憂試算</h3>
+                <p>即時計算保費與癌症數據對比</p>
+            </div>
+        </a>
+
+        <a href="numerology.html" class="tool-card">
+            <div class="icon-box bg-numerology">
+                <i class="fa-solid fa-star"></i>
+            </div>
+            <div class="info-box">
+                <h3>生命靈數全解析</h3>
+                <p>九宮格連線與流年週期運勢</p>
+            </div>
+        </a>
+
+        </div>
+
+    <div class="footer">
+        &copy; 2026 數位工具箱 
+    </div>
+
 </body>
 </html>
