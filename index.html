@@ -7,65 +7,44 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { 
-            --primary-blue: #005a92; 
-            --bg-gray: #f4f7f9; 
-            --accent-red: #d9534f; 
-        }
+        :root { --primary-blue: #005a92; --bg-gray: #f4f7f9; --accent-red: #d9534f; }
         * { box-sizing: border-box; }
-        body { 
-            margin: 0; 
-            font-family: "Microsoft JhengHei", sans-serif; 
-            background: var(--bg-gray); 
-            padding-bottom: 80px; 
-            font-size: 16px; 
-        }
-
-        .page { display: none; padding: 15px 10px; animation: fadeIn 0.3s ease; }
+        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg-gray); padding-bottom: 100px; }
+        .page { display: none; padding: 15px 10px; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h2 { color: var(--primary-blue); text-align: center; margin: 15px 0; font-size: 1.5rem; }
-        
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; }
+        h2 { color: var(--primary-blue); text-align: center; margin: 15px 0; }
         .input-group { background: #eef6fb; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
-        
-        /* 試算卡片排版：手機版自動變2欄縮短長度 */
         .result-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         @media (max-width: 600px) { .result-cards { grid-template-columns: repeat(2, 1fr); } }
         .card { background: #fff; border: 1px solid #e1e8ed; padding: 12px 5px; border-radius: 8px; text-align: center; }
-        .card .title { font-size: 0.85rem; color: #777; margin-bottom: 5px; }
+        .card .title { font-size: 0.85rem; color: #777; }
         .card .value { font-size: 1.1rem; font-weight: bold; color: var(--accent-red); }
 
-        /* 圖表隔離：防止重疊 */
-        .chart-wrapper { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+        /* 圖表高度放寬，確保十大癌症標籤全部顯示 */
+        .chart-wrapper { display: flex; flex-wrap: wrap; gap: 20px; margin: 20px 0; }
         .chart-box { 
-            flex: 1; min-width: 300px; height: 320px; 
-            background: #fff; padding: 10px; border-radius: 8px; 
-            overflow: hidden; display: flex; flex-direction: column;
+            flex: 1; min-width: 300px; 
+            min-height: 500px; /* 增加高度以容納 10 個項目的圖例 */
+            background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #eee;
         }
-        @media (max-width: 480px) { .chart-box { height: 260px; } }
-        .chart-label { font-size: 1rem; font-weight: bold; color: var(--primary-blue); text-align: center; height: 40px; }
-        .chart-container { flex: 1; position: relative; width: 100%; }
+        .chart-label { font-size: 1.1rem; font-weight: bold; color: var(--primary-blue); text-align: center; margin-bottom: 15px; }
+        .chart-container { position: relative; width: 100%; height: 350px; }
 
-        .benefit-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin: 10px 0; }
-        .benefit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .benefit-item { font-size: 0.9rem; border-left: 4px solid var(--primary-blue); padding-left: 10px; line-height: 1.4; }
+        .benefit-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin: 20px 0; }
+        .benefit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .benefit-item { font-size: 0.95rem; border-left: 4px solid var(--primary-blue); padding-left: 10px; line-height: 1.4; }
 
-        /* 8個方案：手機版自動變2欄縮短長度 */
-        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
         @media (max-width: 600px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
-        .plan-item { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 10px 5px; text-align: center; cursor: pointer; }
-        .plan-item i { font-size: 20px; color: var(--primary-blue); margin-bottom: 5px; display: block; }
-        .plan-item span { font-size: 0.85rem; font-weight: bold; }
-        .plan-item.active { background: #eef6fb; border-color: var(--primary-blue); }
+        .plan-item { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px 5px; text-align: center; cursor: pointer; }
+        .plan-item i { font-size: 24px; color: var(--primary-blue); margin-bottom: 8px; display: block; }
+        .plan-item span { font-size: 0.9rem; font-weight: bold; }
         
-        #detail-panel { margin-top: 15px; padding: 15px; background: #fafafa; border: 1px dashed var(--primary-blue); border-radius: 8px; display: none; }
-
+        #detail-panel { margin-top: 20px; padding: 20px; background: #fafafa; border: 1px dashed var(--primary-blue); border-radius: 8px; display: none; }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 9999; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; cursor: pointer; font-size: 14px; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; cursor: pointer; }
         .nav-item.active { color: var(--primary-blue); font-weight: bold; }
-        .nav-item i { font-size: 22px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -120,7 +99,7 @@
                 </div>
             </div>
 
-            <h3 style="text-align:center; font-size:1.1rem;">年度 8 擇 1 精準篩檢</h3>
+            <h3 style="text-align:center; font-size:1.1rem; margin-top: 30px;">年度 8 擇 1 精準篩檢</h3>
             <div class="grid-container">
                 <div class="plan-item" onclick="showDetail(0, this)"><i class="fa-solid fa-dna"></i><span>CTC 循環</span></div>
                 <div class="plan-item" onclick="showDetail(1, this)"><i class="fa-solid fa-shield-virus"></i><span>肝甲狀腺</span></div>
@@ -131,7 +110,7 @@
                 <div class="plan-item" onclick="showDetail(6, this)"><i class="fa-solid fa-heart-pulse"></i><span>癌心血管</span></div>
                 <div class="plan-item" onclick="showDetail(7, this)"><i class="fa-solid fa-brain"></i><span>腦部神經</span></div>
             </div>
-            <div id="detail-panel"><div id="detTitle" style="font-weight:bold; color:var(--primary-blue);"></div><div id="detBody" style="margin:5px 0;"></div><div id="detMethod" style="color:var(--accent-red); font-weight:bold;"></div></div>
+            <div id="detail-panel"><div id="detTitle" style="font-weight:bold; color:var(--primary-blue);"></div><div id="detBody" style="margin:10px 0;"></div><div id="detMethod" style="color:var(--accent-red); font-weight:bold;"></div></div>
         </div>
     </div>
 
@@ -158,19 +137,54 @@
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             element.classList.add('active');
-            if(pageId === 'calc-page' && survivalChart) { 
-                setTimeout(() => { survivalChart.resize(); cancerChart.resize(); }, 100);
+            if(pageId === 'calc-page') { 
+                setTimeout(() => { survivalChart.update(); cancerChart.update(); }, 100);
             }
         }
 
         function initCharts() {
-            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } };
-            survivalChart = new Chart(document.getElementById('survivalChart').getContext('2d'), { type: 'doughnut', data: { labels: ['早期(90%)', '晚期(20%)'], datasets: [{ data: [90, 20], backgroundColor: ['#28a745', '#dc3545'] }] }, options: opt });
-            cancerChart = new Chart(document.getElementById('cancerChart').getContext('2d'), { type: 'pie', data: getCancerData('male'), options: opt });
+            const commonOpt = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: { boxWidth: 12, font: { size: 10 }, padding: 8 }
+                    }
+                }
+            };
+            survivalChart = new Chart(document.getElementById('survivalChart').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: ['早期(90%)', '晚期(20%)'], datasets: [{ data: [90, 20], backgroundColor: ['#28a745', '#dc3545'] }] },
+                options: commonOpt
+            });
+            cancerChart = new Chart(document.getElementById('cancerChart').getContext('2d'), {
+                type: 'pie',
+                data: getCancerData('male'),
+                options: commonOpt
+            });
         }
 
         function getCancerData(gender) {
-            return gender === 'male' ? { labels: ['大腸', '肺癌', '肝癌', '前立腺', '口腔', '其他'], datasets: [{ data: [15, 14, 12, 10, 8, 41], backgroundColor: ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#cbd5e0'] }] } : { labels: ['乳癌', '肺癌', '大腸', '甲狀腺', '子宮', '其他'], datasets: [{ data: [25, 12, 11, 10, 8, 34], backgroundColor: ['#d9534f', '#e57373', '#ef9a9a', '#f48fb1', '#ce93d8', '#b2dfdb'] }] };
+            // 嚴格列出十大癌症，不使用「其他」
+            if (gender === 'male') {
+                return {
+                    labels: ['大腸癌', '肺癌', '肝癌', '口腔癌', '攝護腺癌', '食道癌', '胃癌', '皮膚癌', '非何杰金氏淋巴瘤', '膀胱癌'],
+                    datasets: [{
+                        data: [15, 14, 12, 10, 9, 8, 7, 6, 5, 4],
+                        backgroundColor: ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#f95d6a', '#ff7c43', '#ffa600', '#488f31', '#de425b']
+                    }]
+                };
+            } else {
+                return {
+                    labels: ['乳癌', '大腸癌', '肺癌', '甲狀腺癌', '子宮體癌', '肝癌', '卵巢癌', '皮膚癌', '胃癌', '非何杰金氏淋巴瘤'],
+                    datasets: [{
+                        data: [25, 12, 11, 10, 8, 7, 6, 5, 4, 3],
+                        backgroundColor: ['#d9534f', '#e57373', '#ef9a9a', '#f48fb1', '#ce93d8', '#b2dfdb', '#81c784', '#fff176', '#ffb74d', '#a1887f']
+                    }]
+                };
+            }
         }
 
         const rates = {
@@ -182,7 +196,9 @@
             const g = document.getElementById('gender').value, a = parseInt(document.getElementById('ageInput').value);
             document.getElementById('resAge').innerText = a;
             document.getElementById('cancerChartTitle').innerText = (g === 'male' ? '男性' : '女性') + '十大癌症分佈';
-            cancerChart.data = getCancerData(g); cancerChart.update();
+            cancerChart.data = getCancerData(g); 
+            cancerChart.update();
+            
             const getR = (gen, age, isF) => { const t = isF ? rates[gen].first : rates[gen].renew; const keys = Object.keys(t).map(Number).sort((x,y)=>y-x); for(let k of keys) { if(age>=k) return t[k]; } return t[30]; };
             const f = getR(g, a, true);
             document.getElementById('firstYear').innerText = "$" + f.toLocaleString();
@@ -198,8 +214,21 @@
             document.getElementById('accum30').innerText = "$" + t30.toLocaleString();
         }
 
-        function showDetail(idx, el) { document.querySelectorAll('.plan-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); document.getElementById('detail-panel').style.display = 'block'; document.getElementById('detTitle').innerText = planDetails[idx].title; document.getElementById('detBody').innerText = planDetails[idx].body; document.getElementById('detMethod').innerText = planDetails[idx].method; }
-        function syncAge(type) { const s = document.getElementById('ageSlider'), i = document.getElementById('ageInput'); if (type==='slider') i.value=s.value; else s.value=i.value; calculate(); }
+        function showDetail(idx, el) { 
+            document.querySelectorAll('.plan-item').forEach(i => i.classList.remove('active')); 
+            el.classList.add('active'); 
+            document.getElementById('detail-panel').style.display = 'block'; 
+            document.getElementById('detTitle').innerText = planDetails[idx].title; 
+            document.getElementById('detBody').innerText = planDetails[idx].body; 
+            document.getElementById('detMethod').innerText = planDetails[idx].method; 
+        }
+
+        function syncAge(type) { 
+            const s = document.getElementById('ageSlider'), i = document.getElementById('ageInput'); 
+            if (type==='slider') i.value=s.value; else s.value=i.value; 
+            calculate(); 
+        }
+
         window.onload = () => { initCharts(); calculate(); };
     </script>
 </body>
