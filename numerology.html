@@ -19,7 +19,6 @@
             color: #333;
         }
 
-        /* 返回按鈕樣式 */
         .back-home {
             display: inline-flex;
             align-items: center;
@@ -47,115 +46,50 @@
         }
         
         h2 { color: var(--m-purple); margin: 5px 0 15px 0; font-size: 1.4rem; text-align: center; }
-        
         .input-box { background: #F1F3F5; padding: 10px; border-radius: 15px; margin-bottom: 10px; }
         .mode-toggle { display: flex; gap: 5px; margin-bottom: 8px; }
         .btn-mode { flex: 1; padding: 8px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; background: #DEE2E6; font-size: 0.85rem; }
         .btn-mode.active { background: var(--m-blue); color: white; }
-
         .input-row { display: flex; gap: 4px; justify-content: center; }
         input, select { padding: 8px; border-radius: 8px; border: 1px solid #DDD; font-size: 0.9rem; flex: 1; min-width: 0; outline: none; }
-
         .process-box { background: #fff; border: 1px solid var(--m-blue); border-radius: 12px; padding: 8px; margin-bottom: 10px; text-align: center; display: none; }
         .formula-text { color: var(--m-purple); font-weight: bold; font-size: 0.85rem; }
 
-        /* 九宮格 */
-        .grid-wrapper { 
-            position: relative; 
-            width: 90%; 
-            margin: 15px auto; 
-        }
-        .grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 10px; 
-            width: 100%; 
-        }
+        .grid-wrapper { position: relative; width: 90%; margin: 15px auto; }
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
         .grid-item { 
-            background: #FFF; 
-            border-radius: 15px; 
-            border: 2px solid #F1F3F5; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            position: relative; 
-            z-index: 2; 
-            cursor: pointer; 
-            transition: transform 0.2s;
-            aspect-ratio: 1/1;
+            background: #FFF; border-radius: 15px; border: 2px solid #F1F3F5; 
+            display: flex; align-items: center; justify-content: center; 
+            position: relative; z-index: 2; cursor: pointer; aspect-ratio: 1/1; 
         }
         .num-label { font-size: 1.5rem; font-weight: 900; color: #ced4da; z-index: 10; }
         .active-num .num-label { color: var(--m-purple); }
+        .yearly-active .num-label { color: var(--m-blue) !important; }
 
         #line-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
         .dashed-line { stroke: var(--m-pink); stroke-width: 3; stroke-dasharray: 5; opacity: 0.6; }
+        .yearly-line { stroke: var(--m-blue); stroke-dasharray: 3; opacity: 0.8; } /* 流年產生的連線顏色 */
 
-        .circles-wrap { 
-            position: absolute; 
-            top: 0; left: 0;
-            width: 100%; height: 100%; 
-            display: flex; align-items: center; justify-content: center; 
-            pointer-events: none; 
-        }
-        .circle { 
-            position: absolute; 
-            border: 2px solid var(--m-pink); 
-            border-radius: 50%; 
-            opacity: 0.5; 
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%); 
-        }
-        .c1 { width: 45%; height: 45%; } 
-        .c2 { width: 65%; height: 65%; } 
-        .c3 { width: 85%; height: 85%; } 
-        .c4 { width: 95%; height: 95%; }
+        .circles-wrap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+        .circle { position: absolute; border: 2px solid var(--m-pink); border-radius: 50%; opacity: 0.5; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .circle.yearly { border-color: var(--m-blue); opacity: 0.8; border-width: 3px; }
+        .c1 { width: 45%; height: 45%; } .c2 { width: 65%; height: 65%; } .c3 { width: 85%; height: 85%; } .c4 { width: 95%; height: 95%; }
         
-        .triangle-marker { 
-            position: absolute; 
-            bottom: 4px; 
-            width: 0; height: 0; 
-            border-left: 8px solid transparent; 
-            border-right: 8px solid transparent; 
-            border-bottom: 12px solid var(--m-blue); 
-            display: none; 
-            z-index: 5;
-        }
+        .triangle-marker { position: absolute; bottom: 4px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid var(--m-blue); display: none; z-index: 5; }
         .active-destiny .triangle-marker { display: block; }
 
         .info-card, .line-section, .yearly-card { background: #fff; border-radius: 15px; padding: 12px; margin-top: 10px; border: 1px solid var(--m-mint); text-align: left; display: none; font-size: 0.85rem; }
         .line-section { background: #fdf2f8; border-color: var(--m-pink); border-style: dashed; display: block; }
         .yearly-card { display: block; border-color: var(--m-blue); background: #f0faff; }
-        
-        .timeline-container { 
-            display: flex; 
-            overflow-x: auto; 
-            gap: 10px; 
-            padding: 10px 5px; 
-            scrollbar-width: none; 
-        }
+        .timeline-container { display: flex; overflow-x: auto; gap: 10px; padding: 10px 5px; scrollbar-width: none; }
         .timeline-container::-webkit-scrollbar { display: none; }
-        
-        .timeline-item {
-            flex: 0 0 52px;
-            text-align: center; 
-            background: #fff; 
-            padding: 8px 0; 
-            border-radius: 12px; 
-            border: 1px solid #e0e0e0;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .timeline-item.active {
-            background: var(--m-blue); 
-            color: white; 
-            border-color: var(--m-blue);
-            transform: scale(1.05); 
-            font-weight: bold;
-        }
+        .timeline-item { flex: 0 0 52px; text-align: center; background: #fff; padding: 8px 0; border-radius: 12px; border: 1px solid #e0e0e0; cursor: pointer; transition: 0.3s; }
+        .timeline-item.active { background: var(--m-blue); color: white; border-color: var(--m-blue); transform: scale(1.05); font-weight: bold; }
         .tm-num { font-weight: 900; font-size: 1.1rem; display: block; }
         .tm-year { font-size: 0.6rem; opacity: 0.8; }
 
         .line-tag { display: inline-block; background: var(--m-pink); color: white; padding: 2px 8px; border-radius: 8px; font-size: 0.75rem; margin: 0 4px 4px 0; font-weight: bold;}
+        .line-tag.yearly-boost { background: var(--m-blue); }
         .status-tag { font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; font-weight: bold;}
         .tag-active { background: var(--m-mint); color: #2d6a4f; }
         .tag-strong { background: var(--m-pink); color: white; }
@@ -163,9 +97,7 @@
 </head>
 <body>
 
-<a href="index.html" class="back-home">
-    <i class="fa-solid fa-house"></i> 返回首頁
-</a>
+<a href="index.html" class="back-home"><i class="fa-solid fa-house"></i> 返回首頁</a>
 
 <div class="container">
     <h2><i class="fa-solid fa-star-and-crescent"></i> 生命靈數全解析</h2>
@@ -176,9 +108,7 @@
             <button class="btn-mode" id="btn-manual" onclick="switchMode('manual')">民國碼</button>
         </div>
         <div id="mode-select" class="input-row">
-            <select id="sel-y"></select>
-            <select id="sel-m"></select>
-            <select id="select-d"></select>
+            <select id="sel-y"></select><select id="sel-m"></select><select id="select-d"></select>
         </div>
         <div id="mode-manual" class="input-row" style="display:none;">
             <input type="tel" id="roc-date" placeholder="例: 0800101" maxlength="7">
@@ -186,9 +116,7 @@
         </div>
     </div>
 
-    <div id="processBox" class="process-box">
-        <div id="formula" class="formula-text"></div>
-    </div>
+    <div id="processBox" class="process-box"><div id="formula" class="formula-text"></div></div>
 
     <div class="grid-wrapper">
         <svg id="line-canvas"></svg>
@@ -213,23 +141,22 @@
 
     <div id="yearlyBox" class="yearly-card">
         <div id="yearlyTitle" style="font-weight:bold; color:var(--m-blue); margin-bottom:2px;"></div>
-        <p style="font-size:0.7rem; color:#888; margin: 0 0 5px 0;">點擊下方年份查看各年度解析：</p>
+        <p style="font-size:0.7rem; color:#888; margin: 0 0 5px 0;">點擊下方年份查看流年如何影響你的命盤：</p>
         <div class="timeline-container" id="yearlyTimeline"></div>
         <div id="yearlyContent" style="color: #555; line-height:1.4; padding-top: 10px; border-top: 1px dashed #ced4da;"></div>
     </div>
 </div>
 
 <script>
-    // 這裡保留你原始的所有 JS 邏輯，不做內容修改，僅確保 RWD 與功能運作
-    // (邏輯與你提供的完全一致...)
     let currentMode = 'select';
     let lastSelectedNum = null;
     let globalCounts = {};
+    let currentYearlyNum = null; // 儲存當前選中的流年數字
 
     const numDetailData = {
         1: { has: "具備獨立性與開創力，有主見。", none: "缺數：較依賴他人，果斷力不足。", strong: "凸顯：過於自我，難以溝通。" },
         2: { has: "觀察力細膩，擅長協調合作。", none: "缺數：人際敏感度低，直白易傷人。", strong: "凸顯：過於依賴，情緒波動大。" },
-        3: { has: "富有創意幽默，表達能力強。", none: "缺數：思考嚴肅，缺乏生活熱情。", strong: "凸顯：缺乏耐心，容易虎頭蛇尾。" },
+        3: { has: "富有創意幽默，表達能力強。", none: "缺數：思考嚴肅，缺乏生活熱情。", strong: "凸顯：缺乏耐心，容易虎頭尾。" },
         4: { has: "做事踏實有條理，追求穩定。", none: "缺數：生活較無章法，缺乏安全感。", strong: "凸顯：極度保守固執，害怕改變。" },
         5: { has: "熱愛自由冒險，適應力極強。", none: "缺數：性格被動，害怕變動與未知。", strong: "凸顯：定性不足，情緒起伏劇烈。" },
         6: { has: "富有責任感，擅長照顧他人。", none: "缺數：不擅長表達情感，責任感弱。", strong: "凸顯：過度干涉他人，要求完美。" },
@@ -239,15 +166,15 @@
     };
 
     const yearlyData = {
-        1: "開創年：全新的開始。適合設定九年大計，主動出擊，嘗試新事物，這一年種下的種子將影響未來的循環。",
-        2: "協調年：放慢節奏的合作期。重點在於人際關係與細節處理，適合溝通、談判，耐心等待時機成熟。",
-        3: "表達年：社交與創意的一年。運氣提升，適合學習、表演或社交，注意避免分散過多精力。",
-        4: "紮根年：穩定與建設的一年。適合買房、結婚或在專業領域深耕，壓力可能較大，需注意身體健康。",
-        5: "轉折年：變革與冒險的一年。可能面臨環境變遷、轉職或長途旅行，適合打破常規，迎接新鮮事物。",
-        6: "責任年：家庭與奉獻的一年。重心轉向親友，適合修復關係、美化家園，也需承擔較多責任壓力。",
-        7: "反省年：心靈與智慧的一年。不宜向外大步擴張，適合進修、研究、內觀自我，釐清未來的方向。",
-        8: "收成年：權力與物質的豐收期。過去七年的努力將在此時見效，執行力最強，需注意金錢管理與法律問題。",
-        9: "完成年：斷捨離與大掃除。結束不再適合的關係或工作，為下一個九年循環清空空間，宜收尾不宜開頭。"
+        1: "開創年：全新的開始。適合設定九年大計，主動出擊，嘗試新事物。",
+        2: "協調年：放慢節奏的合作期。重點在於人際關係與細節處理，適合溝通。",
+        3: "表達年：社交與創意的一年。運氣提升，適合學習、表演或社交。",
+        4: "紮根年：穩定與建設的一年。適合在專業領域深耕，需注意身體健康。",
+        5: "轉折年：變革與冒險的一年。可能面臨環境變遷、轉職或長途旅行。",
+        6: "責任年：家庭與奉獻的一年。重心轉向親友，適合修復關係、美化家園。",
+        7: "反省年：心靈與智慧的一年。不宜向外大步擴張，適合進修、內觀自我。",
+        8: "收成年：權力與物質的豐收期。過去七年的努力將見效，執行力最強。",
+        9: "完成年：斷捨離與大掃除。結束不適合的關係，為下個循環清空空間。"
     };
 
     const primaryLines = [
@@ -269,7 +196,7 @@
     ];
 
     const sy = document.getElementById('sel-y'), sm = document.getElementById('sel-m'), sd = document.getElementById('select-d');
-    for(let i=2026; i>=1920; i--) sy.options.add(new Option(i+'年', i));
+    for(let i=2030; i>=1920; i--) sy.options.add(new Option(i+'年', i));
     for(let i=1; i<=12; i++) sm.options.add(new Option(i+'月', i));
     for(let i=1; i<=31; i++) sd.options.add(new Option(i+'日', i));
     sy.value = 1990; [sy, sm, sd].forEach(el => el.onchange = calculate);
@@ -285,15 +212,12 @@
 
     function showDetail(n) {
         const card = document.getElementById('detailCard');
-        if (lastSelectedNum === n && card.style.display === 'block') {
-            card.style.display = 'none';
-            lastSelectedNum = null;
-            return;
-        }
+        if (lastSelectedNum === n && card.style.display === 'block') { card.style.display = 'none'; lastSelectedNum = null; return; }
         card.style.display = 'block';
         const count = globalCounts[n] || 0;
         let status = count === 0 ? '<span class="status-tag">無</span>' : 
                      count >= 3 ? '<span class="status-tag tag-strong">強</span>' : '<span class="status-tag tag-active">有</span>';
+        if(n === currentYearlyNum) status += ' <span class="status-tag" style="background:var(--m-blue);color:white;">流年進駐</span>';
         document.getElementById('detailTitle').innerHTML = `數字 ${n} 解析 ${status}`;
         document.getElementById('detailContent').innerText = count === 0 ? numDetailData[n].none : count >= 3 ? numDetailData[n].strong : numDetailData[n].has;
         lastSelectedNum = n;
@@ -305,13 +229,16 @@
         return n;
     }
 
+    // 優化重點：點擊流年時，重新渲染九宮格與連線
     window.updateYearlyDetail = function(num, year, el) {
+        currentYearlyNum = num;
         document.querySelectorAll('.timeline-item').forEach(item => item.classList.remove('active'));
         el.classList.add('active');
         document.getElementById('yearlyContent').innerHTML = `
             <div style="font-weight:bold; color:var(--m-purple); margin-bottom:5px;">${year} 年（流年數字 ${num}）</div>
             ${yearlyData[num]}
         `;
+        renderGridAndLines(); // 重新畫圖
     }
 
     function calculate() {
@@ -323,26 +250,53 @@
             if(roc.length < 7) return;
             y = parseInt(roc.substring(0,3)) + 1911; m = parseInt(roc.substring(3,5)); d = parseInt(roc.substring(5,7));
         }
-
         const dateStr = `${y}${m.toString().padStart(2,'0')}${d.toString().padStart(2,'0')}`;
         const birthNums = dateStr.split("").map(Number).filter(n => n !== 0);
         let allNums = [...birthNums]; 
         let sum = birthNums.reduce((a, b) => a + b, 0);
         let formula = birthNums.join('+') + `=${sum}`;
         sum.toString().split("").forEach(s => allNums.push(Number(s)));
-
         while (sum > 9) {
             sum = sum.toString().split("").map(Number).reduce((a, b) => a + b, 0);
             formula += `=${sum}`;
             allNums.push(sum);
         }
-
         document.getElementById('processBox').style.display = 'block';
         document.getElementById('formula').innerText = formula;
-
         const counts = {};
         allNums.forEach(n => { if(n > 0) counts[n] = (counts[n] || 0) + 1; });
         globalCounts = counts;
+        globalSum = sum;
+
+        // 計算初始流年
+        const now = new Date(); 
+        const birthdayThisYear = new Date(now.getFullYear(), m - 1, d);
+        let baseYear = (now < birthdayThisYear) ? now.getFullYear() - 1 : now.getFullYear();
+        const calcYearly = (targetYear) => {
+            const s1 = targetYear.toString().split("").map(Number).reduce((a,b)=>a+b, 0);
+            const s2 = m.toString().split("").map(Number).reduce((a,b)=>a+b, 0);
+            const s3 = d.toString().split("").map(Number).reduce((a,b)=>a+b, 0);
+            return getSingleDigit(s1 + s2 + s3);
+        };
+        currentYearlyNum = calcYearly(baseYear);
+        
+        let timelineHtml = "";
+        for(let i=0; i<9; i++) {
+            let tYear = baseYear + i;
+            let tNum = calcYearly(tYear);
+            timelineHtml += `<div class="timeline-item ${i===0?'active':''}" onclick="updateYearlyDetail(${tNum}, ${tYear}, this)">
+                <span class="tm-num">${tNum}</span><span class="tm-year">${tYear}</span></div>`;
+        }
+        document.getElementById('yearlyTimeline').innerHTML = timelineHtml;
+        document.getElementById('yearlyContent').innerHTML = `<div style="font-weight:bold; color:var(--m-purple); margin-bottom:5px;">${baseYear} 年（流年數字 ${currentYearlyNum}）</div>${yearlyData[currentYearlyNum]}`;
+        
+        renderGridAndLines();
+    }
+
+    function renderGridAndLines() {
+        const counts = globalCounts;
+        const sum = globalSum;
+        const yearlyNum = currentYearlyNum;
 
         // 更新格子
         document.querySelectorAll('.grid-item').forEach(item => {
@@ -351,6 +305,8 @@
             wrap.innerHTML = "";
             item.className = 'grid-item';
             if (n === sum) item.classList.add('active-destiny');
+            
+            // 原生圈圈
             if(counts[n]) {
                 item.classList.add('active-num');
                 for(let i=1; i<=Math.min(counts[n], 4); i++) {
@@ -359,9 +315,16 @@
                     wrap.appendChild(c);
                 }
             }
+            // 流年圈圈 (如果原生沒有圈，或是補足空缺)
+            if(n === yearlyNum) {
+                item.classList.add('yearly-active');
+                const yc = document.createElement('div');
+                yc.className = `circle yearly c${Math.min((counts[n]||0)+1, 4)}`;
+                wrap.appendChild(yc);
+            }
         });
 
-        // 繪製連線
+        // 繪製連線並判斷流年影響
         const svg = document.getElementById('line-canvas');
         const wrapper = document.querySelector('.grid-wrapper');
         const wrapperRect = wrapper.getBoundingClientRect();
@@ -369,11 +332,16 @@
         let tags = "", details = "";
         
         [...primaryLines, ...secondaryLines].forEach((l, idx) => {
-            if (l.ids.every(id => counts[id])) {
+            const hasOriginal = l.ids.every(id => counts[id]);
+            const hasWithYearly = l.ids.every(id => counts[id] || id === yearlyNum);
+
+            if (hasWithYearly) {
+                const isYearlyBoost = !hasOriginal; // 這是靠流年補才有的連線
                 const lineNums = l.ids.join('-');
                 const isPrimary = idx < 8;
-                tags += `<span class="line-tag" style="${isPrimary?'':'background:var(--m-blue)'}">${lineNums} ${l.name}</span>`;
-                details += `<div style="margin-bottom:5px;">${isPrimary?'●':'○'} <b>${lineNums} ${l.name}</b>：${l.desc}</div>`;
+                
+                tags += `<span class="line-tag ${isYearlyBoost?'yearly-boost':''}" style="${!isPrimary && !isYearlyBoost?'background:var(--m-blue)':''}">${lineNums} ${l.name}${isYearlyBoost?' (流年補數)':''}</span>`;
+                details += `<div style="margin-bottom:5px;">${isYearlyBoost?'★':(isPrimary?'●':'○')} <b>${lineNums} ${l.name}</b>：${l.desc}</div>`;
                 
                 const el1 = document.getElementById(`grid-${l.ids[0]}`).getBoundingClientRect();
                 const el2 = document.getElementById(`grid-${l.ids[l.ids.length-1]}`).getBoundingClientRect();
@@ -383,48 +351,15 @@
                 line.setAttribute("y1", el1.top + el1.height/2 - wrapperRect.top);
                 line.setAttribute("x2", el2.left + el2.width/2 - wrapperRect.left);
                 line.setAttribute("y2", el2.top + el2.height/2 - wrapperRect.top);
-                line.setAttribute("class", "dashed-line");
+                line.setAttribute("class", `dashed-line ${isYearlyBoost?'yearly-line':''}`);
                 svg.appendChild(line);
             }
         });
         document.getElementById('lineTags').innerHTML = tags || '<span style="color:#999">目前無達成連線</span>';
         document.getElementById('lineDetail').innerHTML = details || '當前無特殊連線。';
-
-        // 流年
-        const now = new Date(); 
-        const currentYear = now.getFullYear();
-        const birthdayThisYear = new Date(currentYear, m - 1, d);
-        let baseYear = (now < birthdayThisYear) ? currentYear - 1 : currentYear;
-
-        const calcYearly = (targetYear) => {
-            const s1 = targetYear.toString().split("").map(Number).reduce((a,b)=>a+b, 0);
-            const s2 = m.toString().split("").map(Number).reduce((a,b)=>a+b, 0);
-            const s3 = d.toString().split("").map(Number).reduce((a,b)=>a+b, 0);
-            return getSingleDigit(s1 + s2 + s3);
-        };
-
-        const currentNum = calcYearly(baseYear);
-        let timelineHtml = "";
-        for(let i=0; i<9; i++) {
-            let tYear = baseYear + i;
-            let tNum = calcYearly(tYear);
-            let isActive = i === 0 ? "active" : "";
-            timelineHtml += `
-                <div class="timeline-item ${isActive}" onclick="updateYearlyDetail(${tNum}, ${tYear}, this)">
-                    <span class="tm-num">${tNum}</span>
-                    <span class="tm-year">${tYear}</span>
-                </div>
-            `;
-        }
-        document.getElementById('yearlyTitle').innerText = `流年週期循環`;
-        document.getElementById('yearlyTimeline').innerHTML = timelineHtml;
-        document.getElementById('yearlyContent').innerHTML = `
-            <div style="font-weight:bold; color:var(--m-purple); margin-bottom:5px;">${baseYear} 年（流年數字 ${currentNum}）</div>
-            ${yearlyData[currentNum]}
-        `;
     }
     
-    window.addEventListener('resize', calculate);
+    window.addEventListener('resize', renderGridAndLines);
     calculate();
 </script>
 </body>
