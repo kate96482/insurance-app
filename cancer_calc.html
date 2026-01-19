@@ -210,7 +210,7 @@
                     },
                     formatter: (v, ctx) => {
                         // 手機版過小不顯示標籤，防止擠壓
-                        if (isMobile && v < 7) return '';
+                        if (isMobile && v < 5) return '';
                         return ctx.chart.data.labels[ctx.dataIndex] + '\n' + v + '%';
                     }
                 }
@@ -233,4 +233,5 @@
 </script>
 </body>
 </html>
+
 
