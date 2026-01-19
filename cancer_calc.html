@@ -3,51 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>防癌試算 - 內容完整恢復版</title>
+    <title>防癌試算 - 最終優化完整版</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --primary: #005a92; --bg: #f4f7f9; }
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 10px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { color: var(--primary); text-align: center; margin: 10px 0 20px; }
+        body { margin: 0; font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; background: var(--bg); padding: 10px; }
+        .container { max-width: 850px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
+        
+        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; font-weight: bold; }
 
-        .control-group { background: #fff; border: 2px solid var(--primary); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        /* 輸入控制區 */
+        .control-group { background: #fff; border: 2px solid var(--primary); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
         .gender-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-        .gender-btn { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #f8f9fa; cursor: pointer; font-weight: bold; }
+        .gender-btn { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f8fafc; cursor: pointer; font-weight: bold; }
         .gender-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .age-control { display: flex; align-items: center; gap: 15px; }
-        #ageInput { width: 65px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 1.1rem; }
-        #ageSlider { flex: 1; cursor: pointer; }
+        #ageInput { width: 65px; padding: 8px; text-align: center; border: 2px solid var(--primary); border-radius: 6px; font-weight: bold; font-size: 1.1rem; }
+        #ageSlider { flex: 1; accent-color: var(--primary); cursor: pointer; }
 
-        /* 圖表區塊：修正手機並排與溢出 */
-        .chart-section { display: flex; gap: 10px; margin-bottom: 25px; min-height: 280px; }
-        .chart-card { flex: 1; border: 1px solid #eee; border-radius: 10px; padding: 10px 5px; background: #fff; min-width: 0; display: flex; flex-direction: column; }
+        /* 圖表區塊：修正並排與跑版 */
+        .chart-section { display: flex; gap: 12px; margin-bottom: 30px; min-height: 280px; }
+        .chart-card { flex: 1; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; background: #fff; min-width: 0; display: flex; flex-direction: column; }
         .chart-title { font-size: 0.9rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 10px; }
-        .chart-wrapper { flex: 1; position: relative; }
+        .chart-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
 
-        /* 費用資料格 */
-        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
-        .result-item { background: #fff; border: 1px solid #e1e8ed; padding: 10px 5px; border-radius: 8px; text-align: center; }
-        .result-item .label { font-size: 0.75rem; color: #777; margin-bottom: 3px; }
-        .result-item .value { font-size: 1rem; color: #d9534f; font-weight: bold; }
-        .result-item.highlight { border: 2px solid var(--primary); background: #f0f7ff; }
+        /* 費用資料格：電腦 3 欄 / 手機 2 欄 */
+        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .result-item { background: #fff; border: 1px solid #cbd5e1; padding: 12px 5px; border-radius: 10px; text-align: center; }
+        .result-item .label { font-size: 0.75rem; color: #64748b; margin-bottom: 5px; font-weight: bold; }
+        .result-item .value { font-size: 1.05rem; color: #d9534f; font-weight: 800; }
+        .result-item.highlight { border: 2px solid var(--primary); background: #f0f9ff; }
+        .result-item.age-box .value { color: var(--primary); }
 
-        /* 篩檢方案 */
-        .plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .plan-card { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 12px 2px; text-align: center; cursor: pointer; }
-        .plan-card.active { border: 2px solid var(--primary); background: #eef6fb; }
-        .plan-card i { font-size: 18px; color: var(--primary); margin-bottom: 5px; }
-        .plan-card span { display: block; font-size: 0.75rem; font-weight: bold; }
+        /* 方案按鈕 */
+        .plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .plan-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 5px; text-align: center; cursor: pointer; }
+        .plan-card.active { border: 2px solid var(--primary); background: #f0f9ff; box-shadow: inset 0 0 0 1px var(--primary); }
+        .plan-card i { font-size: 20px; color: var(--primary); margin-bottom: 6px; }
+        .plan-card span { display: block; font-size: 0.75rem; font-weight: bold; color: #334155; }
 
-        #detail-view { margin-top: 20px; padding: 15px; background: #fafafa; border: 1px dashed var(--primary); border-radius: 8px; display: none; }
-        
+        #detail-view { margin-top: 25px; padding: 15px; border-left: 5px solid var(--primary); background: #f8fafc; border-radius: 8px; display: none; }
+
         @media (max-width: 600px) {
             .result-grid { grid-template-columns: repeat(2, 1fr); }
             .plan-grid { grid-template-columns: repeat(2, 1fr); }
-            .chart-section { min-height: 240px; }
+            .chart-section { min-height: 240px; } /* 手機圖表高度 */
         }
     </style>
 </head>
@@ -58,11 +61,11 @@
 
     <div class="control-group">
         <div class="gender-selector">
-            <button class="gender-btn active" onclick="setGender('male', this)">男性</button>
-            <button class="gender-btn" onclick="setGender('female', this)">女性</button>
+            <button class="gender-btn active" onclick="setGender('male', this)">男性觀點</button>
+            <button class="gender-btn" onclick="setGender('female', this)">女性觀點</button>
         </div>
         <div class="age-control">
-            <span>年齡</span>
+            <span>您的年齡</span>
             <input type="number" id="ageInput" value="30" min="30" max="64" oninput="updateAge('input')">
             <input type="range" id="ageSlider" min="30" max="64" value="30" oninput="updateAge('slider')">
         </div>
@@ -80,15 +83,15 @@
     </div>
 
     <div class="result-grid">
-        <div class="result-item highlight"><div class="label">目前年齡</div><div id="curAge" class="value" style="color:var(--primary)">30</div></div>
+        <div class="result-item highlight age-box"><div class="label">目前年齡</div><div id="curAge" class="value">30</div></div>
         <div class="result-item"><div class="label">首年費用</div><div id="firstYear" class="value">-</div></div>
         <div class="result-item"><div class="label">續年費用</div><div id="secondYear" class="value">-</div></div>
         <div class="result-item"><div class="label">10年總計</div><div id="total10" class="value">-</div></div>
         <div class="result-item"><div class="label">20年總計</div><div id="total20" class="value">-</div></div>
-        <div class="result-item" style="grid-column: span 1;"><div class="label">30年總計(至<span id="endAge">60</span>歲)</div><div id="total30" class="value">-</div></div>
+        <div class="result-item"><div class="label">30年總計 (至 <span id="endAge">60</span> 歲)</div><div id="total30" class="value">-</div></div>
     </div>
 
-    <h3 style="text-align:center; font-size:1rem; margin-bottom:15px;">年度 8 擇 1 精準篩檢方案</h3>
+    <h3 style="text-align:center; font-size:1rem; color:var(--primary); margin-bottom:15px;">年度 8 擇 1 精準篩檢方案</h3>
     <div class="plan-grid">
         <div class="plan-card" onclick="selectPlan(0, this)"><i class="fa-solid fa-dna"></i><span>CTC 循環</span></div>
         <div class="plan-card" onclick="selectPlan(1, this)"><i class="fa-solid fa-shield-virus"></i><span>肝甲狀腺</span></div>
@@ -101,9 +104,9 @@
     </div>
 
     <div id="detail-view">
-        <div id="pTitle" style="font-weight:bold; color:var(--primary); margin-bottom:5px;"></div>
-        <div id="pDesc" style="font-size:0.9rem; margin-bottom:5px;"></div>
-        <div id="pMethod" style="color:#d9534f; font-weight:bold; font-size:0.85rem;"></div>
+        <div id="pTitle" style="font-weight:bold; color:var(--primary); font-size:1.1rem; margin-bottom:5px;"></div>
+        <div id="pDesc" style="font-size:0.95rem; line-height:1.5; margin-bottom:8px; color:#475569;"></div>
+        <div id="pMethod" style="color:#d9534f; font-weight:bold; font-size:0.9rem;"></div>
     </div>
 </div>
 
@@ -112,7 +115,7 @@
     let sChart, cChart;
     Chart.register(ChartDataLabels);
 
-    // 【內容恢復】原始 8 個方案內容
+    // 【100% 內容恢復】方案詳情
     const plans = [
         { t: "CTC 循環腫瘤細胞檢測", d: "透過液體活檢捕捉血液中微小癌細胞病灶。", m: "檢測方式：抽血 10ml" },
         { t: "肝與甲狀腺深度檢測", d: "針對高壓族群常見的代謝與內分泌系統篩查。", m: "檢測方式：超音波 + 血液指標" },
@@ -124,7 +127,7 @@
         { t: "腦部與神經功能篩查", d: "針對中高齡族群預防早發型神經病變。", m: "檢測方式：功能性評估" }
     ];
 
-    // 【內容恢復】原始保費階梯資料
+    // 【100% 內容恢復】保費資料
     const data = {
         male: { first: {30:8464, 45:10199, 60:14175}, renew: {30:8563, 45:10878, 60:16180, 75:23153} },
         female: { first: {30:8696, 45:10688, 60:12184}, renew: {30:8872, 45:11529, 60:13524, 75:15865} }
@@ -144,7 +147,6 @@
         render();
     }
 
-    // 【邏輯恢復】正確的階梯費率抓取
     function getRate(g, age, isFirst) {
         const set = isFirst ? data[g].first : data[g].renew;
         const keys = Object.keys(set).map(Number).sort((a,b)=>b-a);
@@ -173,7 +175,7 @@
     }
 
     function updateCharts() {
-        // 【內容恢復】完整十大癌症數據
+        // 【100% 內容恢復】完整十大癌症數據
         const cData = gender === 'male' ? [15, 14, 12, 10, 9, 8, 7, 6, 5, 4] : [25, 12, 11, 10, 8, 7, 6, 5, 4, 3];
         const cLabels = gender === 'male' ? ['大腸癌','肺癌','肝癌','口腔癌','攝護腺癌','食道癌','胃癌','皮膚癌','淋巴癌','膀胱癌'] : ['乳癌','大腸癌','肺癌','甲狀腺癌','子宮癌','肝癌','卵巢癌','皮膚癌','胃癌','淋巴癌'];
         cChart.data.labels = cLabels;
@@ -192,34 +194,34 @@
     }
 
     window.onload = () => {
-        const commonOptions = {
+        const options = {
             responsive: true,
             maintainAspectRatio: false,
-            layout: { padding: 30 }, // 預留空間給外部標籤
+            layout: { padding: 35 }, // 核心：預留充足空間讓標籤外移不被切掉
             plugins: {
                 legend: { display: false },
                 datalabels: {
                     anchor: 'end', // 標籤在圓餅外
                     align: 'end',
-                    offset: 5,
-                    color: '#334155',
+                    offset: 8,
+                    color: '#475569',
                     font: { size: 10, weight: 'bold' },
                     formatter: (v, ctx) => ctx.chart.data.labels[ctx.dataIndex] + '\n' + v + '%',
-                    display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 4 // 數值太小就不顯示以免重疊
+                    display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 4 // 數值過小隱藏，防重疊
                 }
             }
         };
 
         sChart = new Chart(document.getElementById('survivalChart'), {
             type: 'doughnut',
-            data: { labels: ['早期(90%)', '晚期(15%)'], datasets: [{ data: [90, 15], backgroundColor: ['#28a745', '#dc3545'], borderWidth: 0 }] },
-            options: commonOptions
+            data: { labels: ['早期(90%)', '晚期(15%)'], datasets: [{ data: [90, 15], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }] },
+            options: options
         });
 
         cChart = new Chart(document.getElementById('cancerChart'), {
             type: 'pie',
             data: { labels: [], datasets: [{ data: [], backgroundColor: ['#003f5c','#2f4b7c','#665191','#a05195','#d45087','#f95d6a','#ff7c43','#ffa600','#488f31','#de425b'], borderWidth: 0 }] },
-            options: commonOptions
+            options: options
         });
         render();
     };
