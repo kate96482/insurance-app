@@ -21,35 +21,41 @@
 
         /* 試算卡片 */
         .result-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        @media (max-width: 600px) { .result-cards { grid-template-columns: repeat(3, 1fr); } } /* 手機版也維持3欄縮短長度 */
         .card { background: #fff; border: 1px solid #e1e8ed; padding: 8px 2px; border-radius: 6px; text-align: center; }
         .card .title { font-size: 0.75rem; color: #777; }
         .card .value { font-size: 0.9rem; font-weight: bold; color: var(--accent-red); }
 
-        /* 圖表水平並排關鍵：手機版也並排 */
+        /* 圖表框架修正 */
         .chart-wrapper { 
             display: flex; 
-            flex-direction: row; /* 強制水平 */
+            flex-direction: row; 
             gap: 10px; 
             margin: 15px 0; 
             justify-content: space-between;
         }
         .chart-box { 
             flex: 1; 
-            width: 48%; /* 兩張圖各佔約一半 */
+            width: 48%; 
             background: #fff; 
-            padding: 8px; 
+            padding: 5px; /* 縮減內邊距降低高度 */
             border-radius: 8px; 
             border: 1px solid #eee;
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
-        .chart-label { font-size: 0.8rem; font-weight: bold; color: var(--primary-blue); text-align: center; margin-bottom: 5px; height: 32px; overflow: hidden; }
+        .chart-label { font-size: 0.85rem; font-weight: bold; color: var(--primary-blue); text-align: center; margin-bottom: 5px; }
         .chart-container { 
             position: relative; 
             width: 100%; 
-            aspect-ratio: 1 / 1; /* 固定正方形比例，防止亂動 */
+            /* 固定比例是防止亂動的關鍵 */
+            aspect-ratio: 1 / 1.1; 
+        }
+
+        /* 響應式微調：電腦版字體放大 */
+        @media (min-width: 768px) {
+            .chart-label { font-size: 1.1rem; }
+            .card .title { font-size: 0.9rem; }
+            .card .value { font-size: 1.2rem; }
         }
 
         .benefit-section { background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #eee; margin: 15px 0; }
@@ -58,7 +64,6 @@
 
         /* 8個方案 */
         .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        @media (max-width: 600px) { .grid-container { grid-template-columns: repeat(4, 1fr); } } /* 方案也變4欄縮短長度 */
         .plan-item { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 8px 2px; text-align: center; cursor: pointer; }
         .plan-item i { font-size: 18px; color: var(--primary-blue); margin-bottom: 4px; display: block; }
         .plan-item span { font-size: 0.7rem; font-weight: bold; display: block; white-space: nowrap; overflow: hidden; }
@@ -107,7 +112,7 @@
                     <div class="chart-container"><canvas id="survivalChart"></canvas></div>
                 </div>
                 <div class="chart-box">
-                    <div class="chart-label" id="cancerChartTitle">十大癌症分佈</div>
+                    <div class="chart-label" id="cancerChartTitle">男十大癌</div>
                     <div class="chart-container"><canvas id="cancerChart"></canvas></div>
                 </div>
             </div>
@@ -165,7 +170,11 @@
         }
 
         function initCharts() {
-            // 縮小圖表配置，讓標籤在小空間內也能顯示
+            // 關鍵：根據螢幕寬度動態設定字體大小
+            const isMobile = window.innerWidth < 768;
+            const labelFontSize = isMobile ? 8 : 14;
+            const boxSize = isMobile ? 8 : 15;
+
             const commonOpt = {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -174,18 +183,20 @@
                         display: true,
                         position: 'bottom',
                         labels: { 
-                            boxWidth: 8, 
-                            font: { size: 8 }, // 縮小文字
-                            padding: 4
+                            boxWidth: boxSize, 
+                            font: { size: labelFontSize }, 
+                            padding: isMobile ? 4 : 10
                         }
                     }
                 }
             };
+
             survivalChart = new Chart(document.getElementById('survivalChart').getContext('2d'), {
                 type: 'doughnut',
                 data: { labels: ['早期(90%)', '晚期(20%)'], datasets: [{ data: [90, 20], backgroundColor: ['#28a745', '#dc3545'] }] },
                 options: commonOpt
             });
+
             cancerChart = new Chart(document.getElementById('cancerChart').getContext('2d'), {
                 type: 'pie',
                 data: getCancerData('male'),
@@ -254,6 +265,8 @@
         }
 
         window.onload = () => { initCharts(); calculate(); };
+        // 當視窗縮放時重新初始化圖表字體大小
+        window.onresize = () => { initCharts(); };
     </script>
 </body>
 </html>
