@@ -10,57 +10,39 @@
         :root { --primary-blue: #005a92; --bg-gray: #f4f7f9; --accent-red: #d9534f; }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg-gray); padding: 15px; }
-
         .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        
-        /* 僅新增返回連結樣式 */
         .back-link { text-decoration: none; color: #888; font-size: 14px; margin-bottom: 15px; display: inline-block; }
-
         h2 { color: var(--primary-blue); text-align: center; margin-bottom: 20px; }
-
         .control-group { background: #fff; border: 2px solid var(--primary-blue); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
         .gender-selector { display: flex; gap: 10px; margin-bottom: 15px; }
         .gender-btn { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #f8f9fa; cursor: pointer; font-weight: bold; }
         .gender-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
-
         .age-control { display: flex; align-items: center; gap: 15px; background: #eef6fb; padding: 10px; border-radius: 8px; }
         .age-control input[type="number"] { width: 60px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; }
         .age-control input[type="range"] { flex: 1; cursor: pointer; }
-
         .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
         .result-item { background: #fff; border: 1px solid #e1e8ed; padding: 12px; border-radius: 8px; text-align: center; }
         .result-item .label { font-size: 0.85rem; color: #777; margin-bottom: 5px; }
         .result-item .value { font-size: 1.1rem; color: var(--accent-red); font-weight: bold; }
-
         .chart-section { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .chart-container { background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; position: relative; height: 250px; }
+        .chart-container { background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; position: relative; height: 300px; }
         .chart-title { font-size: 0.9rem; font-weight: bold; color: var(--primary-blue); text-align: center; margin-bottom: 5px; }
-
         .info-box { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 20px; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .info-item { font-size: 0.85rem; border-left: 3px solid var(--primary-blue); padding-left: 8px; }
-
         .plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .plan-card { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px 5px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .plan-card { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px 5px; text-align: center; cursor: pointer; }
         .plan-card.active { border: 1px solid var(--primary-blue); background: #eef6fb; }
         .plan-card i { font-size: 20px; color: var(--primary-blue); margin-bottom: 5px; }
         .plan-card span { display: block; font-size: 0.75rem; font-weight: bold; }
-
         #detail-view { margin-top: 15px; padding: 15px; background: #fafafa; border: 1px dashed var(--primary-blue); border-radius: 8px; display: none; }
-
-        @media (max-width: 600px) {
-            .chart-section { grid-template-columns: 1fr; height: auto; }
-            .plan-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+        @media (max-width: 600px) { .chart-section { grid-template-columns: 1fr; height: auto; } .plan-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
-
 <div class="container">
     <a href="index.html" class="back-link"><i class="fa-solid fa-chevron-left"></i> 返回主選單</a>
-
     <h2>防癌無憂即時試算</h2>
-
     <div class="control-group">
         <div class="gender-selector">
             <button class="gender-btn active" onclick="setGender('male', this)">男性</button>
@@ -72,35 +54,19 @@
             <input type="range" id="ageSlider" min="30" max="64" value="30" oninput="updateAge('slider')">
         </div>
     </div>
-
     <div class="result-grid">
+        <div class="result-item" style="border: 1px solid var(--primary-blue); background: #f0f7ff;"><div class="label">目前年齡</div><div id="currentAgeDisplay" class="value" style="color: var(--primary-blue);">30</div></div>
         <div class="result-item"><div class="label">首年費用</div><div id="firstYear" class="value">-</div></div>
         <div class="result-item"><div class="label">續年費用</div><div id="secondYear" class="value">-</div></div>
         <div class="result-item"><div class="label">10年總計</div><div id="total10" class="value">-</div></div>
         <div class="result-item"><div class="label">20年總計</div><div id="total20" class="value">-</div></div>
         <div class="result-item" style="grid-column: span 2;"><div class="label">30年總計 (至 <span id="endAge">60</span> 歲)</div><div id="total30" class="value">-</div></div>
     </div>
-
     <div class="chart-section">
-        <div class="chart-container">
-            <div class="chart-title">存活率關鍵對比</div>
-            <canvas id="survivalChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <div class="chart-title" id="cancerTitle">男性前十大癌症</div>
-            <canvas id="cancerChart"></canvas>
-        </div>
+        <div class="chart-container"><div class="chart-title">存活率關鍵對比</div><canvas id="survivalChart"></canvas></div>
+        <div class="chart-container"><div class="chart-title" id="cancerTitle">男性前十大癌症</div><canvas id="cancerChart"></canvas></div>
     </div>
-
-    <div class="info-box">
-        <div class="info-grid">
-            <div class="info-item">早期治癒率達 90%+</div>
-            <div class="info-item">避免家庭債務黑洞</div>
-            <div class="info-item">由治療轉向精準篩檢</div>
-            <div class="info-item">保障應花在刀口上</div>
-        </div>
-    </div>
-
+    <div class="info-box"><div class="info-grid"><div class="info-item">早期治癒率達 90%+</div><div class="info-item">避免家庭債務黑洞</div><div class="info-item">由治療轉向精準篩檢</div><div class="info-item">保障應花在刀口上</div></div></div>
     <h3 style="text-align:center; font-size:1rem; margin-bottom:15px;">年度 8 擇 1 精準篩檢方案</h3>
     <div class="plan-grid">
         <div class="plan-card" onclick="selectPlan(0, this)"><i class="fa-solid fa-dna"></i><span>CTC 循環</span></div>
@@ -112,14 +78,12 @@
         <div class="plan-card" onclick="selectPlan(6, this)"><i class="fa-solid fa-heart-pulse"></i><span>癌心血管</span></div>
         <div class="plan-card" onclick="selectPlan(7, this)"><i class="fa-solid fa-brain"></i><span>腦部神經</span></div>
     </div>
-
     <div id="detail-view">
         <div id="pTitle" style="font-weight:bold; color:var(--primary-blue); margin-bottom:5px;"></div>
         <div id="pDesc" style="font-size:0.9rem; margin-bottom:5px;"></div>
         <div id="pMethod" style="color:var(--accent-red); font-weight:bold; font-size:0.85rem;"></div>
     </div>
 </div>
-
 <script>
     let gender = 'male';
     let sChart, cChart;
@@ -133,12 +97,10 @@
         { t: "綜合癌症與心血管風險", d: "同時評估癌症指標與心血管硬化風險。", m: "檢測方式：抽血檢測" },
         { t: "腦部與神經功能篩查", d: "針對中高齡族群預防早發型神經病變。", m: "檢測方式：認知功能測試" }
     ];
-
     const data = {
         male: { first: {30:8464, 45:10199, 60:14175}, renew: {30:8563, 45:10878, 60:16180, 75:23153} },
         female: { first: {30:8696, 45:10688, 60:12184}, renew: {30:8872, 45:11529, 60:13524, 75:15865} }
     };
-
     function setGender(g, btn) {
         gender = g;
         document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
@@ -146,27 +108,24 @@
         document.getElementById('cancerTitle').innerText = (g === 'male' ? '男' : '女') + '性前十大癌症';
         render();
     }
-
     function updateAge(type) {
         const i = document.getElementById('ageInput'), s = document.getElementById('ageSlider');
         if(type === 'input') s.value = i.value; else i.value = s.value;
         render();
     }
-
     function getRate(g, age, isFirst) {
         const set = isFirst ? data[g].first : data[g].renew;
         const keys = Object.keys(set).map(Number).sort((a,b)=>b-a);
         for(let k of keys) { if(age >= k) return set[k]; }
         return set[30];
     }
-
     function render() {
         const age = parseInt(document.getElementById('ageInput').value);
+        document.getElementById('currentAgeDisplay').innerText = age;
         const f = getRate(gender, age, true);
         document.getElementById('firstYear').innerText = '$' + f.toLocaleString();
         document.getElementById('secondYear').innerText = '$' + getRate(gender, age+1, false).toLocaleString();
         document.getElementById('endAge').innerText = age + 30;
-
         let t10=0, t20=0, t30=0;
         for(let i=0; i<30; i++){
             let cur = age + i; if(cur > 75) break;
@@ -178,19 +137,13 @@
         document.getElementById('total30').innerText = '$' + t30.toLocaleString();
         updateCharts();
     }
-
     function updateCharts() {
-        const cData = gender === 'male' ? 
-            [15, 14, 12, 10, 9, 8, 7, 6, 5, 4] : [25, 12, 11, 10, 8, 7, 6, 5, 4, 3];
-        const cLabels = gender === 'male' ? 
-            ['大腸', '肺', '肝', '口腔', '攝護腺', '食道', '胃', '皮膚', '淋巴', '膀胱'] : 
-            ['乳癌', '大腸', '肺', '甲狀腺', '子宮', '肝', '卵巢', '皮膚', '胃', '淋巴'];
-        
+        const cData = gender === 'male' ? [15, 14, 12, 10, 9, 8, 7, 6, 5, 4] : [25, 12, 11, 10, 8, 7, 6, 5, 4, 3];
+        const cLabels = gender === 'male' ? ['大腸癌','肺癌','肝癌','口腔癌','攝護腺癌','食道癌','胃癌','皮膚癌','淋巴癌','膀胱癌'] : ['乳癌','大腸癌','肺癌','甲狀腺癌','子宮癌','肝癌','卵巢癌','皮膚癌','胃癌','淋巴癌'];
         cChart.data.labels = cLabels;
         cChart.data.datasets[0].data = cData;
         cChart.update();
     }
-
     function selectPlan(idx, el) {
         document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
@@ -200,17 +153,16 @@
         document.getElementById('pDesc').innerText = plans[idx].d;
         document.getElementById('pMethod').innerText = plans[idx].m;
     }
-
     window.onload = () => {
         sChart = new Chart(document.getElementById('survivalChart'), {
             type: 'doughnut',
-            data: { labels: ['早期(90%)', '晚期(20%)'], datasets: [{ data: [90, 20], backgroundColor: ['#28a745', '#dc3545'] }] },
-            options: { responsive: true, maintainAspectRatio: false }
+            data: { labels: ['早期(90%)', '晚期(10%)'], datasets: [{ data: [90, 10], backgroundColor: ['#28a745', '#dc3545'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
         });
         cChart = new Chart(document.getElementById('cancerChart'), {
             type: 'pie',
             data: { labels: [], datasets: [{ data: [], backgroundColor: ['#003f5c','#2f4b7c','#665191','#a05195','#d45087','#f95d6a','#ff7c43','#ffa600','#488f31','#de425b'] }] },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } } }
         });
         render();
     };
