@@ -230,7 +230,7 @@
                         weight: 'bold' 
                     },
                     formatter: (v, ctx) => {
-                        if (isMobile && v < 5) return '';
+                        if (isMobile && v < 7) return '';
                         return ctx.chart.data.labels[ctx.dataIndex] + '\n' + v + '%';
                     }
                 }
@@ -253,5 +253,6 @@
 </script>
 </body>
 </html>
+
 
 
