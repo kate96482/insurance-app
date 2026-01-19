@@ -42,9 +42,13 @@
 
         .age-stack { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
         .age-stack input[type="number"] { width: 100%; text-align: center; border: 1px solid #ccc; border-radius: 4px; padding: 4px; font-weight: bold; }
+        
+        /* 修正處：確保滑桿是水平的 */
         .age-stack input[type="range"] { 
-            appearance: slider-vertical; -webkit-appearance: slider-vertical; 
-            width: 12px; height: 100%; background: #ddd; cursor: pointer; 
+            width: 100%; 
+            height: auto; 
+            cursor: pointer; 
+            margin-top: 5px;
         }
 
         .right-stats { flex: 2; display: flex; flex-direction: column; gap: 6px; }
@@ -74,7 +78,6 @@
 
         @media (max-width: 500px) {
             .calc-dashboard { flex-direction: column; }
-            .age-stack input[type="range"] { appearance: auto; -webkit-appearance: slider-horizontal; width: 100%; height: auto; }
         }
     </style>
 </head>
