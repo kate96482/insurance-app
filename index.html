@@ -3,59 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小邦手</title>
+    <title>小邦手-專業響應版</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary-blue: #005a92; --bg-gray: #f4f7f9; --accent-red: #d9534f; }
-        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg-gray); padding-bottom: 80px; }
+        :root { 
+            --primary-blue: #005a92; 
+            --bg-gray: #f4f7f9; 
+            --accent-red: #d9534f; 
+        }
         
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 9999; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; cursor: pointer; font-size: 12px; }
-        .nav-item.active { color: var(--primary-blue); font-weight: bold; }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        /* 基礎字體設定：隨螢幕調整 */
+        body { 
+            margin: 0; 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            background: var(--bg-gray); 
+            padding-bottom: 80px; 
+            font-size: 16px; /* 電腦版基礎字體 */
+        }
+        
+        @media (max-width: 768px) {
+            body { font-size: 14px; } /* 手機版基礎字體 */
+        }
 
-        .page { display: none; padding: 10px; animation: fadeIn 0.3s ease; }
+        /* 底部導覽 */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 9999; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; cursor: pointer; font-size: 14px; }
+        .nav-item.active { color: var(--primary-blue); font-weight: bold; }
+        .nav-item i { font-size: 22px; margin-bottom: 4px; }
+
+        .page { display: none; padding: 20px 10px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h2 { color: var(--primary-blue); text-align: center; margin: 10px 0; font-size: 18px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h2 { color: var(--primary-blue); text-align: center; margin: 15px 0; font-size: 1.5rem; }
+        h3 { font-size: 1.2rem; }
         
-        /* 強制水平並排圖表 */
-        .chart-wrapper { display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin: 15px 0; gap: 5px; }
-        .chart-box { width: 49%; height: 220px; position: relative; }
-        .chart-label { font-size: 10px; font-weight: bold; color: var(--primary-blue); text-align: center; height: 30px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+        /* 圖表響應式 */
+        .chart-wrapper { display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin: 20px 0; gap: 15px; }
+        .chart-box { width: 49%; height: 300px; position: relative; }
+        @media (max-width: 480px) { .chart-box { height: 220px; } }
+        .chart-label { font-size: 1rem; font-weight: bold; color: var(--primary-blue); text-align: center; height: 40px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
 
-        .input-group { background: #eef6fb; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 14px; }
-        .result-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; }
-        .card { background: #fff; border: 1px solid #e1e8ed; padding: 8px 2px; border-radius: 6px; text-align: center; }
-        .card .title { font-size: 10px; color: #777; }
-        .card .value { font-size: 13px; font-weight: bold; color: var(--accent-red); }
+        /* 輸入與結果 */
+        .input-group { background: #eef6fb; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 1.1rem; }
+        .input-group select, .input-group input { font-size: 1.1rem; padding: 5px; }
+        
+        .result-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .card { background: #fff; border: 1px solid #e1e8ed; padding: 15px 5px; border-radius: 8px; text-align: center; }
+        .card .title { font-size: 0.9rem; color: #777; margin-bottom: 5px; }
+        .card .value { font-size: 1.2rem; font-weight: bold; color: var(--accent-red); }
 
         /* 健檢好處區塊 */
-        .benefit-section { background: #fff; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px solid #eee; }
-        .benefit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .benefit-item { font-size: 11px; line-height: 1.4; border-left: 3px solid var(--primary-blue); padding-left: 8px; }
-        .benefit-title { font-weight: bold; color: var(--primary-blue); margin-bottom: 2px; }
+        .benefit-section { background: #fff; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #eee; }
+        .benefit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        @media (max-width: 600px) { .benefit-grid { grid-template-columns: 1fr; } }
+        .benefit-item { font-size: 1rem; line-height: 1.6; border-left: 4px solid var(--primary-blue); padding-left: 12px; }
+        .benefit-title { font-weight: bold; color: var(--primary-blue); margin-bottom: 4px; font-size: 1.1rem; }
 
-        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .plan-item { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px 2px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .plan-item i { display: block; font-size: 16px; color: var(--primary-blue); margin-bottom: 4px; }
-        .plan-item span { font-size: 9px; font-weight: bold; display: block; }
-        .plan-item.active { border-color: var(--primary-blue); background: #eef6fb; }
+        /* 方案格線 */
+        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        @media (max-width: 600px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
+        .plan-item { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px 5px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .plan-item i { display: block; font-size: 24px; color: var(--primary-blue); margin-bottom: 8px; }
+        .plan-item span { font-size: 1rem; font-weight: bold; display: block; }
+        .plan-item.active { border-color: var(--primary-blue); background: #eef6fb; box-shadow: 0 4px 10px rgba(0,90,146,0.1); }
         
-        #detail-panel { margin-top: 15px; padding: 12px; background: #fafafa; border: 1px dashed var(--primary-blue); border-radius: 8px; display: none; font-size: 13px; }
+        #detail-panel { margin-top: 20px; padding: 20px; background: #fafafa; border: 1px dashed var(--primary-blue); border-radius: 8px; display: none; font-size: 1.1rem; line-height: 1.6; }
     </style>
 </head>
 <body>
 
     <div id="home-page" class="page">
         <h2 style="margin-top:50px;">INS_box 工具箱</h2>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
-            <div class="card" style="padding:20px;" onclick="switchPage('calc-page', document.querySelector('.nav-item:nth-child(2)'))">
-                <i class="fa-solid fa-calculator" style="font-size:30px; color:var(--primary-blue);"></i>
-                <p>防癌試算</p>
+        <div style="max-width: 600px; margin: auto; padding:20px;">
+            <div class="card" style="padding:40px; cursor:pointer;" onclick="switchPage('calc-page', document.querySelector('.nav-item:nth-child(2)'))">
+                <i class="fa-solid fa-calculator" style="font-size:50px; color:var(--primary-blue); margin-bottom:15px;"></i>
+                <p style="font-size:1.5rem; font-weight:bold;">防癌試算</p>
             </div>
         </div>
     </div>
@@ -69,8 +94,8 @@
                     <option value="male">男性</option>
                     <option value="female">女性</option>
                 </select>
-                <input type="number" id="ageInput" value="30" min="30" max="64" oninput="syncAge('input')" style="width:45px;"> 歲
-                <input type="range" id="ageSlider" min="30" max="64" value="30" oninput="syncAge('slider')" style="width: 100px; vertical-align: middle;">
+                <input type="number" id="ageInput" value="30" min="30" max="64" oninput="syncAge('input')" style="width:60px;"> 歲
+                <input type="range" id="ageSlider" min="30" max="64" value="30" oninput="syncAge('slider')" style="width: 150px; vertical-align: middle; margin-left: 10px;">
             </div>
 
             <div class="result-cards">
@@ -112,10 +137,10 @@
                         依據風險數據調整保障，讓每分錢都花在刀口。
                     </div>
                 </div>
-                <p style="font-size: 10px; color: #999; margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;">* 附註：數據參考衛生福利部癌症登記報告及各大醫學中心統計資料。</p>
+                <p style="font-size: 0.9rem; color: #999; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">* 附註：數據參考衛生福利部癌症登記報告及各大醫學中心統計資料。</p>
             </div>
 
-            <h3 style="font-size:15px;">年度 8 擇 1 精準篩檢</h3>
+            <h3 style="text-align:center; margin: 30px 0 20px;">年度 8 擇 1 精準篩檢</h3>
             <div class="grid-container">
                 <div class="plan-item" onclick="showDetail(0, this)"><i class="fa-solid fa-dna"></i><span>CTC 循環</span></div>
                 <div class="plan-item" onclick="showDetail(1, this)"><i class="fa-solid fa-shield-virus"></i><span>肝甲狀腺</span></div>
@@ -128,8 +153,8 @@
             </div>
             
             <div id="detail-panel">
-                <div id="detTitle" style="font-weight:bold; color:var(--primary-blue);"></div>
-                <div id="detBody" style="margin:5px 0;"></div>
+                <div id="detTitle" style="font-weight:bold; color:var(--primary-blue); font-size:1.3rem; margin-bottom:10px;"></div>
+                <div id="detBody" style="margin-bottom:10px;"></div>
                 <div id="detMethod" style="color:var(--accent-red); font-weight:bold;"></div>
             </div>
         </div>
@@ -166,7 +191,14 @@
                 responsive: true, 
                 maintainAspectRatio: false, 
                 plugins: { 
-                    legend: { position: 'bottom', labels: { boxWidth: 5, font: { size: 7 }, padding: 5 } } 
+                    legend: { 
+                        position: 'bottom', 
+                        labels: { 
+                            boxWidth: 12, 
+                            font: { size: window.innerWidth > 768 ? 12 : 8 }, 
+                            padding: 10 
+                        } 
+                    } 
                 } 
             };
             survivalChart = new Chart(document.getElementById('survivalChart').getContext('2d'), {
