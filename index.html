@@ -114,7 +114,7 @@
                     <div class="chart-container"><canvas id="survivalChart"></canvas></div>
                 </div>
                 <div class="chart-box">
-                    <div class="chart-label" id="cancerChartTitle">男十大癌</div>
+                    <div class="chart-label" id="cancerChartTitle">男性前十大癌症</div>
                     <div class="chart-container"><canvas id="cancerChart"></canvas></div>
                 </div>
             </div>
@@ -132,8 +132,8 @@
             <div class="grid-container">
                 <div class="plan-item" onclick="showDetail(0, this)"><i class="fa-solid fa-dna"></i><span>CTC 循環</span></div>
                 <div class="plan-item" onclick="showDetail(1, this)"><i class="fa-solid fa-shield-virus"></i><span>肝甲狀腺</span></div>
-                <div class="plan-item" onclick="showDetail(2, this)"><i class="fa-solid fa-mars"></i><span>男十大癌</span></div>
-                <div class="plan-item" onclick="showDetail(3, this)"><i class="fa-solid fa-venus"></i><span>女十大癌</span></div>
+                <div class="plan-item" onclick="showDetail(2, this)"><i class="fa-solid fa-mars"></i><span>男性前十大癌症</span></div>
+                <div class="plan-item" onclick="showDetail(3, this)"><i class="fa-solid fa-venus"></i><span>女性前十大癌症</span></div>
                 <div class="plan-item" onclick="showDetail(4, this)"><i class="fa-solid fa-eye"></i><span>特殊癌</span></div>
                 <div class="plan-item" onclick="showDetail(5, this)"><i class="fa-solid fa-magnifying-glass-plus"></i><span>隱匿危機</span></div>
                 <div class="plan-item" onclick="showDetail(6, this)"><i class="fa-solid fa-heart-pulse"></i><span>癌心血管</span></div>
@@ -211,7 +211,7 @@
         function getCancerData(gender) {
             if (gender === 'male') {
                 return {
-                    labels: ['大腸', '肺癌', '肝癌', '口腔', '攝護腺', '食道', '胃癌', '皮膚', '淋巴', '膀胱'],
+                    labels: ['大腸癌', '肺癌', '肝癌', '口腔', '攝護腺', '食道癌', '胃癌', '皮膚癌', '淋巴癌', '膀胱癌'],
                     datasets: [{
                         data: [15, 14, 12, 10, 9, 8, 7, 6, 5, 4],
                         backgroundColor: ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#f95d6a', '#ff7c43', '#ffa600', '#488f31', '#de425b']
@@ -219,7 +219,7 @@
                 };
             } else {
                 return {
-                    labels: ['乳癌', '大腸', '肺癌', '甲狀腺', '子宮', '肝癌', '卵巢', '皮膚', '胃癌', '淋巴'],
+                    labels: ['乳癌', '大腸癌', '肺癌', '甲狀腺癌', '子宮癌', '肝癌', '卵巢癌', '皮膚癌', '胃癌', '淋巴癌'],
                     datasets: [{
                         data: [25, 12, 11, 10, 8, 7, 6, 5, 4, 3],
                         backgroundColor: ['#d9534f', '#e57373', '#ef9a9a', '#f48fb1', '#ce93d8', '#b2dfdb', '#81c784', '#fff176', '#ffb74d', '#a1887f']
@@ -236,7 +236,7 @@
         function calculate() {
             const g = document.getElementById('gender').value, a = parseInt(document.getElementById('ageInput').value);
             document.getElementById('resAge').innerText = a;
-            document.getElementById('cancerChartTitle').innerText = (g === 'male' ? '男' : '女') + '十大癌';
+            document.getElementById('cancerChartTitle').innerText = (g === 'male' ? '男' : '女') + '性前十大癌症';
             
             if(cancerChart) {
                 cancerChart.data = getCancerData(g); 
@@ -278,3 +278,4 @@
     </script>
 </body>
 </html>
+
