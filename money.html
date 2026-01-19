@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>現代馬卡龍貸款試算 - 決策助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bright-blue: #4CC9F0;
+            --bright-pink: #F72585;
+            --m-purple: #7209B7;
+            --soft-mint: #B5EAD7;
+            --soft-yellow: #FCF6BD;
+            --text-dark: #2B2D42;
+            --bg: #F8F9FA;
+        }
+
+        body { 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            background: var(--bg); 
+            color: var(--text-dark); 
+            margin: 0; padding: 10px;
+        }
+
+        .back-home {
+            display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
+            color: var(--m-purple); font-weight: bold; font-size: 0.9rem; margin-bottom: 10px;
+            padding: 5px 12px; border-radius: 20px; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .calc-container { 
+            max-width: 600px; margin: auto; background: white; 
+            padding: clamp(15px, 4vw, 25px); border-radius: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
+
+        h2 { color: var(--m-purple); text-align: center; margin: 5px 0 15px 0; font-size: 1.4rem; }
+
+        .type-tabs { 
+            display: flex; background: #F1F3F5; padding: 5px; border-radius: 15px; margin-bottom: 20px; 
+        }
+        .tab { 
+            flex: 1; padding: 10px 2px; text-align: center; border-radius: 10px; 
+            cursor: pointer; font-weight: 800; font-size: 0.85rem; transition: 0.3s; color: #ADB5BD;
+        }
+        .tab.active { background: #FFFFFF; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        #tab-personal.active { color: var(--bright-pink); }
+        #tab-mortgage.active { color: var(--bright-blue); }
+        #tab-revolving.active { color: var(--m-purple); }
+
+        .amt-section { 
+            background: var(--soft-yellow); padding: 20px; border-radius: 20px; 
+            margin-bottom: 20px; border: 1px solid #EEE;
+        }
+        .amt-label-row { display: flex; justify-content: space-between; align-items: center; }
+        .amt-input-big { 
+            width: 120px; padding: 5px; font-size: 1.5rem; font-weight: 900; 
+            border: 2px solid var(--bright-blue); border-radius: 12px; text-align: center; color: var(--bright-blue);
+        }
+
+        .input-row { 
+            margin-bottom: 12px; padding: 12px; background: #F8F9FA; border-radius: 15px; 
+        }
+        .val-display { color: var(--bright-pink); font-weight: 800; }
+
+        input[type=range] { width: 100%; height: 8px; appearance: none; background: #DEE2E6; border-radius: 10px; margin-top: 15px; }
+        input[type=range]::-webkit-slider-thumb { appearance: none; height: 20px; width: 20px; background: #FFF; border: 3px solid var(--bright-blue); border-radius: 50%; }
+
+        .rate-config { background: var(--soft-mint); padding: 15px; border-radius: 15px; font-size: 0.9rem; }
+        .step-row { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+        .step-row input { width: 50px; text-align: center; border-radius: 5px; border: 1px solid #ddd; }
+
+        .summary-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
+        .summary-item { padding: 12px 5px; border-radius: 15px; text-align: center; color: white; }
+        .summary-item span { display: block; font-size: 0.7rem; opacity: 0.9; }
+        .summary-item strong { font-size: 0.9rem; }
+
+        .table-wrapper { margin-top: 20px; overflow-x: auto; border-radius: 15px; border: 1px solid #EEE; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; font-size: 0.85rem; }
+        thead { background: var(--text-dark); color: white; }
+        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #F1F3F5; }
+        .last-row { background: var(--soft-mint); font-weight: bold; }
+
+        .form-section { display: none; }
+        .form-section.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="back-home"><i class="fa-solid fa-house"></i> 返回首頁</a>
+
+<div class="calc-container">
+    <h2><i class="fa-solid fa-calculator"></i> 貸款試算工具</h2>
+    
+    <div class="type-tabs">
+        <div class="tab active" onclick="setMode('mortgage')" id="tab-mortgage">一般房貸</div>
+        <div class="tab" onclick="setMode('personal')" id="tab-personal">信用貸款</div>
+        <div class="tab" onclick="setMode('revolving')" id="tab-revolving">理財型房貸</div>
+    </div>
+
+    <div class="amt-section">
+        <div class="amt-label-row">
+            <span style="font-weight:900">貸款金額 (萬)</span>
+            <input type="number" id="amtInp" class="amt-input-big" value="500" oninput="sync('amt')">
+        </div>
+        <input type="range" id="amtSld" min="10" max="5000" step="10" value="500" oninput="sync('amt')">
+    </div>
+
+    <div id="mortgage-options" class="form-section active">
+        <div class="input-row">
+            <div style="display:flex; justify-content:space-between">
+                <label>貸款年期</label><span class="val-display" id="mYearTxt">30 年</span>
+            </div>
+            <input type="range" id="mYearSld" min="10" max="40" value="30" oninput="updateAll()">
+        </div>
+        <div class="input-row">
+            <div style="display:flex; justify-content:space-between">
+                <label>寬限期 (年)</label><span class="val-display" id="graceTxt">0 年</span>
+            </div>
+            <input type="range" id="graceSld" min="0" max="5" value="0" oninput="updateAll()">
+        </div>
+        <div class="rate-config">
+            <label style="font-weight:bold"><input type="checkbox" id="isMultiStep" onchange="toggleRateUI()"> 啟用分段式利率</label>
+            <div id="singleRateUI" style="margin-top:10px">
+                年利率：<input type="number" id="baseRate" value="2.185" step="0.001" style="width:70px" oninput="updateAll()"> %
+            </div>
+            <div id="multiRateUI" style="display:none; margin-top:10px">
+                <div id="stepContainer">
+                    <div class="step-row">
+                        第 1 年至 <input type="number" class="step-end" value="2" oninput="updateAll()"> 年：利率 <input type="number" class="step-rate" value="2.06" step="0.01" oninput="updateAll()"> %
+                    </div>
+                </div>
+                <button onclick="addStep()" style="font-size:0.7rem; cursor:pointer">+ 新增分段</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="personal-options" class="form-section">
+        <div class="input-row">
+            <div style="display:flex; justify-content:space-between">
+                <label>借款年期</label><span class="val-display" id="pYearTxt">7 年</span>
+            </div>
+            <input type="range" id="pYearSld" min="1" max="7" value="7" oninput="updateAll()">
+        </div>
+        <div class="input-row">
+            <div style="display:flex; justify-content:space-between">
+                <label>年利率 (%)</label>
+                <input type="number" id="pRateInp" value="2.5" step="0.1" style="width:60px" oninput="sync('pRate')">
+            </div>
+            <input type="range" id="pRateSld" min="1" max="15" step="0.1" value="2.5" oninput="sync('pRate')">
+        </div>
+    </div>
+
+    <div id="revolving-options" class="form-section">
+        <div class="input-row" style="background:var(--soft-mint)">
+            <p style="font-size:0.8rem; margin:0 0 10px 0">理財型房貸為隨借隨還，按日計息。</p>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+                <label>年利率 (%)</label>
+                <input type="number" id="rRateInp" value="2.5" step="0.1" style="width:60px" oninput="sync('rRate')">
+            </div>
+            <input type="range" id="rRateSld" min="1" max="10" step="0.1" value="2.5" oninput="sync('rRate')">
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-item" style="background:var(--bright-blue)"><span>首期月付</span><strong id="resFirstPmt">0</strong></div>
+        <div class="summary-item" style="background:var(--bright-pink)"><span>總利息</span><strong id="resTotalInt">0</strong></div>
+        <div class="summary-item" style="background:var(--m-purple)"><span>本利總和</span><strong id="resTotalAll">0</strong></div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>期數</th><th>本金</th><th>利息</th><th>月付額</th><th>剩餘本金</th></tr>
+            </thead>
+            <tbody id="detailBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let currentMode = 'mortgage';
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + mode).classList.add('active');
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(mode + '-options').classList.add('active');
+        updateAll();
+    }
+
+    function sync(type) {
+        const inp = document.getElementById(type + 'Inp'), sld = document.getElementById(type + 'Sld');
+        if(event.target.type === 'range') inp.value = sld.value; else sld.value = inp.value;
+        updateAll();
+    }
+
+    function toggleRateUI() {
+        const isMulti = document.getElementById('isMultiStep').checked;
+        document.getElementById('singleRateUI').style.display = isMulti ? 'none' : 'block';
+        document.getElementById('multiRateUI').style.display = isMulti ? 'block' : 'none';
+        updateAll();
+    }
+
+    function addStep() {
+        const container = document.getElementById('stepContainer');
+        const lastYear = parseInt(container.querySelector('.step-row:last-child .step-end').value);
+        const div = document.createElement('div');
+        div.className = 'step-row';
+        div.innerHTML = `第 ${lastYear + 1} 年至 <input type="number" class="step-end" value="${lastYear + 5}" oninput="updateAll()"> 年：利率 <input type="number" class="step-rate" value="2.3" step="0.01" oninput="updateAll()"> % <button onclick="this.parentElement.remove();updateAll();">x</button>`;
+        container.appendChild(div);
+        updateAll();
+    }
+
+    function updateAll() {
+        if(currentMode === 'mortgage') {
+            document.getElementById('mYearTxt').innerText = document.getElementById('mYearSld').value + " 年";
+            document.getElementById('graceTxt').innerText = document.getElementById('graceSld').value + " 年";
+        } else if(currentMode === 'personal') {
+            document.getElementById('pYearTxt').innerText = document.getElementById('pYearSld').value + " 年";
+        }
+        calculate();
+    }
+
+    function calculate() {
+        const principal = Math.round(parseFloat(document.getElementById('amtInp').value) * 10000);
+        if (isNaN(principal) || principal <= 0) return;
+
+        if(currentMode === 'revolving') {
+            const rRate = parseFloat(document.getElementById('rRateInp').value) / 100 / 365;
+            const dailyInt = Math.round(principal * rRate);
+            document.getElementById('resFirstPmt').innerText = "NT$" + (dailyInt * 30).toLocaleString();
+            document.getElementById('resTotalInt').innerText = "日計息";
+            document.getElementById('resTotalAll').innerText = "隨借隨還";
+            document.getElementById('detailBody').innerHTML = "<tr><td colspan='5'>理財型房貸按日計息，借多少算多少。</td></tr>";
+            return;
+        }
+
+        let years = (currentMode === 'mortgage') ? parseInt(document.getElementById('mYearSld').value) : parseInt(document.getElementById('pYearSld').value);
+        let graceMonths = (currentMode === 'mortgage') ? parseInt(document.getElementById('graceSld').value) * 12 : 0;
+        const totalMonths = years * 12;
+
+        let balance = principal;
+        let html = '';
+        let totalInt = 0;
+
+        for (let m = 1; m <= totalMonths; m++) {
+            let rate = (currentMode === 'mortgage') ? parseFloat(document.getElementById('baseRate').value) : parseFloat(document.getElementById('pRateInp').value);
+            
+            // 分段利率邏輯
+            if (currentMode === 'mortgage' && document.getElementById('isMultiStep').checked) {
+                const steps = document.querySelectorAll('.step-row');
+                for (let s of steps) {
+                    if (m <= parseInt(s.querySelector('.step-end').value) * 12) {
+                        rate = parseFloat(s.querySelector('.step-rate').value);
+                        break;
+                    }
+                }
+            }
+
+            let monthlyRate = rate / 100 / 12;
+            let interest = Math.round(balance * monthlyRate);
+            let pRepaid = 0;
+            let pmt = 0;
+
+            if (m <= graceMonths) {
+                pmt = interest;
+            } else {
+                let remM = totalMonths - m + 1;
+                pmt = Math.round((balance * monthlyRate * Math.pow(1+monthlyRate, remM)) / (Math.pow(1+monthlyRate, remM) - 1));
+                pRepaid = pmt - interest;
+            }
+
+            if (m === totalMonths) { pRepaid = balance; pmt = pRepaid + interest; balance = 0; }
+            else { balance -= pRepaid; }
+
+            totalInt += interest;
+            if(m === 1) document.getElementById('resFirstPmt').innerText = pmt.toLocaleString();
+
+            // 只顯示前 24 期與最後一期，避免 DOM 過大
+            if (m <= 24 || m === totalMonths) {
+                html += `<tr class="${m === totalMonths ? 'last-row' : ''}"><td>${m}</td><td>${pRepaid.toLocaleString()}</td><td>${interest.toLocaleString()}</td><td>${pmt.toLocaleString()}</td><td>${Math.max(0, balance).toLocaleString()}</td></tr>`;
+            } else if (m === 25) {
+                html += `<tr><td colspan="5">...... 中略 ......</td></tr>`;
+            }
+        }
+
+        document.getElementById('resTotalInt').innerText = totalInt.toLocaleString();
+        document.getElementById('resTotalAll').innerText = (principal + totalInt).toLocaleString();
+        document.getElementById('detailBody').innerHTML = html;
+    }
+
+    window.onload = updateAll;
+</script>
+</body>
+</html>
