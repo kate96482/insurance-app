@@ -25,19 +25,21 @@
         .card .title { font-size: 0.75rem; color: #777; }
         .card .value { font-size: 0.9rem; font-weight: bold; color: var(--accent-red); }
 
-        /* 圖表框架修正 */
+        /* 圖表框架修正：加入最大寬度與置中 */
         .chart-wrapper { 
             display: flex; 
             flex-direction: row; 
             gap: 10px; 
-            margin: 15px 0; 
-            justify-content: space-between;
+            margin: 15px auto; 
+            justify-content: center; 
+            max-width: 100%;
         }
         .chart-box { 
             flex: 1; 
+            max-width: 300px; /* 限制電腦版最大寬度 */
             width: 48%; 
             background: #fff; 
-            padding: 5px; /* 縮減內邊距降低高度 */
+            padding: 5px; 
             border-radius: 8px; 
             border: 1px solid #eee;
             display: flex;
@@ -47,12 +49,12 @@
         .chart-container { 
             position: relative; 
             width: 100%; 
-            /* 固定比例是防止亂動的關鍵 */
             aspect-ratio: 1 / 1.1; 
         }
 
-        /* 響應式微調：電腦版字體放大 */
+        /* 響應式微調 */
         @media (min-width: 768px) {
+            .chart-wrapper { max-width: 700px; } /* 限制整體容器寬度 */
             .chart-label { font-size: 1.1rem; }
             .card .title { font-size: 0.9rem; }
             .card .value { font-size: 1.2rem; }
@@ -170,7 +172,6 @@
         }
 
         function initCharts() {
-            // 關鍵：根據螢幕寬度動態設定字體大小
             const isMobile = window.innerWidth < 768;
             const labelFontSize = isMobile ? 8 : 14;
             const boxSize = isMobile ? 8 : 15;
@@ -191,6 +192,9 @@
                 }
             };
 
+            if(survivalChart) survivalChart.destroy();
+            if(cancerChart) cancerChart.destroy();
+
             survivalChart = new Chart(document.getElementById('survivalChart').getContext('2d'), {
                 type: 'doughnut',
                 data: { labels: ['早期(90%)', '晚期(20%)'], datasets: [{ data: [90, 20], backgroundColor: ['#28a745', '#dc3545'] }] },
@@ -199,7 +203,7 @@
 
             cancerChart = new Chart(document.getElementById('cancerChart').getContext('2d'), {
                 type: 'pie',
-                data: getCancerData('male'),
+                data: getCancerData(document.getElementById('gender').value),
                 options: commonOpt
             });
         }
@@ -233,7 +237,12 @@
             const g = document.getElementById('gender').value, a = parseInt(document.getElementById('ageInput').value);
             document.getElementById('resAge').innerText = a;
             document.getElementById('cancerChartTitle').innerText = (g === 'male' ? '男' : '女') + '十大癌';
-            cancerChart.data = getCancerData(g); cancerChart.update();
+            
+            if(cancerChart) {
+                cancerChart.data = getCancerData(g); 
+                cancerChart.update();
+            }
+
             const getR = (gen, age, isF) => { const t = isF ? rates[gen].first : rates[gen].renew; const keys = Object.keys(t).map(Number).sort((x,y)=>y-x); for(let k of keys) { if(age>=k) return t[k]; } return t[30]; };
             const f = getR(g, a, true);
             document.getElementById('firstYear').innerText = "$" + f.toLocaleString();
@@ -265,7 +274,6 @@
         }
 
         window.onload = () => { initCharts(); calculate(); };
-        // 當視窗縮放時重新初始化圖表字體大小
         window.onresize = () => { initCharts(); };
     </script>
 </body>
