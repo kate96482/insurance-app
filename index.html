@@ -7,10 +7,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary-blue: #005a92; --bg-gray: #f4f7f9; }
+        :root { --primary-blue: #005a92; --bg-gray: #f4f7f9; --accent-red: #d9534f; }
         body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg-gray); padding-bottom: 80px; }
         
-        /* 底部導覽 */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 9999; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; cursor: pointer; font-size: 12px; }
         .nav-item.active { color: var(--primary-blue); font-weight: bold; }
@@ -23,28 +22,36 @@
         .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         h2 { color: var(--primary-blue); text-align: center; margin: 10px 0; font-size: 18px; }
         
-        /* 圖表並排區 */
-        .chart-wrapper { display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin: 15px 0; }
-        .chart-box { width: 48%; height: 280px; position: relative; }
-        .chart-label { font-size: 11px; font-weight: bold; color: var(--primary-blue); text-align: center; height: 35px; display: flex; align-items: center; justify-content: center; }
+        /* 強制水平並排圖表 */
+        .chart-wrapper { display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin: 15px 0; gap: 5px; }
+        .chart-box { width: 49%; height: 220px; position: relative; }
+        .chart-label { font-size: 10px; font-weight: bold; color: var(--primary-blue); text-align: center; height: 30px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
 
-        /* 輸入與結果 */
         .input-group { background: #eef6fb; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 14px; }
         .result-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; }
         .card { background: #fff; border: 1px solid #e1e8ed; padding: 8px 2px; border-radius: 6px; text-align: center; }
         .card .title { font-size: 10px; color: #777; }
-        .card .value { font-size: 13px; font-weight: bold; color: #d9534f; }
+        .card .value { font-size: 13px; font-weight: bold; color: var(--accent-red); }
+
+        /* 健檢好處區塊 */
+        .benefit-section { background: #fff; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px solid #eee; }
+        .benefit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .benefit-item { font-size: 11px; line-height: 1.4; border-left: 3px solid var(--primary-blue); padding-left: 8px; }
+        .benefit-title { font-weight: bold; color: var(--primary-blue); margin-bottom: 2px; }
 
         .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .plan-item { background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 8px 2px; text-align: center; cursor: pointer; font-size: 10px; }
+        .plan-item { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px 2px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .plan-item i { display: block; font-size: 16px; color: var(--primary-blue); margin-bottom: 4px; }
+        .plan-item span { font-size: 9px; font-weight: bold; display: block; }
         .plan-item.active { border-color: var(--primary-blue); background: #eef6fb; }
+        
         #detail-panel { margin-top: 15px; padding: 12px; background: #fafafa; border: 1px dashed var(--primary-blue); border-radius: 8px; display: none; font-size: 13px; }
     </style>
 </head>
 <body>
 
     <div id="home-page" class="page">
-        <h2 style="margin-top:50px;">INS_box</h2>
+        <h2 style="margin-top:50px;">INS_box 工具箱</h2>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:20px;">
             <div class="card" style="padding:20px;" onclick="switchPage('calc-page', document.querySelector('.nav-item:nth-child(2)'))">
                 <i class="fa-solid fa-calculator" style="font-size:30px; color:var(--primary-blue);"></i>
@@ -56,16 +63,17 @@
     <div id="calc-page" class="page active">
         <div class="container">
             <h2>防癌無憂即時試算</h2>
+            
             <div class="input-group">
                 <select id="gender" onchange="calculate()">
                     <option value="male">男性</option>
                     <option value="female">女性</option>
                 </select>
                 <input type="number" id="ageInput" value="30" min="30" max="64" oninput="syncAge('input')" style="width:45px;"> 歲
-                <input type="range" id="ageSlider" min="30" max="64" value="30" oninput="syncAge('slider')">
+                <input type="range" id="ageSlider" min="30" max="64" value="30" oninput="syncAge('slider')" style="width: 100px; vertical-align: middle;">
             </div>
 
-            <div class="result-cards" id="resBoard">
+            <div class="result-cards">
                 <div class="card"><div class="title">保險年齡</div><div id="resAge" class="value">30</div></div>
                 <div class="card"><div class="title">首年保費</div><div id="firstYear" class="value">-</div></div>
                 <div class="card"><div class="title">續年保費</div><div id="secondYear" class="value">-</div></div>
@@ -85,18 +93,45 @@
                 </div>
             </div>
 
+            <div class="benefit-section">
+                <div class="benefit-grid">
+                    <div class="benefit-item">
+                        <div class="benefit-title">搶佔黃金期</div>
+                        早期發現原位癌，治癒率可高達 90% 以上。
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-title">守護家庭資產</div>
+                        避免一人罹癌，導致全家陷入長期債務黑洞。
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-title">掌握主動權</div>
+                        從被動治療轉為主動篩檢，擊碎潛伏的健康威脅。
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-title">精準醫療配置</div>
+                        依據風險數據調整保障，讓每分錢都花在刀口。
+                    </div>
+                </div>
+                <p style="font-size: 10px; color: #999; margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;">* 附註：數據參考衛生福利部癌症登記報告及各大醫學中心統計資料。</p>
+            </div>
+
             <h3 style="font-size:15px;">年度 8 擇 1 精準篩檢</h3>
             <div class="grid-container">
-                <div class="plan-item" onclick="showDetail(0, this)">CTC 循環腫瘤</div>
-                <div class="plan-item" onclick="showDetail(1, this)">肝與甲狀腺</div>
-                <div class="plan-item" onclick="showDetail(2, this)">男十大癌症</div>
-                <div class="plan-item" onclick="showDetail(3, this)">女十大癌症</div>
-                <div class="plan-item" onclick="showDetail(4, this)">特殊癌警示</div>
-                <div class="plan-item" onclick="showDetail(5, this)">隱匿危機癌</div>
-                <div class="plan-item" onclick="showDetail(6, this)">癌與心血管</div>
-                <div class="plan-item" onclick="showDetail(7, this)">腦神經功能</div>
+                <div class="plan-item" onclick="showDetail(0, this)"><i class="fa-solid fa-dna"></i><span>CTC 循環</span></div>
+                <div class="plan-item" onclick="showDetail(1, this)"><i class="fa-solid fa-shield-virus"></i><span>肝甲狀腺</span></div>
+                <div class="plan-item" onclick="showDetail(2, this)"><i class="fa-solid fa-mars"></i><span>男十大癌</span></div>
+                <div class="plan-item" onclick="showDetail(3, this)"><i class="fa-solid fa-venus"></i><span>女十大癌</span></div>
+                <div class="plan-item" onclick="showDetail(4, this)"><i class="fa-solid fa-eye"></i><span>特殊癌預警</span></div>
+                <div class="plan-item" onclick="showDetail(5, this)"><i class="fa-solid fa-magnifying-glass-plus"></i><span>隱匿危機</span></div>
+                <div class="plan-item" onclick="showDetail(6, this)"><i class="fa-solid fa-heart-pulse"></i><span>癌心血管</span></div>
+                <div class="plan-item" onclick="showDetail(7, this)"><i class="fa-solid fa-brain"></i><span>腦部神經</span></div>
             </div>
-            <div id="detail-panel"><div id="detTitle" style="font-weight:bold; color:var(--primary-blue);"></div><div id="detBody"></div><div id="detMethod" style="color:#d9534f; font-weight:bold; margin-top:5px;"></div></div>
+            
+            <div id="detail-panel">
+                <div id="detTitle" style="font-weight:bold; color:var(--primary-blue);"></div>
+                <div id="detBody" style="margin:5px 0;"></div>
+                <div id="detMethod" style="color:var(--accent-red); font-weight:bold;"></div>
+            </div>
         </div>
     </div>
 
@@ -110,12 +145,12 @@
         const planDetails = [
             { title: "CTC 循環腫瘤細胞檢測", body: "捕捉血液中脫離組織的腫瘤細胞，比影像檢查更能早期發現微小病灶。", method: "方式：抽血 10ml。" },
             { title: "肝與甲狀腺深度檢測", body: "針對高壓、熬夜引起代謝問題，透過精密超音波預防病變。", method: "方式：超音波 + 血液分析。" },
-            { title: "男性十大癌症基因風險", body: "檢測肺癌、肝癌、大腸癌等遺傳變異。", method: "方式：口腔抹片。" },
-            { title: "女性十大癌症基因風險", body: "針對乳腺癌、卵巢癌等基因篩查。", method: "方式：口腔抹片。" },
+            { title: "男性十大癌症基因風險", body: "檢測肺癌、肝癌、大腸癌等遺傳變異，掌握先天致癌機率。", method: "方式：口腔抹片。" },
+            { title: "女性十大癌症基因風險", body: "針對乳腺癌、卵巢癌等基因篩查，精準掌握變異風險。", method: "方式：口腔抹片。" },
             { title: "特殊癌症早期警示", body: "針對胰臟癌、膽囊癌等早期症狀不明顯之癌症。", method: "方式：血液精密定序。" },
-            { title: "隱匿危機癌症監測", body: "偵測體內長期的潛伏性病變，適合有家族史者。", method: "方式：全身癌症指標組合。" },
-            { title: "綜合癌症與心血管風險", body: "同時涵蓋癌症風險與血管硬化基因。", method: "方式：抽血檢測。" },
-            { title: "腦部與神經功能篩查", body: "評估腦部血液循環與神經退化指標。", method: "方式：認知測試 + 指標。" }
+            { title: "隱匿危機癌症監測", body: "偵測體內長期的潛伏性病變，適合有家族史者追蹤。", method: "方式：全身癌症指標組合。" },
+            { title: "綜合癌症與心血管風險", body: "同時涵蓋癌症風險與血管硬化基因，全面評估健康。", method: "方式：抽血檢測。" },
+            { title: "腦部與神經功能篩查", body: "評估腦部血液循環與神經退化指標，預防早發失智。", method: "方式：認知測試 + 指標。" }
         ];
 
         function switchPage(pageId, element) {
@@ -127,10 +162,16 @@
         }
 
         function initCharts() {
-            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 6, font: { size: 8 } } } } };
+            const opt = { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { position: 'bottom', labels: { boxWidth: 5, font: { size: 7 }, padding: 5 } } 
+                } 
+            };
             survivalChart = new Chart(document.getElementById('survivalChart').getContext('2d'), {
                 type: 'doughnut',
-                data: { labels: ['早期(90%)', '晚期(20%)'], datasets: [{ data: [90, 20], backgroundColor: ['#28a745', '#dc3545'] }] },
+                data: { labels: ['早期(90%)', '晚期(20%)'], datasets: [{ data: [90, 20], backgroundColor: ['#28a745', '#dc3545'], borderWidth: 1 }] },
                 options: opt
             });
             cancerChart = new Chart(document.getElementById('cancerChart').getContext('2d'), {
@@ -140,7 +181,6 @@
             });
         }
 
-        // 完整恢復十大癌症數據
         function getCancerData(gender) {
             if (gender === 'male') {
                 return {
