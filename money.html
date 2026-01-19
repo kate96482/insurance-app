@@ -281,7 +281,7 @@
             if(m === 1) document.getElementById('resFirstPmt').innerText = pmt.toLocaleString();
 
             // 只顯示前 24 期與最後一期，避免 DOM 過大
-            if (m <= 24 || m === totalMonths) {
+            if (m <= 120 || m === totalMonths) {
                 html += `<tr class="${m === totalMonths ? 'last-row' : ''}"><td>${m}</td><td>${pRepaid.toLocaleString()}</td><td>${interest.toLocaleString()}</td><td>${pmt.toLocaleString()}</td><td>${Math.max(0, balance).toLocaleString()}</td></tr>`;
             } else if (m === 25) {
                 html += `<tr><td colspan="5">...... 中略 ......</td></tr>`;
@@ -298,3 +298,4 @@
 </body>
 
 </html>
+
