@@ -3,52 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>防癌試算 - 最終適配版</title>
+    <title>防癌試算 - 圖表縮小完整版</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --primary: #005a92; --bg: #f4f7f9; }
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 10px; }
-        .container { max-width: 850px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
-        
-        h2 { color: var(--primary); text-align: center; margin: 5px 0 15px; font-size: 1.3rem; }
+        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 8px; }
+        .container { max-width: 850px; margin: auto; background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
+        h2 { color: var(--primary); text-align: center; margin: 5px 0 12px; font-size: 1.15rem; }
 
-        /* 控制區 */
-        .control-group { background: #fff; border: 2px solid var(--primary); padding: 12px; border-radius: 10px; margin-bottom: 15px; }
-        .gender-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+        .control-group { background: #fff; border: 2px solid var(--primary); padding: 10px; border-radius: 10px; margin-bottom: 12px; }
+        .gender-selector { display: flex; gap: 8px; margin-bottom: 10px; }
         .gender-btn { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f8fafc; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
         .gender-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .age-control { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
-        #ageInput { width: 55px; padding: 5px; text-align: center; border: 1px solid var(--primary); border-radius: 4px; font-weight: bold; }
+        #ageInput { width: 50px; padding: 4px; text-align: center; border: 1.5px solid var(--primary); border-radius: 4px; font-weight: bold; }
         #ageSlider { flex: 1; accent-color: var(--primary); }
 
-        /* 圖表區：解決高度過高與並排問題 */
-        .chart-section { display: flex; gap: 8px; margin-bottom: 20px; }
-        .chart-card { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 0; background: #fff; min-width: 0; display: flex; flex-direction: column; height: 260px; /* 電腦版高度 */ }
-        .chart-title { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 5px; }
-        .chart-wrapper { flex: 1; position: relative; width: 100%; height: 100%; overflow: visible; }
+        /* 圖表區：固定高度，溢出顯示 */
+        .chart-section { display: flex; gap: 6px; margin-bottom: 12px; overflow: hidden; }
+        .chart-card { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 5px 0; background: #fff; min-width: 0; display: flex; flex-direction: column; height: 220px; }
+        .chart-title { font-size: 0.8rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 2px; }
+        .chart-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
 
         /* 數據格 */
-        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
-        .result-item { background: #fff; border: 1px solid #cbd5e1; padding: 8px 2px; border-radius: 8px; text-align: center; }
-        .result-item .label { font-size: 0.7rem; color: #64748b; margin-bottom: 3px; }
-        .result-item .value { font-size: 0.95rem; color: #d9534f; font-weight: 800; }
+        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px; }
+        .result-item { background: #fff; border: 1px solid #cbd5e1; padding: 6px 2px; border-radius: 8px; text-align: center; }
+        .result-item .label { font-size: 0.65rem; color: #64748b; margin-bottom: 2px; }
+        .result-item .value { font-size: 0.85rem; color: #d9534f; font-weight: 800; }
         .result-item.highlight { border: 1.5px solid var(--primary); background: #f0f9ff; }
 
         /* 方案按鈕 */
-        .plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .plan-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 2px; text-align: center; cursor: pointer; }
+        .plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .plan-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 2px; text-align: center; cursor: pointer; }
         .plan-card.active { border: 2px solid var(--primary); background: #f0f9ff; }
-        .plan-card i { font-size: 18px; color: var(--primary); margin-bottom: 4px; }
-        .plan-card span { display: block; font-size: 0.7rem; font-weight: bold; }
+        .plan-card i { font-size: 16px; color: var(--primary); margin-bottom: 2px; }
+        .plan-card span { display: block; font-size: 0.65rem; font-weight: bold; }
 
-        #detail-view { margin-top: 15px; padding: 12px; border-left: 4px solid var(--primary); background: #f8fafc; border-radius: 6px; display: none; font-size: 0.9rem; }
+        #detail-view { margin-top: 12px; padding: 10px; border-left: 4px solid var(--primary); background: #f8fafc; display: none; font-size: 0.85rem; }
 
-        /* 手機專屬微調 */
         @media (max-width: 600px) {
-            .chart-card { height: 180px; } /* 強制縮短手機圖表高度 */
+            .chart-card { height: 150px; } /* 手機高度進一步縮減 */
             .result-grid { grid-template-columns: repeat(2, 1fr); }
             .plan-grid { grid-template-columns: repeat(2, 1fr); }
         }
@@ -58,14 +55,13 @@
 
 <div class="container">
     <h2>防癌無憂即時試算</h2>
-
     <div class="control-group">
         <div class="gender-selector">
             <button class="gender-btn active" onclick="setGender('male', this)">男性觀點</button>
             <button class="gender-btn" onclick="setGender('female', this)">女性觀點</button>
         </div>
         <div class="age-control">
-            <span>您的年齡</span>
+            <span>年齡</span>
             <input type="number" id="ageInput" value="30" min="30" max="64" oninput="updateAge('input')">
             <input type="range" id="ageSlider" min="30" max="64" value="30" oninput="updateAge('slider')">
         </div>
@@ -88,7 +84,7 @@
         <div class="result-item"><div class="label">續年費用</div><div id="secondYear" class="value">-</div></div>
         <div class="result-item"><div class="label">10年總計</div><div id="total10" class="value">-</div></div>
         <div class="result-item"><div class="label">20年總計</div><div id="total20" class="value">-</div></div>
-        <div class="result-item"><div class="label">至 <span id="endAge">60</span> 歲總計</div><div id="total30" class="value">-</div></div>
+        <div class="result-item"><div class="label">累計至 75 歲止</div><div id="totalToMax" class="value">-</div></div>
     </div>
 
     <div class="plan-grid">
@@ -104,7 +100,7 @@
 
     <div id="detail-view">
         <div id="pTitle" style="font-weight:bold; color:var(--primary);"></div>
-        <div id="pDesc" style="margin:5px 0;"></div>
+        <div id="pDesc" style="margin:5px 0; line-height:1.4;"></div>
         <div id="pMethod" style="color:#d9534f; font-weight:bold;"></div>
     </div>
 </div>
@@ -156,18 +152,20 @@
         document.getElementById('curAge').innerText = age;
         const f = getRate(gender, age, true);
         document.getElementById('firstYear').innerText = '$' + f.toLocaleString();
-        document.getElementById('secondYear').innerText = '$' + getRate(gender, age+1, false).toLocaleString();
-        document.getElementById('endAge').innerText = age + 30;
+        document.getElementById('secondYear').innerText = '$' + getRate(gender, Math.min(age+1, 75), false).toLocaleString();
 
-        let t10=0, t20=0, t30=0;
-        for(let i=0; i<30; i++){
-            let cur = age + i; if(cur > 85) break;
+        let t10=0, t20=0, tMax=0;
+        for(let i=0; i<=45; i++){
+            let cur = age + i; 
+            if(cur > 75) break; 
             let p = (i===0) ? f : getRate(gender, cur, false);
-            if(i < 10) t10 += p; if(i < 20) t20 += p; if(i < 30) t30 += p;
+            if(i < 10) t10 += p;
+            if(i < 20) t20 += p;
+            tMax += p;
         }
         document.getElementById('total10').innerText = '$' + t10.toLocaleString();
         document.getElementById('total20').innerText = '$' + t20.toLocaleString();
-        document.getElementById('total30').innerText = '$' + t30.toLocaleString();
+        document.getElementById('totalToMax').innerText = '$' + tMax.toLocaleString();
         updateCharts();
     }
 
@@ -190,22 +188,31 @@
     }
 
     window.onload = () => {
-        // 核心設定：根據螢幕寬度調整
         const isMobile = window.innerWidth < 600;
-        const options = {
+        const commonOptions = {
             responsive: true,
             maintainAspectRatio: false,
-            layout: { padding: isMobile ? 20 : 35 }, // 手機版減少內邊距防溢出
+            // 核心：關鍵就在縮小圓餅半徑，留出空間給文字
+            radius: isMobile ? '60%' : '75%', 
+            layout: { 
+                padding: isMobile ? 25 : 35 
+            },
             plugins: {
                 legend: { display: false },
                 datalabels: {
                     anchor: 'end',
                     align: 'end',
-                    offset: isMobile ? 2 : 8, // 手機版縮短距離防止切到
-                    color: '#475569',
-                    font: { size: isMobile ? 9 : 10, weight: 'bold' },
-                    formatter: (v, ctx) => ctx.chart.data.labels[ctx.dataIndex] + '\n' + v + '%',
-                    display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 6 // 手機版僅顯示較大比例，防重疊
+                    offset: isMobile ? 2 : 8,
+                    color: '#444',
+                    font: { 
+                        size: isMobile ? 9 : 10, 
+                        weight: 'bold' 
+                    },
+                    formatter: (v, ctx) => {
+                        // 手機版過小不顯示標籤，防止擠壓
+                        if (isMobile && v < 7) return '';
+                        return ctx.chart.data.labels[ctx.dataIndex] + '\n' + v + '%';
+                    }
                 }
             }
         };
@@ -213,13 +220,13 @@
         sChart = new Chart(document.getElementById('survivalChart'), {
             type: 'doughnut',
             data: { labels: ['早期(90%)', '晚期(15%)'], datasets: [{ data: [90, 15], backgroundColor: ['#28a745', '#dc3545'], borderWidth: 0 }] },
-            options: options
+            options: commonOptions
         });
 
         cChart = new Chart(document.getElementById('cancerChart'), {
             type: 'pie',
             data: { labels: [], datasets: [{ data: [], backgroundColor: ['#003f5c','#2f4b7c','#665191','#a05195','#d45087','#f95d6a','#ff7c43','#ffa600','#488f31','#de425b'], borderWidth: 0 }] },
-            options: options
+            options: commonOptions
         });
         render();
     };
