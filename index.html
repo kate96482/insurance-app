@@ -6,9 +6,10 @@
     <title>保險助手-離線版</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root { --primary-blue: #005a92; --bg-gray: #f4f7f9; }
-        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg-gray); padding-bottom: 70px; }
+        body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg-gray); padding-bottom: 80px; }
         
         /* 底部導覽列 */
         .bottom-nav {
@@ -23,40 +24,117 @@
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
 
         /* 頁面切換控制 */
-        .page { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+        .page { display: none; padding: 10px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 防癌試算專屬樣式 (保留你之前的設定) */
-        .container { max-width: 800px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        /* 防癌試算專屬樣式 (你要求的水平排列版型) */
+        .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h2 { color: var(--primary-blue); text-align: center; margin: 10px 0; font-size: 20px; }
+        .input-group { background: #eef6fb; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+        .control-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
+        .result-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; }
+        .card { background: #fff; border: 1px solid #e1e8ed; padding: 8px 2px; border-radius: 6px; text-align: center; }
+        .card .value { font-size: 14px; font-weight: bold; color: #d9534f; margin-top: 2px; }
+        
+        .promo-section { background: #fff; border-radius: 8px; padding: 15px; margin-top: 15px; border: 1px solid #eee; }
         .chart-wrapper { display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin-bottom: 15px; }
         .chart-box { width: 48%; height: 260px; position: relative; }
-        .result-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 15px; }
-        .card { background: #fff; border: 1px solid #eee; padding: 8px 2px; border-radius: 6px; text-align: center; }
-        .card .value { font-size: 14px; font-weight: bold; color: #d9534f; }
-        /* ...其餘樣式與之前一致... */
+        .chart-label { font-size: 11px; font-weight: bold; color: var(--primary-blue); text-align: center; margin-bottom: 5px; height: 35px; display: flex; align-items: center; justify-content: center; }
+        
+        .benefit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; border-top: 1px solid #f5f5f5; padding-top: 15px; }
+        .benefit-item { text-align: center; font-size: 11px; }
+        .benefit-title { font-weight: bold; margin-bottom: 3px; }
+
+        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+        .plan-item { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px 5px; text-align: center; cursor: pointer; font-size: 11px; }
+        .plan-item.active { border-color: var(--primary-blue); background: #eef6fb; }
+        
+        #detail-panel { margin-top: 15px; padding: 15px; background: #fafafa; border: 1px dashed var(--primary-blue); border-radius: 8px; display: none; }
     </style>
 </head>
 <body>
 
     <div id="home-page" class="page">
-        <h2 style="text-align:center; color:var(--primary-blue); margin-top:50px;">專業保險工具箱</h2>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:30px;">
-            <div class="card" style="padding:20px;" onclick="switchPage('calc-page', document.querySelector('.nav-item:nth-child(2)'))">
+        <h2 style="margin-top:50px;">保險專業工具箱</h2>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
+            <div class="card" style="padding:20px; cursor:pointer;" onclick="switchPage('calc-page', document.querySelector('.nav-item:nth-child(2)'))">
                 <i class="fa-solid fa-calculator" style="font-size:30px; color:var(--primary-blue);"></i>
                 <p>防癌試算</p>
             </div>
             <div class="card" style="padding:20px; opacity:0.5;">
                 <i class="fa-solid fa-lock" style="font-size:30px;"></i>
-                <p>敬請期待</p>
+                <p>預約開發</p>
             </div>
         </div>
     </div>
 
     <div id="calc-page" class="page active">
         <div class="container">
-            <h2 style="font-size:18px; text-align:center;">防癌無憂試算</h2>
+            <h2><i class="fa-solid fa-calculator"></i> 防癌無憂即時試算</h2>
+            
+            <div class="input-group">
+                <div class="control-row">
+                    <select id="gender" onchange="calculate()">
+                        <option value="male">男性</option>
+                        <option value="female">女性</option>
+                    </select>
+                    <input type="number" id="ageInput" value="30" min="30" max="64" oninput="syncAge('input')"> 歲
+                    <input type="range" id="ageSlider" min="30" max="64" value="30" oninput="syncAge('slider')" style="width:100px;">
+                </div>
             </div>
+
+            <div class="result-cards">
+                <div class="card"><div class="title">保險年齡</div><div id="resAge" class="value">30</div></div>
+                <div class="card"><div class="title">首年保費</div><div id="firstYear" class="value">-</div></div>
+                <div class="card"><div class="title">續年保費</div><div id="secondYear" class="value">-</div></div>
+                <div class="card"><div class="title">10年總繳</div><div id="accum10" class="value">-</div></div>
+                <div class="card"><div class="title">20年總繳</div><div id="accum20" class="value">-</div></div>
+                <div class="card"><div class="title">30年總繳</div><div id="accum30" class="value">-</div></div>
+            </div>
+
+            <div class="promo-section">
+                <div class="chart-wrapper">
+                    <div class="chart-box">
+                        <div class="chart-label">存活率對比<br>(早期 vs 晚期)</div>
+                        <canvas id="survivalChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-label" id="cancerChartTitle">男性十大癌症分佈</div>
+                        <canvas id="cancerChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="benefit-grid">
+                    <div class="benefit-item"><div class="benefit-title">搶佔黃金期</div>早期發現提升痊癒率</div>
+                    <div class="benefit-item"><div class="benefit-title">掌握主動權</div>主動篩檢擊碎威脅</div>
+                    <div class="benefit-item"><div class="benefit-title">守護資產</div>避免一人病全家窮</div>
+                </div>
+            </div>
+
+            <h3>年度 8 擇 1 方案</h3>
+            <div class="grid-container">
+                <div class="plan-item" onclick="showDetail(0, this)">CTC 循環腫瘤</div>
+                <div class="plan-item" onclick="showDetail(1, this)">肝與甲狀腺</div>
+                <div class="plan-item" onclick="showDetail(2, this)">男十大癌症</div>
+                <div class="plan-item" onclick="showDetail(3, this)">女十大癌症</div>
+                <div class="plan-item" onclick="showDetail(4, this)">特殊癌警示</div>
+                <div class="plan-item" onclick="showDetail(5, this)">隱匿危機癌</div>
+                <div class="plan-item" onclick="showDetail(6, this)">癌與心血管</div>
+                <div class="plan-item" onclick="showDetail(7, this)">腦神經功能</div>
+            </div>
+
+            <div id="detail-panel">
+                <div id="detTitle" style="font-weight:bold; color:var(--primary-blue);"></div>
+                <div id="detBody" style="font-size:13px; margin-top:5px;"></div>
+                <div id="detMethod" style="font-size:12px; color:#d9534f; margin-top:5px; font-weight:bold;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-page" class="page">
+        <h2 style="margin-top:50px;">設定</h2>
+        <p style="text-align:center;">版本：1.0.0 (離線支援)</p>
     </div>
 
     <nav class="bottom-nav">
@@ -67,19 +145,109 @@
             <i class="fa-solid fa-chart-pie"></i><span>防癌試算</span>
         </div>
         <div class="nav-item" onclick="switchPage('info-page', this)">
-            <i class="fa-solid fa-user"></i><span>個人設定</span>
+            <i class="fa-solid fa-user"></i><span>設定</span>
         </div>
     </nav>
 
     <script>
+        let survivalChart, cancerChart;
+        const planDetails = [
+            { title: "CTC 循環腫瘤細胞檢測", body: "捕捉血液中脫離組織的腫瘤細胞，比影像檢查更能早期發現微小病灶。", method: "檢測方式：抽血 10ml，無需空腹。" },
+            { title: "肝與甲狀腺深度檢測", body: "針對高壓、熬夜引起的代謝問題，透過精密超音波預防肝硬化與結節。", method: "檢測方式：超音波檢查 + 血液分析。" },
+            { title: "男性十大癌症基因風險", body: "檢測肺癌、肝癌、大腸癌等遺傳變異，掌握先天致癌機率。", method: "檢測方式：口腔抹片或採集唾液。" },
+            { title: "女性十大癌症基因風險", body: "針對乳腺癌、卵巢癌等基因篩查，精準掌握變異風險。", method: "檢測方式：口腔抹片或採集唾液。" },
+            { title: "特殊癌症早期警示", body: "針對胰臟癌、膽囊癌等早期症狀不明顯之癌症，利用腫瘤指標監控。", method: "檢測方式：血液精密定序檢測。" },
+            { title: "隱匿危機癌症監測", body: "偵測體內長期的潛伏性病變，適合有家族史者追蹤。", method: "檢測方式：全身癌症篩檢指標組合。" },
+            { title: "綜合癌症與心血管風險", body: "同時涵蓋癌症風險與血管硬化基因，全面評估健康威脅。", method: "檢測方式：抽血 + 遺傳標記檢測。" },
+            { title: "腦部與神經功能篩查", body: "評估腦部血液循環與神經退化指標，預防早發性失智。", method: "檢測方式：認知測試 + 腦血管健康指標。" }
+        ];
+
         function switchPage(pageId, element) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             element.classList.add('active');
-            if(pageId === 'calc-page') { /* 觸發圖表重繪防止跑版 */ }
+            // 切換頁面後重繪圖表，確保版型不縮水
+            if(pageId === 'calc-page' && cancerChart) {
+                setTimeout(() => {
+                    survivalChart.resize();
+                    cancerChart.resize();
+                }, 100);
+            }
         }
-        // ... 原本的 calculate, initCharts 邏輯 ...
+
+        function initCharts() {
+            const commonOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9 } } } } };
+            survivalChart = new Chart(document.getElementById('survivalChart').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: ['早期 (90%)', '晚期 (20%)'], datasets: [{ data: [90, 20], backgroundColor: ['#28a745', '#dc3545'], borderWidth: 1 }] },
+                options: commonOptions
+            });
+            cancerChart = new Chart(document.getElementById('cancerChart').getContext('2d'), {
+                type: 'pie',
+                data: getCancerData('male'),
+                options: commonOptions
+            });
+        }
+
+        function getCancerData(gender) {
+            if (gender === 'male') return { labels: ['大腸', '肺癌', '肝癌', '前列腺', '口腔', '其他'], datasets: [{ data: [15, 14, 12, 10, 8, 41], backgroundColor: ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#cbd5e0'] }] };
+            return { labels: ['乳癌', '肺癌', '大腸', '甲狀腺', '子宮', '其他'], datasets: [{ data: [25, 12, 11, 10, 8, 34], backgroundColor: ['#d9534f', '#e57373', '#ef9a9a', '#f48fb1', '#ce93d8', '#cbd5e0'] }] };
+        }
+
+        function calculate() {
+            const gender = document.getElementById('gender').value;
+            const age = parseInt(document.getElementById('ageInput').value);
+            document.getElementById('resAge').innerText = age;
+            document.getElementById('cancerChartTitle').innerText = (gender === 'male' ? '男性' : '女性') + '十大癌症分佈';
+            cancerChart.data = getCancerData(gender);
+            cancerChart.update();
+            // ... 這裡省略費率計算代碼以節省空間，請確保加入之前的 getRate 邏輯 ...
+            updateRates(gender, age); 
+        }
+
+        const rates = {
+            male: { first: { 30: 8464, 35: 8761, 40: 9321, 45: 10199, 50: 11290, 55: 12620, 60: 14175 }, renew: { 30: 8563, 35: 8960, 40: 9706, 45: 10878, 50: 12331, 55: 14105, 60: 16180, 65: 18263, 70: 20023, 75: 23153 } },
+            female: { first: { 30: 8696, 35: 9161, 40: 9805, 45: 10688, 50: 11238, 55: 11643, 60: 12184 }, renew: { 30: 8872, 35: 9494, 40: 10353, 45: 11529, 50: 12262, 55: 12803, 60: 13524, 65: 14244, 70: 14411, 75: 15865 } }
+        };
+
+        function updateRates(gender, age) {
+            function getR(g, a, isF) { 
+                const t = isF ? rates[g].first : rates[g].renew;
+                const keys = Object.keys(t).map(Number).sort((a,b)=>b-a);
+                for(let k of keys) { if(age>=k) return t[k]; }
+                return t[30];
+            }
+            const f = getR(gender, age, true);
+            document.getElementById('firstYear').innerText = "$" + f.toLocaleString();
+            document.getElementById('secondYear').innerText = "$" + getR(gender, age+1, false).toLocaleString();
+            let t10=0, t20=0, t30=0;
+            for(let i=0; i<30; i++) {
+                let cur = age+i; if(cur>75) break;
+                let p = (i===0)?f:getR(gender, cur, false);
+                if(i<10) t10+=p; if(i<20) t20+=p; if(i<30) t30+=p;
+            }
+            document.getElementById('accum10').innerText = "$" + t10.toLocaleString();
+            document.getElementById('accum20').innerText = "$" + t20.toLocaleString();
+            document.getElementById('accum30').innerText = "$" + t30.toLocaleString();
+        }
+
+        function showDetail(idx, el) {
+            const p = document.getElementById('detail-panel');
+            document.querySelectorAll('.plan-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active'); p.style.display = 'block';
+            document.getElementById('detTitle').innerText = planDetails[idx].title;
+            document.getElementById('detBody').innerText = planDetails[idx].body;
+            document.getElementById('detMethod').innerText = planDetails[idx].method;
+        }
+
+        function syncAge(type) {
+            const s = document.getElementById('ageSlider'), i = document.getElementById('ageInput');
+            if (type==='slider') i.value=s.value; else s.value=i.value;
+            calculate();
+        }
+
+        window.onload = () => { initCharts(); calculate(); };
     </script>
 </body>
 </html>
