@@ -36,32 +36,37 @@
 
         .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         h2 { color: var(--primary-blue); text-align: center; margin: 15px 0; font-size: 1.5rem; }
-        h3 { font-size: 1.2rem; }
         
-        /* --- 圖表響應式優化 --- */
+        /* --- 修正後的圖表佈局 --- */
         .chart-wrapper { 
             display: flex; 
-            flex-direction: row; 
+            flex-wrap: nowrap; /* 強制並排 */
             justify-content: space-between; 
             width: 100%; 
-            margin: 20px 0 40px; /* 增加底部 Margin，確保不壓到下方內容 */
-            gap: 15px; 
+            margin: 20px 0;
+            gap: 10px; 
         }
         .chart-box { 
             width: 49%; 
-            min-height: 350px; /* 改用 min-height，讓容器隨圖例長高 */
-            position: relative; 
+            height: 380px; /* PC 版固定高度，預留足夠空間給 Legend */
             display: flex;
             flex-direction: column;
         }
+        .chart-container {
+            flex: 1;
+            position: relative; /* 讓 Chart.js 的 absolute canvas 定位 */
+            width: 100%;
+        }
+
         @media (max-width: 768px) {
-            .chart-wrapper { gap: 8px; }
-            .chart-box { min-height: 300px; }
+            .chart-box { height: 320px; } /* 平板高度 */
         }
         @media (max-width: 480px) { 
-            .chart-box { min-height: 260px; } 
+            .chart-box { height: 280px; } /* 手機高度，避免過長 */
+            .chart-label { font-size: 0.9rem !important; }
         }
-        .chart-label { font-size: 1rem; font-weight: bold; color: var(--primary-blue); text-align: center; height: 50px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+
+        .chart-label { font-size: 1rem; font-weight: bold; color: var(--primary-blue); text-align: center; margin-bottom: 10px; height: 40px; display: flex; align-items: center; justify-content: center; }
 
         /* 輸入與結果 */
         .input-group { background: #eef6fb; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 1.1rem; }
@@ -69,8 +74,8 @@
         
         .result-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .card { background: #fff; border: 1px solid #e1e8ed; padding: 15px 5px; border-radius: 8px; text-align: center; }
-        .card .title { font-size: 0.9rem; color: #777; margin-bottom: 5px; }
-        .card .value { font-size: 1.2rem; font-weight: bold; color: var(--accent-red); }
+        .card .title { font-size: 0.85rem; color: #777; margin-bottom: 5px; }
+        .card .value { font-size: 1.1rem; font-weight: bold; color: var(--accent-red); }
 
         /* 健檢好處區塊 */
         .benefit-section { background: #fff; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #eee; clear: both; }
@@ -84,8 +89,7 @@
         @media (max-width: 600px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
         .plan-item { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px 5px; text-align: center; cursor: pointer; transition: 0.2s; }
         .plan-item i { display: block; font-size: 24px; color: var(--primary-blue); margin-bottom: 8px; }
-        .plan-item span { font-size: 1rem; font-weight: bold; display: block; }
-        .plan-item.active { border-color: var(--primary-blue); background: #eef6fb; box-shadow: 0 4px 10px rgba(0,90,146,0.1); }
+        .plan-item span { font-size: 0.95rem; font-weight: bold; display: block; }
         
         #detail-panel { margin-top: 20px; padding: 20px; background: #fafafa; border: 1px dashed var(--primary-blue); border-radius: 8px; display: none; font-size: 1.1rem; line-height: 1.6; }
     </style>
@@ -127,11 +131,15 @@
             <div class="chart-wrapper">
                 <div class="chart-box">
                     <div class="chart-label">存活率對比<br>(早期 vs 晚期)</div>
-                    <canvas id="survivalChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="survivalChart"></canvas>
+                    </div>
                 </div>
                 <div class="chart-box">
                     <div class="chart-label" id="cancerChartTitle">男性十大癌症分佈</div>
-                    <canvas id="cancerChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="cancerChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -200,7 +208,12 @@
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             element.classList.add('active');
-            if(pageId === 'calc-page') { setTimeout(() => { survivalChart.resize(); cancerChart.resize(); }, 150); }
+            if(pageId === 'calc-page') { 
+                setTimeout(() => { 
+                    survivalChart.resize(); 
+                    cancerChart.resize(); 
+                }, 150); 
+            }
         }
 
         function initCharts() {
@@ -211,9 +224,9 @@
                     legend: { 
                         position: 'bottom', 
                         labels: { 
-                            boxWidth: 10, 
-                            font: { size: window.innerWidth > 768 ? 12 : 9 }, 
-                            padding: 8 
+                            boxWidth: 8, 
+                            font: { size: window.innerWidth > 768 ? 12 : 10 }, 
+                            padding: 10 
                         } 
                     } 
                 } 
@@ -233,7 +246,7 @@
         function getCancerData(gender) {
             if (gender === 'male') {
                 return {
-                    labels: ['大腸', '肺癌', '肝癌', '前列腺', '口腔', '食道', '胃癌', '胰臟', '非何杰', '白血病'],
+                    labels: ['大腸', '肺癌', '肝癌', '前立腺', '口腔', '食道', '胃癌', '胰臟', '非何杰', '白血病'],
                     datasets: [{
                         data: [15, 14, 12, 10, 8, 7, 6, 5, 4, 3],
                         backgroundColor: ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#f95d6a', '#ff7c43', '#ffa600', '#005a92', '#cbd5e0']
