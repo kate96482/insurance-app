@@ -54,6 +54,24 @@
             <button class="btn btn-primary" onclick="startQuiz()">開始全新測驗</button>
         </div>
     </div>
+<div style="margin-top: 25px; padding: 15px; background: #f8f9fa; border-radius: 20px; text-align: center;">
+    <p style="font-weight: bold; color: #666; font-size: 0.9rem; margin-bottom: 10px;">已知人格？直接選型號分析</p>
+    <div id="mbti-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+        </div>
+</div>
+
+<div id="subtype-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:white; padding:25px; border-radius:20px; width:80%; max-width:320px; text-align:center;">
+        <h3 id="target-mbti">請選擇亞型</h3>
+        <div style="display:grid; grid-template-columns: 1fr; gap:10px;">
+            <button class="opt-btn" onclick="finalStep('Pioneer')">開拓亞型</button>
+            <button class="opt-btn" onclick="finalStep('Reactor')">感應亞型</button>
+            <button class="opt-btn" onclick="finalStep('Defender')">防禦亞型</button>
+            <button class="opt-btn" onclick="finalStep('Observer')">深思亞型</button>
+        </div>
+        <button onclick="document.getElementById('subtype-modal').style.display='none'" style="margin-top:15px; background:none; border:none; color:grey; cursor:pointer;">取消</button>
+    </div>
+</div>
 
     <div id="quiz-content" style="display:none;">
         <div class="progress-box"><div id="progress-bar"></div></div>
@@ -95,6 +113,139 @@
 </div>
 
 <script>
+// A. 先放數據 (這裡縮寫，請換成我之前給你的完整 64 型矩陣)
+const fullMatrix64 = {
+    "INTJ": {
+        "Pioneer": { sub: "開拓亞型", name: "戰略遠見者", desc: "具備強大意志力，能冷靜拆解願景並精確執行。", spirit: "以理性的力量重構世界秩序。", celebs: "埃隆·馬斯克", partner: "ENFP-A", motto: "「預測未來最好的方式就是創造它。」" },
+        "Reactor": { sub: "感應亞型", name: "完美主義謀士", desc: "對細節與邏輯漏洞極度敏感，擅長在高壓中修正系統。", spirit: "在批判中完善自我，追求極致真理。", celebs: "尼采", partner: "ENFP-T", motto: "「那些殺不死我的，必使我更強大。」" },
+        "Defender": { sub: "防禦亞型", name: "冷靜執行官", desc: "情緒穩定度極高，是團隊中最堅實、不被干擾的智囊。", spirit: "守護邏輯邊界，穩定發揮長遠影響力。", celebs: "傑夫·貝佐斯", partner: "ENFJ-A", motto: "「靜水流深，實力無須喧嘩。」" },
+        "Observer": { sub: "深思亞型", name: "深邃哲學家", desc: "活在精神世界深處，對世界有極其獨特的解構與預判。", spirit: "洞察本源，在思維荒原中開拓路徑。", celebs: "牛頓", partner: "INFP-T", motto: "「我看見了真理的大海。」" }
+    },
+    "INFP": {
+        "Pioneer": { sub: "開拓亞型", name: "理想實踐家", desc: "帶著溫情改變現實的行動者，將抽象價值觀化為具體影響力。", spirit: "用感性引導世界，將理想照進現實。", celebs: "莎士比亞", partner: "ENFJ-A", motto: "「忠於內心，方得始終。」" },
+        "Reactor": { sub: "感應亞型", name: "靈魂藝術家", desc: "感性敏銳多變，常透過創作來轉化內在的衝突與痛苦。", spirit: "在情緒起伏中，捕捉生命的永恆韻律。", celebs: "J.K.羅琳", partner: "ENTJ-T", motto: "「文字是有魔力的。」" },
+        "Defender": { sub: "防禦亞型", name: "心靈護衛者", desc: "溫柔但有不可逾越的價值底線，默默守護身邊人的安全感。", spirit: "守護內在和平，做亂世中善良的火種。", celebs: "德蕾莎修女", partner: "ESTJ-A", motto: "「愛是唯一的語言。」" },
+        "Observer": { sub: "深思亞型", name: "夢境構築師", desc: "沈溺於宏大的精神宇宙，對人類本質有極深悲憫與理解。", spirit: "在精神孤島上，建設永恆的理想國。", celebs: "三島由紀夫", partner: "ENFJ-T", motto: "「美，是靈魂最後的反抗。」" }
+    },
+    "INFJ": {
+        "Pioneer": { sub: "開拓亞型", name: "信念導師", desc: "具備強大的遠見與感召力，引導大眾追求更高尚的人文目標。", spirit: "引領人類覺醒，重構核心精神價值。", celebs: "馬丁路德金", partner: "ENFP-A", motto: "「我也夢想有一天。」" },
+        "Reactor": { sub: "感應亞型", name: "感應先知", desc: "能直覺捕捉人性光輝與陰暗，常因過度共情而感到精神疲憊。", spirit: "承載他人的重量，在痛苦中尋求救贖。", celebs: "柏拉圖", partner: "ENFP-T", motto: "「往內看的人覺醒了。」" },
+        "Defender": { sub: "防禦亞型", name: "安靜守護者", desc: "默默維護道德基石，透過穩定的行為影響周遭環境。", spirit: "守護心靈秩序，做時代的孤勇者。", celebs: "甘地", partner: "ENTP-A", motto: "「欲變世界，先變自身。」" },
+        "Observer": { sub: "深思亞型", name: "符號分析師", desc: "擅長從歷史與潛意識提取隱喻，對長期趨勢有預判力。", spirit: "在文字脈絡中，看見人類的終局。", celebs: "卡爾·榮格", partner: "INTJ-T", motto: "「潛意識即命運。」" }
+    },
+    "ENFP": {
+        "Pioneer": { sub: "開拓亞型", name: "自由冒險家", desc: "熱情洋溢的啟發者，能瞬間點燃團隊創意並大膽嘗試。", spirit: "打破生活疆界，追求極致的自由體驗。", celebs: "華特·迪士尼", partner: "INTJ-A", motto: "「想像力沒有極限。」" },
+        "Reactor": { sub: "感應亞型", name: "情感探險員", desc: "情感細膩且多變，在與人建立深層聯結中尋找自我意義。", spirit: "感應他人靈魂，在不斷變化中進化。", celebs: "小勞勃道尼", partner: "INTJ-T", motto: "「人生就是一場偉大的試驗。」" },
+        "Defender": { sub: "防禦亞型", name: "快樂播種者", desc: "穩定的樂觀主義者，能在絕境中透過行動帶給他人希望。", spirit: "用喜悅驅散陰霾，守護希望之火。", celebs: "湯姆·漢克斯", partner: "INFJ-A", motto: "「生活就像一盒巧克力。」" },
+        "Observer": { sub: "深思亞型", name: "靈性追尋者", desc: "外向活潑下藏著深沉哲學思考，不斷探究人生的終極意義。", spirit: "遊戲人間，卻看透紅塵的遊戲規則。", celebs: "羅賓·威廉斯", partner: "INFJ-T", motto: "「你是獨一無二的。」" }
+    },
+    "ENTJ": {
+        "Pioneer": { sub: "開拓亞型", name: "霸氣統帥", desc: "卓越的資源整合者，能在混亂中迅速建立秩序並擴張領土。", spirit: "征服未知領地，用意志碾壓一切障礙。", celebs: "賈伯斯", partner: "INFP-A", motto: "「Stay Hungry, Stay Foolish.」" },
+        "Reactor": { sub: "感應亞型", name: "競爭先鋒", desc: "在高壓與挑戰中成長，對市場與權力脈動有驚人的嗅覺。", spirit: "不斷自我超越，在巔峰維持高度競爭力。", celebs: "戈登·拉姆齊", partner: "INFP-T", motto: "「如果不完美，那就重做。」" },
+        "Defender": { sub: "防禦亞型", name: "秩序維護者", desc: "冷靜且具備高度責任感，確保計畫萬無一失地落地執行。", spirit: "以規矩定方圓，穩健擴張影響力版圖。", celebs: "柴契爾夫人", partner: "ISFP-A", motto: "「轉向？不可能。」" },
+        "Observer": { sub: "深思亞型", name: "權力棋手", desc: "低調的幕後佈局者，擅長長期策略與系統性的商業博弈。", spirit: "掌握核心邏輯，不戰而屈人之兵。", celebs: "洛克菲勒", partner: "INTP-T", motto: "「耐心是成功最關鍵的要素。」" }
+    },
+    "INTP": {
+        "Pioneer": { sub: "開拓亞型", name: "概念發明家", desc: "熱衷於破解宇宙與技術難題，將理論模型轉化為現實雛形。", spirit: "解構世界本質，重組真理模塊。", celebs: "比爾·蓋茲", partner: "ENTJ-A", motto: "「世界需要更多思考者。」" },
+        "Reactor": { sub: "感應亞型", name: "瘋狂科學家", desc: "思維跳躍且對細節敏感，常在混亂中發現被忽略的新定律。", spirit: "在質疑中前進，在思想碰撞中靈感迸發。", celebs: "愛因斯坦", partner: "ENTJ-T", motto: "「想像力比知識更重要。」" },
+        "Defender": { sub: "防禦亞型", name: "知識館長", desc: "情緒穩定的學究，追求數據與邏輯體系的絕對一致性。", spirit: "守護客觀事實，排除主觀情緒干擾。", celebs: "查理·芒格", partner: "ENFJ-A", motto: "「持續學習是生存的基本功。」" },
+        "Observer": { sub: "深思亞型", name: "孤傲邏輯師", desc: "極度深思熟慮且偏好孤獨，在純粹邏輯中獲得精神愉悅。", spirit: "剝離所有假象，直達核心真理。", celebs: "笛卡兒", partner: "INFJ-T", motto: "「我思故我在。」" }
+    },
+    "ISTJ": {
+        "Pioneer": { sub: "開拓亞型", name: "效率執行官", desc: "務實且專注，能將傳統方法優化到極致，產出驚人成果。", spirit: "用數據說話，以結果證實自我價值。", celebs: "傑夫·貝佐斯", partner: "ESFP-A", motto: "「一步一腳印，實踐最有力。」" },
+        "Reactor": { sub: "感應亞型", name: "風險控制官", desc: "對系統偏差極度敏感，擅長在危機爆發前排除所有隱患。", spirit: "在變動中維穩，精準控制所有流程細節。", celebs: "喬治·華盛頓", partner: "ESFP-T", motto: "「誠信是做人的第一原則。」" },
+        "Defender": { sub: "防禦亞型", name: "傳統守望者", desc: "紀律的化身，是家庭與組織中最強大、穩定的基石。", spirit: "守護既有秩序，傳承文明的核心價值。", celebs: "伊莉莎白二世", partner: "ESTP-A", motto: "「責任永遠高於個人權利。」" },
+        "Observer": { sub: "深思亞型", name: "程序監查員", desc: "嚴謹觀察法規與現實細節，對流程缺陷有深刻的體認。", spirit: "在規則中生活，從細節處定義美感。", celebs: "康德", partner: "ESFP-T", motto: "「自律帶給我絕對的自由。」" }
+    },
+    "ISFJ": {
+        "Pioneer": { sub: "開拓亞型", name: "溫情管理者", desc: "能將細膩的關懷轉化為具體的服務，深受團隊與家庭依賴。", spirit: "關懷人性需求，打造最和諧的環境。", celebs: "凱特王妃", partner: "ESTP-A", motto: "「溫柔本身就是一種強大的力量。」" },
+        "Reactor": { sub: "感應亞型", name: "敏銳照顧者", desc: "對他人情緒起伏極度敏銳，常默默承擔團體中的心理壓力。", spirit: "在給予中獲得力量，感應他人的痛苦。", celebs: "德蕾莎修女", partner: "ESTP-T", motto: "「做微小但充滿愛的事。」" },
+        "Defender": { sub: "防禦亞型", name: "寧靜堡壘", desc: "情緒極度穩定，是親友在風暴中最安心、最堅固的避風港。", spirit: "守護溫馨記憶，默默付出不求回報。", celebs: "羅莎·帕克斯", partner: "ESFP-A", motto: "「每個人都值得被溫柔對待。」" },
+        "Observer": { sub: "深思亞型", name: "生活觀察家", desc: "細心觀察生活點滴的美好，對人際細節有驚人的記憶力。", spirit: "在安靜中看見美，記錄平凡中的偉大。", celebs: "馬可·奧里略", partner: "ESTP-T", motto: "「內在的平靜是人生最高追求。」" }
+    },
+    "ESTJ": {
+        "Pioneer": { sub: "開拓亞型", name: "社會組織者", desc: "具備強大推動力，能將混亂的團隊迅速納入高效軌道。", spirit: "效率即是正義，執行即是真理。", celebs: "約翰·洛克菲勒", partner: "ISFP-A", motto: "「如果你不計畫，你就在計畫失敗。」" },
+        "Reactor": { sub: "感應亞型", name: "戰地指揮官", desc: "適應力強的高階主管，在高壓環境中能迅速做出明智應變。", spirit: "在變動的局勢中，建立不敗的體系。", celebs: "希拉蕊·柯林頓", partner: "ISFP-T", motto: "「永不言敗，直到目標達成。」" },
+        "Defender": { sub: "防禦亞型", name: "公正法官", desc: "極度重視事實與客觀標準，追求絕對的社會與組織公平。", spirit: "守護社會契約，做規則的捍衛者。", celebs: "亨利·福特", partner: "ISFP-A", motto: "「公義是社會最穩定的基石。」" },
+        "Observer": { sub: "深思亞型", name: "系統監督者", desc: "冷靜分析組織長期漏洞，追求流程的極致優化與完美。", spirit: "從宏觀看缺失，從微觀定勝負。", celebs: "漢米爾頓", partner: "ISFP-T", motto: "「魔鬼隱藏在細節之中。」" }
+    },
+    "ESFJ": {
+        "Pioneer": { sub: "開拓亞型", name: "社交導師", desc: "充滿熱情的聯結者，擅長整合人脈並創造共贏的氛圍。", spirit: "建立共存群體，連結每顆孤單的心。", celebs: "泰勒絲", partner: "ISFP-A", motto: "「團結帶來的力量無可取代。」" },
+        "Reactor": { sub: "感應亞型", name: "情感協調員", desc: "對團體氣氛有驚人感知，能預判並化解潛在的人際衝突。", spirit: "感應集體情緒，做連結人心的橋樑。", celebs: "休·傑克曼", partner: "ISFP-T", motto: "「善良是一種勇敢的選擇。」" },
+        "Defender": { sub: "防禦亞型", name: "傳統守衛者", desc: "穩定且可靠的服務者，堅定維護家庭與社會的核心價值。", spirit: "守護溫暖記憶，傳承古老的智慧。", celebs: "安·海瑟薇", partner: "ISTP-A", motto: "「家是心靈最後的歸宿。」" },
+        "Observer": { sub: "深思亞型", name: "人性洞察者", desc: "深諳人情世故的觀察家，能洞悉大眾行為背後的動機。", spirit: "看透社交密碼，體現人文關懷。", celebs: "艾爾頓·強", partner: "ISTP-T", motto: "「理解他人，就是原諒自己。」" }
+    },
+    "ISTP": {
+        "Pioneer": { sub: "開拓亞型", name: "技術先鋒", desc: "冷靜的實踐者，熱衷於拆解複雜機械或系統並進行改造。", spirit: "動手改造現實，不滿足於現狀。", celebs: "麥可·喬丹", partner: "ESTJ-A", motto: "「結果比任何言語都有力。」" },
+        "Reactor": { sub: "感應亞型", name: "極限冒險者", desc: "在危急時刻展現驚人冷靜，享受解決突發難題的快感。", spirit: "與風險共舞，在挑戰中找到自我。", celebs: "湯姆·克魯斯", partner: "ESTJ-T", motto: "「活在當下，做就對了。」" },
+        "Defender": { sub: "防禦亞型", name: "孤狼匠人", desc: "專注於個人技能修煉，情緒穩定且不隨波逐流，追求卓越。", spirit: "守護純粹工藝，不受外界噪音干擾。", celebs: "詹姆斯·狄恩", partner: "ENFJ-A", motto: "「追求極致，不需要解釋。」" },
+        "Observer": { sub: "深思亞型", name: "邏輯偵探", desc: "觀察世界運行機制，能從瑣碎線索中推導出事物的本質。", spirit: "解鎖萬物奧秘，觀察大於言說。", celebs: "克林·伊斯威特", partner: "ENFJ-T", motto: "「沈默是為了更好的觀察。」" }
+    },
+    "ISFP": {
+        "Pioneer": { sub: "開拓亞型", name: "視覺創造者", desc: "用感官體驗世界，勇於打破傳統審美並建立個人風格。", spirit: "透過美感表達最真實的自我。", celebs: "萊昂納多·迪卡普里奧", partner: "ESFJ-A", motto: "「美就是真理，真理就是美。」" },
+        "Reactor": { sub: "感應亞型", name: "情感藝術家", desc: "對環境與情緒高度敏感，透過藝術或行動傳達內在澎湃。", spirit: "感應世界的跳動，捕捉瞬間的情緒。", celebs: "艾薇兒", partner: "ESFJ-T", motto: "「真實比完美更重要。」" },
+        "Defender": { sub: "防禦亞型", name: "靈魂守護者", desc: "低調溫和，在安靜中守護個人美學底線與內在的純真。", spirit: "守護心靈花園，在沈靜中爆發。", celebs: "大衛·鮑伊", partner: "ENTJ-A", motto: "「不需要向世界解釋我的不同。」" },
+        "Observer": { sub: "深思亞型", name: "感官哲學家", desc: "在孤獨中體味生命的細膩，對世界的脆弱有深刻的理解。", spirit: "捕捉流逝的瞬間，體悟生命真意。", celebs: "梵谷", partner: "ENTJ-T", motto: "「我在畫布中尋找救贖。」" }
+    },
+    "ESTP": {
+        "Pioneer": { sub: "開拓亞型", name: "商場掠奪者", desc: "對機會與危機極度敏銳，能迅速採取行動佔領制高點。", spirit: "贏在起跑線上，掌握變動的先機。", celebs: "唐納·川普", partner: "ISFJ-A", motto: "「行動永遠勝過完美的藍圖。」" },
+        "Reactor": { sub: "感應亞型", name: "現場操控員", desc: "在極限環境中反應速度驚人，擅長處理即時發生的矛盾。", spirit: "掌握混亂的節奏，化危機為轉機。", celebs: "瑪丹娜", partner: "ISFJ-T", motto: "「生命是一場永不終止的挑戰。」" },
+        "Defender": { sub: "防禦亞型", name: "實戰智者", desc: "務實且富有豐富經驗，能在複雜現實中找到最省力的解法。", spirit: "守護實戰智慧，用實力定義地位。", celebs: "巨石強森", partner: "ISTJ-A", motto: "「實力是唯一不會說謊的東西。」" },
+        "Observer": { sub: "深思亞型", name: "機會解碼器", desc: "觀察市場規律，精準預判對手的下一步棋，冷靜佈局。", spirit: "洞察博弈局勢，看準再出手。", celebs: "梅威瑟", partner: "ISTJ-T", motto: "「贏家總是最後才出手。」" }
+    },
+    "ESFP": {
+        "Pioneer": { sub: "開拓亞型", name: "聚光燈靈魂", desc: "天生的表演者，能帶領大眾享受當下的精彩與生命熱力。", spirit: "燃燒生命熱情，照亮周遭黑暗。", celebs: "艾維斯·普里斯萊", partner: "ISTJ-A", motto: "「人生就是一場華麗的歌舞劇。」" },
+        "Reactor": { sub: "感應亞型", name: "情感渲染師", desc: "情緒張力極大，能瞬間感染並點燃周圍人的真實情感。", spirit: "感應當下能量，與世界共鳴。", celebs: "麥莉·希拉", partner: "ISTJ-T", motto: "「盡情揮灑，不留遺憾。」" },
+        "Defender": { sub: "防禦亞型", name: "快樂衛士", desc: "穩定的正能量傳遞者，不讓悲觀情緒影響團隊與生活。", spirit: "守護集體歡樂，維持生命質感。", celebs: "賽琳娜·戈梅茲", partner: "ISFJ-A", motto: "「活得漂亮，是對挫折最好的反擊。」" },
+        "Observer": { sub: "深思亞型", name: "感官鑑定家", desc: "在喧囂繁華中，依然能洞察人性中最真實的渴望與脆弱。", spirit: "看透繁華表象，體悟人性冷暖。", celebs: "瑪麗蓮·夢露", partner: "ISFJ-T", motto: "「我是我自己的，不屬於任何人。」" }
+    },
+    "ENTP": {
+        "Pioneer": { sub: "開拓亞型", name: "跨界發明家", desc: "不斷產生顛覆性點子，熱衷於挑戰所有既有的知識框架。", spirit: "推動思維進化，挑戰不可能的界限。", celebs: "李奧納多·達文西", partner: "INFJ-A", motto: "「永遠不要停止問『為什麼』。」" },
+        "Reactor": { sub: "感應亞型", name: "思維角鬥士", desc: "在觀點碰撞中尋求快感，應變速度極快，擅長瓦解對手邏輯。", spirit: "在碰撞中覺醒，在質疑中重生。", celebs: "托尼·史塔克", partner: "INFJ-T", motto: "「最好的防禦就是瘋狂的進攻。」" },
+        "Defender": { sub: "防禦亞型", name: "理性導航員", desc: "情緒穩定且具批判精神，能確保創意不偏離科學與現實航道。", spirit: "守護創新價值，降低變革風險。", celebs: "湯瑪斯·艾迪生", partner: "INTJ-A", motto: "「失敗是通往真理的必經之路。」" },
+        "Observer": { sub: "深思亞型", name: "系統解構者", desc: "看透社會規則弱點，尋找非傳統路徑來實現個人目標。", spirit: "解構世間悖論，尋找隱藏漏洞。", celebs: "班傑明·富蘭克林", partner: "INTJ-T", motto: "「常識往往是最不常擁有的東西。」" }
+    },
+    "ENFJ": {
+        "Pioneer": { sub: "開拓亞型", name: "變革領袖", desc: "極具感染力，能感召並帶領團隊共同建設更好的未來。", spirit: "賦予他人力量，共創理想社會。", celebs: "巴拉克·歐巴馬", partner: "INFP-A", motto: "「Yes We Can.」" },
+        "Reactor": { sub: "感應亞型", name: "情感引路人", desc: "對他人的潛力與需求感知極強，常承擔過多的群體責任。", spirit: "感應群體共鳴，實現眾人期待。", celebs: "歐普拉·溫芙蕾", partner: "INFP-T", motto: "「你的聲音值得被全世界聽見。」" },
+        "Defender": { sub: "防禦亞型", name: "和諧大使", desc: "情緒穩定且具備包容力，在危機中是團隊最重要的定海神針。", spirit: "守護共同價值，維護社會穩定。", celebs: "珍妮佛·勞倫斯", partner: "ISFP-A", motto: "「共存與共榮，才是最後的勝利。」" },
+        "Observer": { sub: "深思亞型", name: "心理策略家", desc: "深入研究人性動機，精準佈局教育、心理與個人成長路徑。", spirit: "看穿潛在可能，引導靈魂進化。", celebs: "馬修·麥康納", partner: "INTP-T", motto: "「持續進步，直到看見光。」" }
+    }
+};
+
+let selectedType = ""; // 用來記住點了哪個型號
+
+// B. 生成 16 型按鈕的邏輯
+window.addEventListener('DOMContentLoaded', () => {
+    const types = ["INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"];
+    const container = document.getElementById('mbti-grid');
+    if (container) {
+        types.forEach(type => {
+            let btn = document.createElement('button');
+            btn.innerText = type;
+            btn.style = "padding:10px 0; border:1px solid #ddd; border-radius:10px; background:white; cursor:pointer; font-weight:bold;";
+            btn.onclick = () => {
+                selectedType = type;
+                document.getElementById('target-mbti').innerText = type + " - 選擇分析維度";
+                document.getElementById('subtype-modal').style.display = 'flex';
+            };
+            container.appendChild(btn);
+        });
+    }
+});
+
+// C. 選完亞型後的跳轉
+function finalStep(sub) {
+    document.getElementById('subtype-modal').style.display = 'none';
+    // 直接呼叫你原本顯示結果的 function
+    // 注意：請確認你原本顯示結果的 function 名字，如果是 showResult 就改成 showResult
+    showFinalResult(selectedType, sub); 
+}
+
+// D. 返回首頁功能
+function goHome() {
+    location.reload(); // 點了直接重整，就是回首頁
+}
 // 
 // 題目邏輯 (簡化顯示，邏輯完整)
 const mbtiQuestions = [
