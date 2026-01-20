@@ -17,11 +17,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --primary: #005a92; --bg: #f4f7f9; }
+        :root { --primary: #005a92; --bg: #f4f7f9; --accent: #d9534f; }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 8px; }
         
-        /* 返回按鈕樣式 */
         .back-home {
             display: inline-flex;
             align-items: center;
@@ -51,29 +50,37 @@
         #ageSlider { flex: 1; accent-color: var(--primary); }
 
         .chart-section { display: flex; gap: 6px; margin-bottom: 12px; overflow: hidden; }
-        .chart-card { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 5px 0; background: #fff; min-width: 0; display: flex; flex-direction: column; height: 220px; }
-        .chart-title { font-size: 0.8rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 2px; }
+        .chart-card { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 0; background: #fff; min-width: 0; display: flex; flex-direction: column; height: 220px; position: relative; }
+        .chart-title { font-size: 0.8rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 5px; }
         .chart-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
+
+        /* 新增：癌症時鐘與年齡分布樣式 */
+        .visual-stats { display: flex; gap: 8px; margin-bottom: 15px; }
+        .stat-box { flex: 1; background: #f0f9ff; border-radius: 10px; padding: 10px; text-align: center; border: 1px solid #bae6fd; }
+        .clock-val { font-size: 1.8rem; font-weight: 900; color: var(--accent); margin: 5px 0; display: block; }
+        .clock-label { font-size: 0.7rem; color: #475569; }
+        .age-trend-img { width: 100%; height: 60px; object-fit: contain; margin-top: 5px; }
 
         .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px; }
         .result-item { background: #fff; border: 1px solid #cbd5e1; padding: 6px 2px; border-radius: 8px; text-align: center; }
         .result-item .label { font-size: 0.65rem; color: #64748b; margin-bottom: 2px; }
-        .result-item .value { font-size: 0.85rem; color: #d9534f; font-weight: 800; }
+        .result-item .value { font-size: 0.85rem; color: var(--accent); font-weight: 800; }
         .result-item.highlight { border: 1.5px solid var(--primary); background: #f0f9ff; }
 
         .section-subtitle { font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; color: #444; }
         .plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .plan-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 2px; text-align: center; cursor: pointer; }
+        .plan-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 2px; text-align: center; cursor: pointer; transition: 0.2s; }
         .plan-card.active { border: 2px solid var(--primary); background: #f0f9ff; }
-        .plan-card i { font-size: 16px; color: var(--primary); margin-bottom: 2px; }
-        .plan-card span { display: block; font-size: 0.65rem; font-weight: bold; }
+        .plan-card i { font-size: 18px; color: var(--primary); margin-bottom: 4px; }
+        .plan-card span { display: block; font-size: 0.65rem; font-weight: bold; line-height: 1.2; }
 
-        #detail-view { margin-top: 12px; padding: 10px; border-left: 4px solid var(--primary); background: #f8fafc; display: none; font-size: 0.85rem; }
+        #detail-view { margin-top: 12px; padding: 12px; border-left: 4px solid var(--primary); background: #f8fafc; display: none; font-size: 0.85rem; border-radius: 0 8px 8px 0; }
 
         @media (max-width: 600px) {
-            .chart-card { height: 150px; }
+            .chart-card { height: 160px; }
             .result-grid { grid-template-columns: repeat(2, 1fr); }
             .plan-grid { grid-template-columns: repeat(2, 1fr); }
+            .visual-stats { flex-direction: column; }
         }
     </style>
 </head>
@@ -108,6 +115,25 @@
         </div>
     </div>
 
+    <div class="visual-stats">
+        <div class="stat-box">
+            <div class="chart-title" style="margin:0"><i class="fa-solid fa-hourglass-half"></i> 癌症時鐘</div>
+            <span class="clock-val">04:10</span>
+            <span class="clock-label">每 4 分 10 秒即有一人罹癌</span>
+        </div>
+        <div class="stat-box">
+            <div class="chart-title" style="margin:0"><i class="fa-solid fa-chart-line"></i> 罹癌年齡分布</div>
+            <div style="font-size: 0.75rem; font-weight: bold; color: var(--accent); margin: 4px 0;">20-49 歲發病率顯著攀升</div>
+            <div style="display:flex; align-items:flex-end; gap:3px; height:35px; justify-content:center;">
+                <div style="width:12%; height:20%; background:#cbd5e1;"></div>
+                <div style="width:12%; height:45%; background:var(--primary);"></div>
+                <div style="width:12%; height:75%; background:var(--primary);"></div>
+                <div style="width:12%; height:100%; background:#64748b;"></div>
+                <div style="width:12%; height:90%; background:#94a3b8;"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="result-grid">
         <div class="result-item highlight"><div class="label">目前年齡</div><div id="curAge" class="value" style="color:var(--primary)">30</div></div>
         <div class="result-item"><div class="label">首年費用</div><div id="firstYear" class="value">-</div></div>
@@ -117,66 +143,51 @@
         <div class="result-item"><div class="label">累計至 75 歲止</div><div id="totalToMax" class="value">-</div></div>
     </div>
 
-    <div class="section-subtitle">檢測方案每年8選1(點選查看說明)</div>
+    <div class="section-subtitle">最新檢測方案每年 8 選 1 (點選查看)</div>
     <div class="plan-grid">
         <div class="plan-card" onclick="selectPlan(0, this)"><i class="fa-solid fa-dna"></i><span>CTC 循環</span></div>
-        <div class="plan-card" onclick="selectPlan(1, this)"><i class="fa-solid fa-shield-virus"></i><span>肝甲狀腺</span></div>
-        <div class="plan-card" onclick="selectPlan(2, this)"><i class="fa-solid fa-mars"></i><span>男性十大</span></div>
-        <div class="plan-card" onclick="selectPlan(3, this)"><i class="fa-solid fa-venus"></i><span>女性十大</span></div>
-        <div class="plan-card" onclick="selectPlan(4, this)"><i class="fa-solid fa-eye"></i><span>特殊癌</span></div>
-        <div class="plan-card" onclick="selectPlan(5, this)"><i class="fa-solid fa-magnifying-glass-plus"></i><span>隱匿危機</span></div>
+        <div class="plan-card" onclick="selectPlan(1, this)"><i class="fa-solid fa-shield-heart"></i><span>肝甲狀腺</span></div>
+        <div class="plan-card" onclick="selectPlan(2, this)"><i class="fa-solid fa-mars"></i><span>男性基因</span></div>
+        <div class="plan-card" onclick="selectPlan(3, this)"><i class="fa-solid fa-venus"></i><span>女性基因</span></div>
+        <div class="plan-card" onclick="selectPlan(4, this)"><i class="fa-solid fa-biohazard"></i><span>特殊癌</span></div>
+        <div class="plan-card" onclick="selectPlan(5, this)"><i class="fa-solid fa-magnifying-glass-chart"></i><span>隱匿危機</span></div>
         <div class="plan-card" onclick="selectPlan(6, this)"><i class="fa-solid fa-heart-pulse"></i><span>癌心血管</span></div>
         <div class="plan-card" onclick="selectPlan(7, this)"><i class="fa-solid fa-brain"></i><span>腦部神經</span></div>
     </div>
 
     <div id="detail-view">
-        <div id="pTitle" style="font-weight:bold; color:var(--primary);"></div>
-        <div id="pDesc" style="margin:5px 0; line-height:1.4;"></div>
-        <div id="pMethod" style="color:#d9534f; font-weight:bold;"></div>
+        <div id="pTitle" style="font-weight:bold; color:var(--primary); font-size:1rem;"></div>
+        <div id="pDesc" style="margin:8px 0; line-height:1.5; color:#334155;"></div>
+        <div id="pMethod" style="color:var(--accent); font-weight:bold; background:#fee2e2; padding:4px 8px; border-radius:4px; display:inline-block;"></div>
     </div>
 </div>
 
 <script>
-    // 修正 2：統一的導航與防跳窗腳本
+    // iOS 全螢幕導覽修正
     function navTo(url, e) {
         if (e) e.preventDefault();
         if (("standalone" in window.navigator) && window.navigator.standalone) {
-            window.location.replace(url); // 用 replace 更有 App 感
+            window.location.replace(url);
         } else {
             window.location.href = url;
         }
     }
 
-    (function(doc, nav, standalone) {
-        if ((standalone in nav) && nav[standalone]) {
-            doc.addEventListener('click', function(event) {
-                var cnode = event.target;
-                while (cnode && cnode.nodeName !== 'A' && cnode.nodeName !== 'HTML') {
-                    cnode = cnode.parentNode;
-                }
-                if (cnode && 'href' in cnode && cnode.hostname === window.location.hostname) {
-                    event.preventDefault();
-                    window.location.replace(cnode.href);
-                }
-            }, false);
-        }
-    })(document, window.navigator, 'standalone');
+    // 更新後的 8 選 1 詳細資料
+    const plans = [
+        { t: "CTC 循環腫瘤細胞檢測", d: "新一代血液循環腫瘤細胞檢測及腫瘤標記，提供更安全便捷的早期癌症篩檢及術後監控。", m: "費用參考：$15,000 ~ $45,000" },
+        { t: "全方位肝及甲狀腺檢測", d: "針對肝炎、肝纖維化、肝癌數值，以及甲狀腺功能與甲狀腺癌進行深度評估。", m: "費用參考：$17,000 ~ $20,000" },
+        { t: "男性十大癌症基因套組", d: "針對男性高風險癌症如肺癌、肝癌等進行基因篩檢，涵蓋多項關鍵健康指標。", m: "費用參考：$25,800" },
+        { t: "女性十大癌症基因套組", d: "針對女性十大高風險癌症如乳癌、卵巢癌、子宮頸癌等進行專屬基因風險評估。", m: "費用參考：$25,800" },
+        { t: "特殊癌症早期警示基因", d: "針對胰臟、膽囊、基底細胞癌及黑色素瘤等較特殊或隱蔽的癌症提供早期預警。", m: "費用參考：$15,800" },
+        { t: "隱匿危機癌症風險預測", d: "預測較難察覺的癌症風險，包括膀胱癌、甲狀腺癌等潛在的隱匿性威脅。", m: "費用參考：$15,800" },
+        { t: "綜合血癌與心血管基因", d: "同時涵蓋血癌風險與心血管疾病（如心臟衰竭、冠狀動脈硬化）之基因篩查。", m: "費用參考：$15,800" },
+        { t: "腦癌與神經功能障礙套組", d: "針對腦部腫瘤及早發型神經病變（如阿茲海默症、帕金森氏症）進行預防性檢測。", m: "費用參考：$15,800" }
+    ];
 
-    // 以下為原本的業務邏輯
     let gender = 'male';
     let sChart, cChart;
     Chart.register(ChartDataLabels);
-
-    const plans = [
-        { t: "CTC 循環腫瘤細胞檢測", d: "透過液體活檢捕捉血液中微小癌細胞病灶。", m: "檢測方式：抽血 10ml" },
-        { t: "肝與甲狀腺深度檢測", d: "針對高壓族群常見的代謝與內分泌系統篩查。", m: "檢測方式：超音波 + 血液指標" },
-        { t: "男性十大癌症基因風險", d: "檢測先天遺傳弱點，提早規劃防護路徑。", m: "檢測方式：口腔抹片" },
-        { t: "女性十大癌症基因風險", d: "針對乳腺、子宮等女性高風險癌症進行基因篩檢。", m: "檢測方式：口腔抹片" },
-        { t: "特殊癌症早期警示", d: "針對胰臟、膽囊等難以偵測的器官進行精密定序。", m: "檢測方式：血液精密定序" },
-        { t: "隱匿危機癌症監測", d: "偵測長期潛伏於體內的異常生長信號。", m: "檢測方式：全身癌症指標" },
-        { t: "綜合癌症與心血管風險", d: "同時評估癌症指標與心血管風險。", m: "檢測方式：抽血檢測" },
-        { t: "腦部與神經功能篩查", d: "針對中高齡族群預防早發型神經病變。", m: "檢測方式：功能性評估" }
-    ];
 
     const data = {
         male: { first: {30: 8464, 35: 8761, 40: 9321, 45: 10199, 50: 11290, 55: 12620, 60: 14175 }, renew: { 30: 8563, 35: 8960, 40: 9706, 45: 10878, 50: 12331, 55: 14105, 60: 16180, 65: 18263, 70: 20023, 75: 23153} },
@@ -242,6 +253,7 @@
         document.getElementById('pTitle').innerText = plans[idx].t;
         document.getElementById('pDesc').innerText = plans[idx].d;
         document.getElementById('pMethod').innerText = plans[idx].m;
+        v.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     window.onload = () => {
