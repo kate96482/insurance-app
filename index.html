@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>小邦手</title>
 
     <link rel="apple-touch-icon" href="logo.png">
@@ -23,19 +23,19 @@
         .grid-container { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; max-width: 450px; }
         @media (min-width: 600px) { .grid-container { max-width: 800px; grid-template-columns: 1fr 1fr; } }
 
-        /* 關鍵修正：將 tool-card 改為 div 樣式 */
         .tool-card {
             background: white; border-radius: 20px; padding: 25px; 
             display: flex; align-items: center; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
             transition: transform 0.2s; border: 1px solid #eee;
-            cursor: pointer; /* 讓鼠標變成手指 */
-            -webkit-tap-highlight-color: transparent; /* 消除手機點擊閃爍 */
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
         .tool-card:active { transform: scale(0.96); background-color: #f9f9f9; }
         .icon-box { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-size: 1.5rem; color: white; }
         .info-box h3 { margin: 0; font-size: 1.15rem; color: #222; }
         .info-box p { margin: 5px 0 0 0; font-size: 0.85rem; color: #888; }
+        
         .bg-cancer { background: linear-gradient(135deg, #FF6B6B, #EE5253); }
         .bg-numerology { background: linear-gradient(135deg, #4CC9F0, #4895EF); }
         .bg-money { background: linear-gradient(135deg, #B5EAD7, #88D8B0); } 
@@ -51,22 +51,22 @@
     </div>
 
     <div class="grid-container">
-        <div onclick="window.location.assign('cancer_calc.html');" class="tool-card">
+        <div onclick="navTo('cancer_calc.html');" class="tool-card">
             <div class="icon-box bg-cancer"><i class="fa-solid fa-file-medical"></i></div>
             <div class="info-box"><h3>防癌無憂試算</h3><p>即時計算保費與癌症數據對比</p></div>
         </div>
 
-        <div onclick="window.location.assign('numerology.html');" class="tool-card">
+        <div onclick="navTo('numerology.html');" class="tool-card">
             <div class="icon-box bg-numerology"><i class="fa-solid fa-star"></i></div>
             <div class="info-box"><h3>生命靈數全解析</h3><p>九宮格連線與流年週期運勢</p></div>
         </div>
         
-        <div onclick="window.location.assign('money.html');" class="tool-card">
+        <div onclick="navTo('money.html');" class="tool-card">
             <div class="icon-box bg-money"><i class="fa-solid fa-money-bill-trend-up"></i></div>
             <div class="info-box"><h3>貸款試算全攻略</h3><p>信貸周轉/購屋貸款/原屋融資</p></div>
         </div>
 
-        <div onclick="window.location.assign('mbti.html');" class="tool-card">
+        <div onclick="navTo('mbti.html');" class="tool-card">
             <div class="icon-box bg-mbti"><i class="fa-solid fa-puzzle-piece"></i></div>
             <div class="info-box"><h3>16型人格測驗</h3><p>探索內在核心與社交特質解析</p></div>
         </div>
@@ -74,5 +74,34 @@
 
     <div class="footer">&copy; 2026 數位工具箱</div>
 
+    <script>
+        // 【核心修正】這段腳本會強制在當前 PWA 視窗內跳轉，不再彈出打叉視窗
+        function navTo(url) {
+            if (("standalone" in window.navigator) && window.navigator.standalone) {
+                // 如果是 iOS PWA 模式，強制使用 location.assign 
+                // 並且確保不觸發系統預設的新視窗行為
+                window.location.assign(url);
+            } else {
+                // 普通網頁模式
+                window.location.href = url;
+            }
+        }
+
+        // 另外增加一個全局攔截，防止所有意外的視窗彈出
+        (function(document, navigator, standalone) {
+            if ((standalone in navigator) && navigator[standalone]) {
+                document.addEventListener('click', function(e) {
+                    let noddy = e.target;
+                    while (noddy.nodeName !== "A" && noddy.nodeName !== "HTML") {
+                        noddy = noddy.parentNode;
+                    }
+                    if ("href" in noddy && noddy.href.indexOf('http') === -1 && (noddy.href.indexOf(window.location.host) !== -1)) {
+                        e.preventDefault();
+                        window.location.href = noddy.href;
+                    }
+                }, false);
+            }
+        })(document, window.navigator, 'standalone');
+    </script>
 </body>
 </html>
