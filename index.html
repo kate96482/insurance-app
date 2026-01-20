@@ -172,5 +172,26 @@
         &copy; 2026 數位工具箱 
     </div>
 
+    <script>
+        (function(doc, nav, standalone) {
+            // 只在 App 模式 (Standalone) 下運作
+            if ((standalone in nav) && nav[standalone]) {
+                var cnode;
+                doc.addEventListener('click', function(event) {
+                    cnode = event.target;
+                    // 向上搜尋直到找到 A 標籤
+                    while (cnode.nodeName !== 'A' && cnode.nodeName !== 'HTML') {
+                        cnode = cnode.parentNode;
+                    }
+                    // 如果點擊的是連結，且是同一個網站的連結，就強制在原視窗開啟
+                    if ('href' in cnode && cnode.href.indexOf('http') !== -1 && (cnode.href.indexOf(doc.location.host) !== -1)) {
+                        event.preventDefault();
+                        doc.location.href = cnode.href;
+                    }
+                }, false);
+            }
+        })(document, window.navigator, 'standalone');
+    </script>
+
 </body>
 </html>
