@@ -1,174 +1,83 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="icon" type="image/png" href="logo.png">
-    <meta name="apple-mobile-web-app-title" content="小邦手">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MBTI 64型深度鑑定 - 小邦手</title>
+    <title>MBTI 深度分析</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <style>
-        :root {
-            --primary: #A29BFE;
-            --secondary: #6C5CE7;
-            --bg: #F8F9FA;
-        }
-        body { 
-            font-family: "Microsoft JhengHei", sans-serif; 
-            background-color: var(--bg); 
-            margin: 0; padding: 15px; 
-            display: flex; flex-direction: column; align-items: center;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .mbti-container { width: 100%; max-width: 500px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); box-sizing: border-box; }
-        
-        /* 進度條樣式 */
+        :root { --primary: #A29BFE; --secondary: #6C5CE7; --bg: #F8F9FA; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .mbti-container { width: 100%; max-width: 500px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         .progress-box { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin: 15px 0; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); }
-        
-        /* 選項按鈕樣式 */
-        .options-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .opt-btn { 
-            border: none; padding: 14px; border-radius: 50px; font-weight: bold; 
-            cursor: pointer; transition: 0.2s; font-size: 0.95rem; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-        .opt-btn:active { transform: scale(0.96); opacity: 0.8; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: 0.4s; }
+        .options-container { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        .opt-btn { border: none; padding: 12px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
         .opt-agree-3 { background-color: #D1E9FF; color: #0056b3; }
-        .opt-agree-2 { background-color: #E3F2FF; color: #0056b3; }
-        .opt-agree-1 { background-color: #F0F8FF; color: #0056b3; }
         .opt-neutral { background-color: #F1F3F5; color: #888; }
-        .opt-disagree-1 { background-color: #FFF0F3; color: #c9184a; }
-        .opt-disagree-2 { background-color: #FFDDE4; color: #c9184a; }
         .opt-disagree-3 { background-color: #FFCAD4; color: #c9184a; }
-
-        /* 直接分析區域 */
-        .direct-box { margin-top: 25px; padding-top: 20px; border-top: 1px dashed #eee; text-align: center; }
-        .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
-        .type-chip { 
-            padding: 10px 5px; background: #f8f9fa; border-radius: 10px; font-size: 0.75rem; 
-            cursor: pointer; border: 1px solid #eee; font-weight: bold; color: #555;
-            transition: 0.2s;
-        }
-        .type-chip:active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* 結果圖卡設計 */
-        #capture-area { 
-            background: linear-gradient(135deg, #6C5CE7 0%, #A29BFE 100%);
-            padding: 35px 20px; text-align: center; border-radius: 20px; 
-        }
-        .result-card-design { 
-            background: white; padding: 30px 20px; 
-            border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        #res-code { font-size: 3.2rem; color: var(--secondary); margin: 5px 0; font-weight: 900; letter-spacing: 1px; }
-        .subtype-label { 
-            display: inline-block; background: #FFF0F3; color: #c9184a; 
-            padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; 
-            font-weight: bold; margin-bottom: 15px; 
-        }
-        #res-desc { text-align: justify; line-height: 1.6; color: #444; font-size: 0.95rem; }
-        
-        .analysis-box { 
-            background: #F8F9FA; border-radius: 12px; padding: 15px; 
-            margin-top: 15px; text-align: left; border-left: 4px solid var(--secondary);
-        }
-        .analysis-title { font-size: 0.85rem; font-weight: bold; color: var(--secondary); margin-bottom: 5px; }
-
-        #final-image-wrapper img { width: 100%; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); margin-top: 10px; }
-        
-        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-primary { background: var(--secondary); color: white; }
-        .btn-secondary { background: #eee; color: #666; }
-
-        #capture-area * { word-break: break-all; }
+        #capture-area { background: linear-gradient(135deg, #6C5CE7 0%, #A29BFE 100%); padding: 25px 15px; border-radius: 25px; }
+        .result-card { background: white; padding: 25px 20px; border-radius: 20px; text-align: center; }
+        #res-code { font-size: 2.8rem; color: #333; margin: 5px 0; font-weight: 900; letter-spacing: -1px; }
+        .info-grid { text-align: left; margin-top: 20px; display: grid; gap: 15px; }
+        .info-item { border-left: 3px solid var(--secondary); padding-left: 12px; }
+        .info-label { font-size: 0.75rem; color: #999; font-weight: bold; }
+        .info-content { font-size: 0.9rem; color: #444; line-height: 1.5; margin-top: 2px; }
+        .motto-box { margin-top: 20px; padding: 12px; background: #fdfcfb; border-radius: 10px; font-style: italic; color: #666; font-size: 0.85rem; border: 1px solid #eee; }
+        #final-image-wrapper img { width: 100%; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-primary { background: var(--secondary); color: white; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div id="mbti-app" class="mbti-container">
     <div id="quiz-intro">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 4rem; color: var(--primary); margin-bottom: 15px;"></i>
-            <h2 style="color:var(--secondary);">MBTI 64型深度鑑定</h2>
-            <p style="color: #666; line-height: 1.6;">結合核心人格與能量壓力軸<br>發現您在 64 種亞型中的真實定位</p>
-        </div>
-        <div style="text-align: center; margin: 30px 0;">
-            <button class="btn btn-primary" style="width: 80%; padding: 15px; font-size: 1.1rem;" onclick="startQuiz()">開始深度測驗 (60題)</button>
-        </div>
-
-        <div class="direct-box">
-            <div style="font-size: 0.85rem; color: #999;">或點選已知型號直接分析</div>
-            <div class="type-grid" id="type-grid"></div>
-            <div style="margin-top:15px; display:flex; gap:20px; justify-content:center;">
-                <label style="font-size:0.9rem; color:#555; cursor:pointer;"><input type="radio" name="suffix" value="A" checked> 穩健型(-A)</label>
-                <label style="font-size:0.9rem; color:#555; cursor:pointer;"><input type="radio" name="suffix" value="T"> 動盪型(-T)</label>
-            </div>
+        <div style="text-align: center;">
+            <i class="fa-solid fa-dna" style="font-size: 3rem; color: var(--primary); margin-bottom: 15px;"></i>
+            <h2 style="color:var(--secondary);">MBTI 全維度鑑定</h2>
+            <p style="color: #666; font-size: 0.9rem;">解析核心人格、處事精神與靈魂亞型。</p>
+            <button class="btn btn-primary" onclick="startQuiz()">開始深度測驗</button>
         </div>
     </div>
 
     <div id="quiz-content" style="display:none;">
         <div class="progress-box"><div id="progress-bar"></div></div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #aaa; margin-bottom: 20px;">
-            <span onclick="location.reload()" style="cursor:pointer;"><i class="fa-solid fa-xmark"></i> 放棄</span>
-            <span id="progress-text">0 / 60</span>
-        </div>
-        <div style="min-height: 100px; display: flex; align-items: center; justify-content: center;">
-            <h3 id="q-text" style="text-align: center; margin: 0; color: #333; line-height: 1.4;"></h3>
+        <div style="text-align: center; min-height: 70px; display: flex; align-items: center; justify-content: center;">
+            <h3 id="q-text" style="font-size: 1.1rem; color: #333; margin: 0;"></h3>
         </div>
         <div class="options-container">
             <button class="opt-btn opt-agree-3" onclick="handleAnswer(3)">非常同意</button>
-            <button class="opt-btn opt-agree-2" onclick="handleAnswer(2)">同意</button>
-            <button class="opt-btn opt-agree-1" onclick="handleAnswer(1)">稍微同意</button>
+            <button class="opt-btn opt-agree-3" style="opacity:0.8;" onclick="handleAnswer(2)">同意</button>
+            <button class="opt-btn opt-agree-3" style="opacity:0.6;" onclick="handleAnswer(1)">稍微同意</button>
             <button class="opt-btn opt-neutral" onclick="handleAnswer(0)">中立</button>
-            <button class="opt-btn opt-disagree-1" onclick="handleAnswer(-1)">稍微不同意</button>
-            <button class="opt-btn opt-disagree-2" onclick="handleAnswer(-2)">不同意</button>
+            <button class="opt-btn opt-disagree-3" style="opacity:0.6;" onclick="handleAnswer(-1)">稍微不同意</button>
+            <button class="opt-btn opt-disagree-3" style="opacity:0.8;" onclick="handleAnswer(-2)">不同意</button>
             <button class="opt-btn opt-disagree-3" onclick="handleAnswer(-3)">非常不同意</button>
-        </div>
-        <div style="text-align:center; margin-top:20px;">
-            <button id="prev-btn" onclick="prevQuestion()" style="display:none; color: #aaa; background: none; border: none; cursor: pointer;">
-                <i class="fa-solid fa-arrow-left"></i> 上一題
-            </button>
         </div>
     </div>
 
     <div id="result-page" style="display:none;">
         <div id="capture-area">
-            <div class="result-card-design">
-                <div style="color:var(--secondary); font-weight:bold; font-size:0.75rem; margin-bottom:5px; letter-spacing:2px;">MBTI 64-TYPE REPORT</div>
-                <h1 id="res-code">----</h1>
-                <div class="subtype-label" id="res-subtype">子型鑑定中...</div>
-                <div id="res-desc"></div>
-                
-                <div class="analysis-box">
-                    <div class="analysis-title"><i class="fa-solid fa-bolt"></i> 亞型壓力應對 (Subtype Focus)</div>
-                    <div id="res-stress" style="font-size: 0.85rem; color: #666; line-height: 1.5;"></div>
+            <div class="result-card">
+                <div id="res-sub" style="color:var(--secondary); font-weight:bold; font-size:0.8rem;">亞型</div>
+                <h1 id="res-code"></h1>
+                <h2 id="res-name" style="margin:0; font-size:1.3rem;"></h2>
+                <div class="info-grid">
+                    <div class="info-item"><div class="info-label">性格分析</div><div id="res-desc" class="info-content"></div></div>
+                    <div class="info-item"><div class="info-label">處事精神</div><div id="res-spirit" class="info-content"></div></div>
+                    <div class="info-item"><div class="info-label">代表人物 / 適合伴侶</div><div class="info-content">👤 <span id="res-celebs"></span><br>❤️ <span id="res-partner"></span></div></div>
                 </div>
-                
-                <div style="margin-top:20px; font-size: 10px; color:#ccc;">小邦手心理測驗 | 2026 數位鑑定版</div>
+                <div id="res-motto" class="motto-box"></div>
             </div>
         </div>
-        <div id="final-image-wrapper">
-            <div style="text-align: center; padding: 40px; color: #aaa;">
-                <i class="fa-solid fa-circle-notch fa-spin"></i> 正在生成您的 64 型專屬名片...
-            </div>
-        </div>
-        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-            <button class="btn btn-secondary" onclick="location.reload()">重新測驗</button>
-            <button class="btn btn-primary" onclick="location.reload()">回首頁</button>
-        </div>
+        <div id="final-image-wrapper"></div>
+        <button class="btn btn-primary" onclick="location.reload()">重新測驗</button>
     </div>
 </div>
 
 <script>
-// 完整 60 題庫
 const mbtiQuestions = [
     { text: "在社交聚會中，你通常是主動找人交談的那一位。", dim: "EI", dir: 1 },
     { text: "即使是在熱鬧的場合待上一整天，你依然感到精力充沛。", dim: "EI", dir: 1 },
@@ -232,125 +141,126 @@ const mbtiQuestions = [
     { text: "你很容易因為生活中的小事而感到焦慮或挫折。", dim: "AT", dir: -1 }
 ];
 
-const personalityData = {
-    "INTJ": { name: "建築師", desc: "追求完美的策略家，擁有極強的獨立思考能力與長遠願景。" },
-    "INTP": { name: "邏輯學家", desc: "腦袋裡裝滿理論的發明家，比起現實，更愛探索知識的本質。" },
-    "ENTJ": { name: "指揮官", desc: "天生的領導者，具備強大意志，能迅速將複雜願景轉化為行動。" },
-    "ENTP": { name: "辯論家", desc: "思維活躍的挑戰者，喜歡在智力博弈中打破傳統規則。" },
-    "INFJ": { name: "提倡者", desc: "深沉的理想主義者，對人性有極深洞察，渴望改變世界的底層邏輯。" },
-    "INFP": { name: "調解者", desc: "靈魂的藝術家，對內在價值極度忠誠，充滿詩意與同理心。" },
-    "ENFJ": { name: "主人公", desc: "溫暖且具感染力的領袖，善於引領眾人走向和諧與進步。" },
-    "ENFP": { name: "競選者", desc: "自由奔放的追夢人，在生活的每一個角落尋找靈感與火花。" },
-    "ISTJ": { name: "物流師", desc: "社會的守護者，重視傳統、秩序與事實，極度可靠且務實。" },
-    "ISFJ": { name: "守護者", desc: "低調的奉獻者，默默照顧他人需求，維持環境的和諧穩定。" },
-    "ESTJ": { name: "總管", desc: "秩序的執行者，追求效率與具體成果，是團隊中最強的執行力。" },
-    "ESFJ": { name: "執政官", desc: "社交的樞紐，熱衷於建立連結，對群體需求極為敏銳且友善。" },
-    "ISTP": { name: "鑑賞家", desc: "冷靜的工匠，動手能力極強，擅長用最精簡的方法解決問題。" },
-    "ISFP": { name: "藝術家", desc: "活在當下的美感追求者，用細膩且溫和的方式探索感官世界。" },
-    "ESTP": { name: "企業家", desc: "行動派冒險家，活在當下，能精準捕捉機會並迅速反應。" },
-    "ESFP": { name: "表演者", desc: "生命的演出者，能點燃現場氣氛，讓每一刻都充滿樂趣。" }
+// 核心 64 型數據矩陣 (16人格 x 4子型)
+const fullMatrix64 = {
+    "INTJ": {
+        "Pioneer": { sub: "開拓型", name: "戰略遠見者", desc: "天生的系統構建者，能冷靜將複雜願景拆解為精確步驟。", spirit: "以理性的力量重構世界秩序。", celebs: "埃隆·馬斯克", partner: "ENFP-A", motto: "「預測未來最好的方式就是創造它。」" },
+        "Reactor": { sub: "感應型", name: "完美主義謀士", desc: "在極高標準下運作，擅長在壓力中爆發靈感，修正系統缺陷。", spirit: "在批判中完善自我，尋求極致真理。", celebs: "尼采", partner: "ENFP-T", motto: "「那些殺不死我的，必使我更強大。」" },
+        "Defender": { sub: "防禦型", name: "冷靜執行官", desc: "極度自律且穩定，是團隊中最堅實的智囊，無視外界干擾。", spirit: "守護邏輯邊界，在安靜中發揮影響力。", celebs: "傑夫·貝佐斯", partner: "ENFJ-A", motto: "「靜水流深，實力無須喧嘩。」" },
+        "Observer": { sub: "深思型", name: "憂鬱哲學家", desc: "活在深邃的精神世界，對社會漏洞有天生洞察力。", spirit: "洞察本源，在思維荒原中開拓路徑。", celebs: "牛頓", partner: "INFP-T", motto: "「我看見真理的大海。」" }
+    },
+    "INFP": {
+        "Pioneer": { sub: "開拓型", name: "理想實踐家", desc: "勇於將內在價值觀轉化為現實變革，具備溫柔的領導力。", spirit: "用感性引導世界，將理想照進現實。", celebs: "莎士比亞", partner: "ENFJ-A", motto: "「忠於內心，方得始終。」" },
+        "Reactor": { sub: "感應型", name: "靈魂藝術家", desc: "感性敏銳，常透過創作宣洩內在衝突，對人性能量高度感知。", spirit: "在情緒起伏中，捕捉生命的永恆。", celebs: "J.K.羅琳", partner: "ENTJ-T", motto: "「文字是有魔力的。」" },
+        "Defender": { sub: "防禦型", name: "心靈護衛者", desc: "溫柔但有不可逾越的底線，守護身邊人的情感安全感。", spirit: "內在和平高於一切，守護善良火種。", celebs: "德蕾莎修女", partner: "ESTJ-A", motto: "「愛是唯一的語言。」" },
+        "Observer": { sub: "深思型", name: "夢境構築師", desc: "沈溺於宏大精神宇宙，追求純粹的美與真理。", spirit: "在精神孤島上，建設永恆理想國。", celebs: "三島由紀夫", partner: "ENFJ-T", motto: "「美，是靈魂的反抗。」" }
+    },
+    "INFJ": {
+        "Pioneer": { sub: "開拓型", name: "信念導師", desc: "具備強大遠見與感召力，引導大眾追求崇高目標。", spirit: "引領人類覺醒，重構核心價值。", celebs: "馬丁路德金", partner: "ENFP-A", motto: "「我也夢想有一天。」" },
+        "Reactor": { sub: "感應型", name: "感應先知", desc: "能直覺捕捉人性光輝與陰暗，常因共情而精神疲憊。", spirit: "承載他人重量，在痛苦中救贖。", celebs: "柏拉圖", partner: "ENFP-T", motto: "「往內看的人覺醒了。」" },
+        "Defender": { sub: "防禦型", name: "安靜守護者", desc: "默默維護道德基石，影響力如細雨潤物。", spirit: "守護心靈秩序，做時代孤勇者。", celebs: "甘地", partner: "ENTP-A", motto: "「欲變世界，先變自身。」" },
+        "Observer": { sub: "深思型", name: "符號分析師", desc: "擅長從歷史提取隱喻，對長期趨勢有驚人預判。", spirit: "在文字脈絡中，看見人類終局。", celebs: "卡爾·榮格", partner: "INTJ-T", motto: "「潜意識即命運。」" }
+    },
+    "ENFP": {
+        "Pioneer": { sub: "開拓型", name: "自由冒險家", desc: "熱情洋溢的啟發者，能瞬間點燃團隊創意火花。", spirit: "打破生活疆界，追求極致自由。", celebs: "華特迪士尼", partner: "INTJ-A", motto: "「想像力沒有極限。」" },
+        "Reactor": { sub: "感應型", name: "情感探險員", desc: "情感細膩多變，在與人聯結中尋找自我意義。", spirit: "感應他人靈魂，在變化中進化。", celebs: "小勞勃道尼", partner: "INTJ-T", motto: "「人生就是一場試驗。」" },
+        "Defender": { sub: "防禦型", name: "快樂播種者", desc: "穩定的樂觀主義者，能在崩潰邊緣帶給他人希望。", spirit: "用喜悅驅散陰霾，守護希望之火。", celebs: "湯姆漢克斯", partner: "INFJ-A", motto: "「生活就像巧克力。」" },
+        "Observer": { sub: "深思型", name: "靈性追尋者", desc: "在瘋狂外表下藏著深沉哲學思考，探究存在本質。", spirit: "遊戲人間，卻看透紅塵遊戲。", celebs: "羅賓威廉斯", partner: "INFJ-T", motto: "「你是獨一無二的。」" }
+    },
+    "ENTJ": {
+        "Pioneer": { sub: "開拓型", name: "霸氣統帥", desc: "卓越的資源整合者，能在混亂中迅速建立秩序。", spirit: "征服未知領地，用意志碾壓障礙。", celebs: "賈伯斯", partner: "INFP-A", motto: "「Stay Hungry, Stay Foolish.」" },
+        "Reactor": { sub: "感應型", name: "競爭先鋒", desc: "在高壓中成長，對市場與權力脈動極其敏銳。", spirit: "不斷自我超越，在巔峰維持穩定。", celebs: "戈登拉姆齊", partner: "INFP-T", motto: "「如果不完美就重做。」" },
+        "Defender": { sub: "防禦型", name: "秩序維護者", desc: "冷靜且具備高度責任感，確保計畫萬無一失地落地。", spirit: "以規矩定方圓，穩健擴張版圖。", celebs: "柴契爾夫人", partner: "ISFP-A", motto: "「轉向？不可能。」" },
+        "Observer": { sub: "深思型", name: "權力棋手", desc: "低調的幕後操控者，擅長長期佈局與系統性競爭。", spirit: "掌握核心邏輯，不戰而屈人之兵。", celebs: "洛克菲勒", partner: "INTP-T", motto: "「耐心是成功關鍵。」" }
+    },
+    "INTP": {
+        "Pioneer": { sub: "開拓型", name: "概念發明家", desc: "熱衷於破解宇宙與技術難題，將理論化為原型。", spirit: "解構世界本質，重組真理模塊。", celebs: "比爾蓋茲", partner: "ENTJ-A", motto: "「世界需要更多思考者。」" },
+        "Reactor": { sub: "感應型", name: "瘋狂科學家", desc: "思维跳躍且對細節敏感，常在混亂中發現新定律。", spirit: "在質疑中前進，在碰撞中靈感迸發。", celebs: "愛因斯坦", partner: "ENTJ-T", motto: "「想像力比知識重要。」" },
+        "Defender": { sub: "防禦型", name: "知識館長", desc: "情緒穩定的學究，追求數據與邏輯的絕對一致性。", spirit: "守護客觀事實，排除主觀干擾。", celebs: "查理芒格", partner: "ENFJ-A", motto: "「持續學習是基本功。」" },
+        "Observer": { sub: "深思型", name: "孤傲邏輯師", desc: "深思熟慮且偏好孤獨，在純粹邏輯中獲得快感。", spirit: "剝離所有假象，直達核心真理。", celebs: "笛卡兒", partner: "INFJ-T", motto: "「我思故我在。」" }
+    },
+    "ISTJ": {
+        "Pioneer": { sub: "開拓型", name: "效率執行官", desc: "務實且極度專注，能將傳統方法優化到極致。", spirit: "用數據說話，以結果證實價值。", celebs: "傑夫貝佐斯", partner: "ESFP-A", motto: "「一步一腳印。」" },
+        "Reactor": { sub: "感應型", name: "風險控制官", desc: "對系統偏差極度敏感，擅長在危機前排除隱患。", spirit: "在變動中維穩，精準控制細節。", celebs: "華盛頓", partner: "ESFP-T", motto: "「誠信是第一原則。」" },
+        "Defender": { sub: "防禦型", name: "傳統守望者", desc: "紀律的化身，是家庭與機構最穩定的基石。", spirit: "守護既有秩序，傳承文明價值。", celebs: "英女王", partner: "ESTP-A", motto: "「責任高於權利。」" },
+        "Observer": { sub: "深思型", name: "程序監查員", desc: "嚴謹觀察法規與細節，對流程缺陷有深刻認知。", spirit: "在規則中生活，從細節處定義美。", celebs: "康德", partner: "ESFP-T", motto: "「自律帶給我自由。」" }
+    },
+    "ISFJ": {
+        "Pioneer": { sub: "開拓型", name: "溫情管理者", desc: "能將細膩的關懷轉化為具體的服務，深受團隊信任。", spirit: "關懷人性需求，打造和諧環境。", celebs: "凱特王妃", partner: "ESTP-A", motto: "「溫柔是有力量的。」" },
+        "Reactor": { sub: "感應型", name: "敏銳照顧者", desc: "對他人情緒起伏極度敏銳，常默默承擔後勤壓力。", spirit: "在給予中獲得，感應他人痛苦。", celebs: "德蕾莎修女", partner: "ESTP-T", motto: "「做微小但有愛的事。」" },
+        "Defender": { sub: "防禦型", name: "寧靜堡壘", desc: "情緒極度穩定，是親友在風暴中最安心的避風港。", spirit: "守護溫馨記憶，默默付出不求報。", celebs: "羅莎帕克斯", partner: "ESFP-A", motto: "「每個人都值得被溫柔對待。」" },
+        "Observer": { sub: "深思型", name: "生活觀察家", desc: "觀察生活中的點滴美好，對人際細節有驚人記憶力。", spirit: "在安靜中看見美，記錄平凡的偉大。", celebs: "馬可奧里略", partner: "ESTP-T", motto: "「內在平靜是最高追求。」" }
+    },
+    // 其餘型態採用動態合成 (因字數限制)
+    "ESTJ": { "Pioneer": { sub: "開拓型", name: "執行總管", desc: "卓越的組織者，強勢推動目標達成。", spirit: "紀律即力量。", celebs: "洛克菲勒", partner: "ISFP-A", motto: "「效率決定一切。」" }, "Reactor": { sub: "感應型", name: "戰地指揮", desc: "適應力強，在高壓環境中迅速應變。", spirit: "在混亂中建立秩序。", celebs: "希拉蕊", partner: "ISFP-T", motto: "「永不言敗。」" }, "Defender": { sub: "防禦型", name: "公正法官", desc: "重視事實與規則，追求絕對公平。", spirit: "守護社會契約。", celebs: "華盛頓", partner: "ISFP-A", motto: "「公義是基石。」" }, "Observer": { sub: "深思型", name: "系統監督", desc: "冷靜分析組織漏洞，優化現有流程。", spirit: "精確定位缺陷。", celebs: "漢米爾頓", partner: "ISFP-T", motto: "「細節決定生死。」" } },
+    "ESFJ": { "Pioneer": { sub: "開拓型", name: "社交領袖", desc: "充滿熱情，擅長建立跨界合作聯結。", spirit: "共創和諧社區。", celebs: "泰勒絲", partner: "ISFP-A", motto: "「團結力量大。」" }, "Reactor": { sub: "感應型", name: "情感協調員", desc: "對團體氣氛極其敏銳，化解內在衝突。", spirit: "連結每顆心。", celebs: "休傑克曼", partner: "ISFP-T", motto: "「善良是選擇。」" }, "Defender": { sub: "防禦型", name: "傳統衛士", desc: "穩定可靠，維護家庭與傳統價值觀。", spirit: "守護溫暖記憶。", celebs: "安海瑟薇", partner: "ISTP-A", motto: "「家是心靈歸宿。」" }, "Observer": { sub: "深思型", name: "人性觀察家", desc: "深諳人情世故，洞察大眾行為模式。", spirit: "看透社交密碼。", celebs: "艾爾頓強", partner: "ISTP-T", motto: "「理解即原諒。」" } },
+    "ISTP": { "Pioneer": { sub: "開拓型", name: "技術先鋒", desc: "冷靜的工具大師，擅長解決具體難題。", spirit: "動手改造現實。", celebs: "喬丹", partner: "ESTJ-A", motto: "「結果證明實力。」" }, "Reactor": { sub: "感應型", name: "危機應變者", desc: "在高壓危險中極度冷靜，享受心流體驗。", spirit: "與風險共舞。", celebs: "湯姆克魯斯", partner: "ESTJ-T", motto: "「活在當下。」" }, "Defender": { sub: "防禦型", name: "孤狼匠人", desc: "專注於個人技能修煉，不為外界所動。", spirit: "守護純粹工藝。", celebs: "賈伯斯", partner: "ENFJ-A", motto: "「追求極致。」" }, "Observer": { sub: "深思型", name: "邏輯偵探", desc: "觀察世界運行機制，拆解事物運作原理。", spirit: "解鎖萬物奧秘。", celebs: "伊斯特伍德", partner: "ENFJ-T", motto: "「觀察大於言說。」" } },
+    "ISFP": { "Pioneer": { sub: "開拓型", name: "前衛藝術家", desc: "用感官體驗世界，勇於打破審美框架。", spirit: "表達獨特自我。", celebs: "萊昂納多", partner: "ESFJ-A", motto: "「美就是真理。」" }, "Reactor": { sub: "感應型", name: "情感共鳴者", desc: "對環境氛圍敏感，用色彩與音樂傳遞情緒。", spirit: "感應世界跳動。", celebs: "艾薇兒", partner: "ESFJ-T", motto: "「真實比完美重要。」" }, "Defender": { sub: "防禦型", name: "自然之友", desc: "溫和低調，在安靜中守護內在美學。", spirit: "守護心靈花園。", celebs: "大衛鮑伊", partner: "ENTJ-A", motto: "「沈靜中爆發。」" }, "Observer": { sub: "深思型", name: "美學哲思者", desc: "在孤獨中體味生命的細膩與脆弱。", spirit: "捕捉流逝的瞬間。", celebs: "梵谷", partner: "ENTJ-T", motto: "「我為畫而生。」" } },
+    "ESTP": { "Pioneer": { sub: "開拓型", name: "商場戰士", desc: "對機會極度敏銳，敢於進行高風險決策。", spirit: "贏在起跑線上。", celebs: "川普", partner: "ISFJ-A", motto: "「行動勝過藍圖。」" }, "Reactor": { sub: "感應型", name: "極限運動員", desc: "在變動中尋找刺激，反應速度驚人。", spirit: "掌握混亂節奏。", celebs: "瑪丹娜", partner: "ISFJ-T", motto: "「生命是場挑戰。」" }, "Defender": { sub: "防禦型", name: "街頭智者", desc: "務實且富有經驗，總能找到生存之道。", spirit: "守護實戰智慧。", celebs: "巨石強森", partner: "ISTJ-A", motto: "「實力說話。」" }, "Observer": { sub: "深思型", name: "機會解碼器", desc: "觀察市場規律，精準預判對手下一步。", spirit: "洞察博弈局勢。", celebs: "梅威瑟", partner: "ISTJ-T", motto: "「看準再出手。」" } },
+    "ESFP": { "Pioneer": { sub: "開拓型", name: "聚光燈主角", desc: "天生表演者，能帶領大眾享受當下精彩。", spirit: "燃燒生命熱情。", celebs: "艾維斯普里斯萊", partner: "ISTJ-A", motto: "「人生如戲。」" }, "Reactor": { sub: "感應型", name: "情緒點火者", desc: "情緒張力大，能瞬間感染周圍人的心情。", spirit: "感應當下能量。", celebs: "麥莉希拉", partner: "ISTJ-T", motto: "「盡情揮灑。」" }, "Defender": { sub: "防禦型", name: "快樂守護者", desc: "穩定傳遞正能量，不讓悲觀情緒蔓延。", spirit: "守護集體歡樂。", celebs: "賽琳娜戈梅茲", partner: "ISFJ-A", motto: "「活得漂亮。」" }, "Observer": { sub: "深思型", name: "感官鑑賞家", desc: "在喧囂中洞察人性的真實渴望與脆弱。", spirit: "看透繁華表象。", celebs: "瑪麗蓮夢露", partner: "ISFJ-T", motto: "「我是我自己的。」" } },
+    "ENTP": { "Pioneer": { sub: "開拓型", name: "發明家", desc: "不斷產生新點子，挑戰既有知識框架。", spirit: "推動思維進化。", celebs: "達文西", partner: "INFJ-A", motto: "「問為什麼。」" }, "Reactor": { sub: "感應型", name: "辯論專家", desc: "在觀點碰撞中尋求快感，應變速度極快。", spirit: "在碰撞中覺醒。", celebs: "鋼鐵人", partner: "INFJ-T", motto: "「我是認真的嗎？」" }, "Defender": { sub: "防禦型", name: "理性導航員", desc: "穩定分析風險，確保創意不偏離航道。", spirit: "守護創新價值。", celebs: "艾迪生", partner: "INTJ-A", motto: "「失敗是養分。」" }, "Observer": { sub: "深思型", name: "系統解構者", desc: "看透規則弱點，尋找非傳統路徑。", spirit: "解構世間悖論。", celebs: "富蘭克林", partner: "INTJ-T", motto: "「常識不常有。」" } },
+    "ENFJ": { "Pioneer": { sub: "開拓型", name: "理想導師", desc: "極具感染力，能感召團隊共建美好未來。", spirit: "賦予他人力量。", celebs: "歐巴馬", partner: "INFP-A", motto: "「我們做得到。」" }, "Reactor": { sub: "感應型", name: "情感磁場", desc: "對他人需求感知極強，常承擔過多責任。", spirit: "感應群體共鳴。", celebs: "歐普拉", partner: "INFP-T", motto: "「聽見你的聲音。」" }, "Defender": { sub: "防禦型", name: "和諧大使", desc: "穩定情緒，在危機中維持團隊向心力。", spirit: "守護共同價值。", celebs: "珍妮佛勞倫斯", partner: "ISFP-A", motto: "「共存共榮。」" }, "Observer": { sub: "深思型", name: "心理策略家", desc: "深入研究人性動機，精準佈局教育與成長。", spirit: "看穿潛在可能。", celebs: "馬修麥康納", partner: "INTP-T", motto: "「持續進步。」" } }
 };
 
 let currentIdx = 0;
 let userScores = { EI: 0, SN: 0, TF: 0, JP: 0, AT: 0 };
 let scoreHistory = [];
 
-// 初始化選單
-const grid = document.getElementById('type-grid');
-Object.keys(personalityData).forEach(code => {
-    const chip = document.createElement('div');
-    chip.className = 'type-chip';
-    chip.innerText = code;
-    chip.onclick = () => {
-        const suffix = document.querySelector('input[name="suffix"]:checked').value;
-        showResultPage(`${code}-${suffix}`);
-    };
-    grid.appendChild(chip);
-});
-
 function startQuiz() {
+    currentIdx = 0;
+    userScores = { EI: 0, SN: 0, TF: 0, JP: 0, AT: 0 };
     document.getElementById('quiz-intro').style.display = 'none';
     document.getElementById('quiz-content').style.display = 'block';
     renderQuestion();
 }
 
 function renderQuestion() {
-    window.scrollTo(0,0);
     const q = mbtiQuestions[currentIdx];
     document.getElementById('q-text').innerText = q.text;
-    document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${mbtiQuestions.length}`;
-    document.getElementById('progress-bar').style.width = ((currentIdx + 1) / mbtiQuestions.length * 100) + "%";
-    document.getElementById('prev-btn').style.display = currentIdx > 0 ? "inline-block" : "none";
+    document.getElementById('progress-bar').style.width = ((currentIdx + 1) / mbtiQuestions.length) * 100 + "%";
 }
 
-function handleAnswer(val) {
+function handleAnswer(value) {
     const q = mbtiQuestions[currentIdx];
-    const pts = val * q.dir;
-    userScores[q.dim] += pts;
-    scoreHistory.push({ dim: q.dim, pts: pts });
-    
+    userScores[q.dim] += (value * q.dir);
     currentIdx++;
-    if (currentIdx < mbtiQuestions.length) {
-        renderQuestion();
-    } else {
-        const res = (userScores.EI >= 0 ? "E" : "I") + (userScores.SN >= 0 ? "S" : "N") + 
-                    (userScores.TF >= 0 ? "T" : "F") + (userScores.JP >= 0 ? "J" : "P") +
-                    "-" + (userScores.AT >= 0 ? "A" : "T");
-        showResultPage(res);
-    }
+    if (currentIdx < mbtiQuestions.length) renderQuestion();
+    else calculateResult();
 }
 
-function prevQuestion() {
-    if (currentIdx > 0) {
-        currentIdx--;
-        const last = scoreHistory.pop();
-        userScores[last.dim] -= last.pts;
-        renderQuestion();
-    }
+function calculateResult() {
+    let mbti = (userScores.EI >= 0 ? "E" : "I") + (userScores.SN >= 0 ? "S" : "N") + (userScores.TF >= 0 ? "T" : "F") + (userScores.JP >= 0 ? "J" : "P");
+    let identity = userScores.AT >= 0 ? "A" : "T";
+    let subtype = "";
+    if (userScores.EI >= 0 && userScores.AT >= 0) subtype = "Pioneer";
+    else if (userScores.EI >= 0 && userScores.AT < 0) subtype = "Reactor";
+    else if (userScores.EI < 0 && userScores.AT >= 0) subtype = "Defender";
+    else subtype = "Observer";
+
+    showResult(mbti, subtype, identity);
 }
 
-function showResultPage(code) {
-    document.getElementById('quiz-intro').style.display = 'none';
+function showResult(mbti, subtype, identity) {
     document.getElementById('quiz-content').style.display = 'none';
     document.getElementById('result-page').style.display = 'block';
-
-    const base = code.split('-')[0];
-    const isE = code.startsWith('E');
-    const isA = code.endsWith('A');
-    
-    // 64亞型邏輯
-    let subTitle = "";
-    let stressDesc = "";
-    
-    if (isE && isA) {
-        subTitle = "開拓亞型 (The Pioneer)";
-        stressDesc = "在壓力下表現出極強的侵略性與行動力，傾向於透過「控制外部環境」來解決焦慮，是天生的變革引領者。";
-    } else if (isE && !isA) {
-        subTitle = "感應亞型 (The Reactor)";
-        stressDesc = "高度關注外界反饋，雖然充滿活力但內心起伏劇烈，常在社交互動中尋求自我價值的確認與情緒緩解。";
-    } else if (!isE && isA) {
-        subTitle = "防禦亞型 (The Defender)";
-        stressDesc = "內在極度穩定，不輕易受外界干擾。在危機中表現冷漠且高效，能獨自消化大量負面訊息而不崩潰。";
-    } else {
-        subTitle = "深思亞型 (The Observer)";
-        stressDesc = "高敏感且追求完美，壓力下傾向於退縮到精神世界進行過度分析，對細節有近乎強迫的掌控欲。";
-    }
-
-    document.getElementById('res-code').innerText = code;
-    document.getElementById('res-subtype').innerText = subTitle;
-    document.getElementById('res-desc').innerText = personalityData[base].desc;
-    document.getElementById('res-stress').innerText = stressDesc;
+    const data = fullMatrix64[mbti][subtype];
+    document.getElementById('res-sub').innerText = data.sub;
+    document.getElementById('res-code').innerText = `${mbti}-${identity}`;
+    document.getElementById('res-name').innerText = data.name;
+    document.getElementById('res-desc').innerText = data.desc;
+    document.getElementById('res-spirit').innerText = data.spirit;
+    document.getElementById('res-celebs').innerText = data.celebs;
+    document.getElementById('res-partner').innerText = data.partner;
+    document.getElementById('res-motto').innerText = data.motto;
 
     setTimeout(() => {
         html2canvas(document.getElementById('capture-area'), { scale: 2 }).then(canvas => {
-            const wrapper = document.getElementById('final-image-wrapper');
-            wrapper.innerHTML = "";
             const img = document.createElement('img');
             img.src = canvas.toDataURL();
-            wrapper.appendChild(img);
+            document.getElementById('final-image-wrapper').appendChild(img);
             document.getElementById('capture-area').style.display = "none";
         });
-    }, 1000);
+    }, 800);
 }
 </script>
 </body>
