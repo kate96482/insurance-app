@@ -2,17 +2,15 @@
 <html lang="zh-TW">
 <head>
     <link rel="apple-touch-icon" href="logo.png">
-<link rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta name="apple-mobile-web-app-title" content="小邦手">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-<meta name="apple-mobile-web-app-title" content="小邦手">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>現代馬卡龍貸款試算 - 決策助手</title>
+    <title>貸款試算全攻略 - 小邦手</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -32,11 +30,16 @@
             margin: 0; padding: 10px;
         }
 
+        /* 修正：返回按鈕樣式與 PWA 跳轉優化 */
         .back-home {
-            display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 5px; 
             color: var(--m-purple); font-weight: bold; font-size: 0.9rem; margin-bottom: 10px;
-            padding: 5px 12px; border-radius: 20px; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            padding: 8px 15px; border-radius: 20px; background: white; 
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
+        .back-home:active { background: #eee; transform: scale(0.95); }
 
         .calc-container { 
             max-width: 600px; margin: auto; background: white; 
@@ -66,6 +69,7 @@
         .amt-input-big { 
             width: 120px; padding: 5px; font-size: 1.5rem; font-weight: 900; 
             border: 2px solid var(--bright-blue); border-radius: 12px; text-align: center; color: var(--bright-blue);
+            background: white;
         }
 
         .input-row { 
@@ -78,7 +82,7 @@
 
         .rate-config { background: var(--soft-mint); padding: 15px; border-radius: 15px; font-size: 0.9rem; }
         .step-row { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
-        .step-row input { width: 50px; text-align: center; border-radius: 5px; border: 1px solid #ddd; }
+        .step-row input { width: 50px; text-align: center; border-radius: 5px; border: 1px solid #ddd; padding: 2px; }
 
         .summary-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
         .summary-item { padding: 12px 5px; border-radius: 15px; text-align: center; color: white; }
@@ -98,7 +102,9 @@
 </head>
 <body>
 
-<a href="index.html" class="back-home"><i class="fa-solid fa-house"></i> 返回首頁</a>
+<div onclick="window.location.assign('index.html');" class="back-home">
+    <i class="fa-solid fa-house"></i> 返回首頁
+</div>
 
 <div class="calc-container">
     <h2><i class="fa-solid fa-calculator"></i> 貸款試算工具</h2>
@@ -131,7 +137,7 @@
             <input type="range" id="graceSld" min="0" max="5" value="0" oninput="updateAll()">
         </div>
         <div class="rate-config">
-            <label style="font-weight:bold"><input type="checkbox" id="isMultiStep" onchange="toggleRateUI()"> 啟用分段式利率</label>
+            <label style="font-weight:bold; cursor:pointer"><input type="checkbox" id="isMultiStep" onchange="toggleRateUI()"> 啟用分段式利率</label>
             <div id="singleRateUI" style="margin-top:10px">
                 年利率：<input type="number" id="baseRate" value="2.185" step="0.001" style="width:70px" oninput="updateAll()"> %
             </div>
@@ -141,7 +147,7 @@
                         第 1 年至 <input type="number" class="step-end" value="2" oninput="updateAll()"> 年：利率 <input type="number" class="step-rate" value="2.06" step="0.01" oninput="updateAll()"> %
                     </div>
                 </div>
-                <button onclick="addStep()" style="font-size:0.7rem; cursor:pointer">+ 新增分段</button>
+                <button onclick="addStep()" style="font-size:0.7rem; cursor:pointer; padding: 2px 8px;">+ 新增分段</button>
             </div>
         </div>
     </div>
@@ -149,7 +155,7 @@
     <div id="personal-options" class="form-section">
         <div class="input-row">
             <div style="display:flex; justify-content:space-between">
-                <label>借款年期</label><span class="val-display" id="pYearTxt">10 年</span>
+                <label>借款年期</label><span class="val-display" id="pYearTxt">7 年</span>
             </div>
             <input type="range" id="pYearSld" min="1" max="10" value="7" oninput="updateAll()">
         </div>
@@ -190,6 +196,22 @@
 </div>
 
 <script>
+    // PWA 防跳轉腳本
+    (function(doc, nav, standalone) {
+        if ((standalone in nav) && nav[standalone]) {
+            doc.addEventListener('click', function(event) {
+                var cnode = event.target;
+                while (cnode && cnode.nodeName !== 'A' && cnode.nodeName !== 'HTML') {
+                    cnode = cnode.parentNode;
+                }
+                if (cnode && 'href' in cnode && cnode.href.indexOf('.html') !== -1) {
+                    event.preventDefault();
+                    window.location.assign(cnode.href);
+                }
+            }, false);
+        }
+    })(document, window.navigator, 'standalone');
+
     let currentMode = 'mortgage';
 
     function setMode(mode) {
@@ -242,7 +264,7 @@
             const rRate = parseFloat(document.getElementById('rRateInp').value) / 100 / 365;
             const dailyInt = Math.round(principal * rRate);
             document.getElementById('resFirstPmt').innerText = "NT$" + (dailyInt * 30).toLocaleString();
-            document.getElementById('resTotalInt').innerText = "日計息";
+            document.getElementById('resTotalInt').innerText = "按日計息";
             document.getElementById('resTotalAll').innerText = "隨借隨還";
             document.getElementById('detailBody').innerHTML = "<tr><td colspan='5'>理財型房貸按日計息，借多少算多少。</td></tr>";
             return;
@@ -259,7 +281,6 @@
         for (let m = 1; m <= totalMonths; m++) {
             let rate = (currentMode === 'mortgage') ? parseFloat(document.getElementById('baseRate').value) : parseFloat(document.getElementById('pRateInp').value);
             
-            // 分段利率邏輯
             if (currentMode === 'mortgage' && document.getElementById('isMultiStep').checked) {
                 const steps = document.querySelectorAll('.step-row');
                 for (let s of steps) {
@@ -287,25 +308,22 @@
             else { balance -= pRepaid; }
 
             totalInt += interest;
-            if(m === 1) document.getElementById('resFirstPmt').innerText = pmt.toLocaleString();
+            if(m === 1) document.getElementById('resFirstPmt').innerText = "NT$" + pmt.toLocaleString();
 
-            // 只顯示前 24 期與最後一期，避免 DOM 過大
+            // 調整顯示：顯示前 120 期與最後一期
             if (m <= 120 || m === totalMonths) {
                 html += `<tr class="${m === totalMonths ? 'last-row' : ''}"><td>${m}</td><td>${pRepaid.toLocaleString()}</td><td>${interest.toLocaleString()}</td><td>${pmt.toLocaleString()}</td><td>${Math.max(0, balance).toLocaleString()}</td></tr>`;
-            } else if (m === 25) {
+            } else if (m === 121) {
                 html += `<tr><td colspan="5">...... 中略 ......</td></tr>`;
             }
         }
 
-        document.getElementById('resTotalInt').innerText = totalInt.toLocaleString();
-        document.getElementById('resTotalAll').innerText = (principal + totalInt).toLocaleString();
+        document.getElementById('resTotalInt').innerText = "NT$" + totalInt.toLocaleString();
+        document.getElementById('resTotalAll').innerText = "NT$" + (principal + totalInt).toLocaleString();
         document.getElementById('detailBody').innerHTML = html;
     }
 
     window.onload = updateAll;
 </script>
 </body>
-
 </html>
-
-
