@@ -64,21 +64,24 @@
             }
         }
 
+        /* 這裡改為 .tool-card 設定，因為它不再是 <a> */
         .tool-card {
             background: white;
             border-radius: 20px;
             padding: 25px;
-            text-decoration: none;
             color: var(--text-color);
             display: flex;
             align-items: center;
             box-shadow: 0 10px 20px rgba(0,0,0,0.05);
             transition: transform 0.2s, box-shadow 0.2s;
             border: 1px solid #eee;
+            cursor: pointer; /* 讓它滑過去有手指圖案 */
+            -webkit-tap-highlight-color: transparent; /* 移除手機點擊時的藍色外框 */
         }
 
         .tool-card:active {
-            transform: scale(0.98);
+            transform: scale(0.96);
+            background-color: #f0f0f0;
         }
 
         .icon-box {
@@ -126,7 +129,7 @@
 
     <div class="grid-container">
         
-        <a href="cancer_calc.html" class="tool-card">
+        <div onclick="location.href='cancer_calc.html';" class="tool-card">
             <div class="icon-box bg-cancer">
                 <i class="fa-solid fa-file-medical"></i>
             </div>
@@ -134,9 +137,9 @@
                 <h3>防癌無憂試算</h3>
                 <p>即時計算保費與癌症數據對比</p>
             </div>
-        </a>
+        </div>
 
-        <a href="numerology.html" class="tool-card">
+        <div onclick="location.href='numerology.html';" class="tool-card">
             <div class="icon-box bg-numerology">
                 <i class="fa-solid fa-star"></i>
             </div>
@@ -144,9 +147,9 @@
                 <h3>生命靈數全解析</h3>
                 <p>九宮格連線與流年週期運勢</p>
             </div>
-        </a>
+        </div>
         
-        <a href="money.html" class="tool-card">
+        <div onclick="location.href='money.html';" class="tool-card">
             <div class="icon-box bg-money">
                 <i class="fa-solid fa-money-bill-trend-up"></i>
             </div>
@@ -154,9 +157,9 @@
                 <h3>貸款試算全攻略</h3>
                 <p>信貸周轉/購屋貸款/原屋融資</p>
             </div>
-        </a>
+        </div>
 
-        <a href="mbti.html" class="tool-card">
+        <div onclick="location.href='mbti.html';" class="tool-card">
             <div class="icon-box bg-mbti">
                 <i class="fa-solid fa-puzzle-piece"></i>
             </div>
@@ -164,34 +167,13 @@
                 <h3>16型人格測驗</h3>
                 <p>探索內在核心與社交特質解析</p>
             </div>
-        </a>
+        </div>
 
     </div>
 
     <div class="footer">
         &copy; 2026 數位工具箱 
     </div>
-
-    <script>
-        (function(doc, nav, standalone) {
-            // 只在 App 模式 (Standalone) 下運作
-            if ((standalone in nav) && nav[standalone]) {
-                var cnode;
-                doc.addEventListener('click', function(event) {
-                    cnode = event.target;
-                    // 向上搜尋直到找到 A 標籤
-                    while (cnode.nodeName !== 'A' && cnode.nodeName !== 'HTML') {
-                        cnode = cnode.parentNode;
-                    }
-                    // 如果點擊的是連結，且是同一個網站的連結，就強制在原視窗開啟
-                    if ('href' in cnode && cnode.href.indexOf('http') !== -1 && (cnode.href.indexOf(doc.location.host) !== -1)) {
-                        event.preventDefault();
-                        doc.location.href = cnode.href;
-                    }
-                }, false);
-            }
-        })(document, window.navigator, 'standalone');
-    </script>
 
 </body>
 </html>
