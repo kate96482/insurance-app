@@ -2,78 +2,108 @@
 <html lang="zh-TW">
 <head>
     <link rel="apple-touch-icon" href="logo.png">
-<link rel="icon" type="image/png" href="logo.png">
-
-<meta name="apple-mobile-web-app-title" content="小邦手">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta name="apple-mobile-web-app-title" content="小邦手">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MBTI 測驗 - 小邦手</title>
+    <title>MBTI 性格測驗 - 小邦手</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         :root {
-            --primary-color: #A29BFE;
-            --bg-color: #F8F9FA;
+            --primary: #A29BFE;
+            --secondary: #6C5CE7;
+            --bg: #F8F9FA;
         }
-        body { font-family: "Microsoft JhengHei", sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        body { 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            background-color: var(--bg); 
+            margin: 0; padding: 15px; 
+            display: flex; flex-direction: column; align-items: center;
+            -webkit-tap-highlight-color: transparent;
+        }
         
-        .mbti-container { width: 100%; max-width: 500px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .mbti-container { width: 100%; max-width: 500px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); box-sizing: border-box; }
         
         /* 進度條樣式 */
-        .progress-box { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin: 15px 0; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #A29BFE, #6C5CE7); transition: 0.3s; }
+        .progress-box { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); }
         
         /* 選項按鈕樣式 */
-        .options-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        .opt-btn { border: none; padding: 15px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; }
-        .opt-agree-3 { background-color: #D1E9FF; }
-        .opt-agree-2 { background-color: #E3F2FF; }
-        .opt-agree-1 { background-color: #F0F8FF; }
+        .options-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .opt-btn { 
+            border: none; padding: 14px; border-radius: 50px; font-weight: bold; 
+            cursor: pointer; transition: 0.2s; font-size: 0.95rem; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .opt-btn:active { transform: scale(0.96); opacity: 0.8; }
+        
+        .opt-agree-3 { background-color: #D1E9FF; color: #0056b3; }
+        .opt-agree-2 { background-color: #E3F2FF; color: #0056b3; }
+        .opt-agree-1 { background-color: #F0F8FF; color: #0056b3; }
         .opt-neutral { background-color: #F1F3F5; color: #888; }
-        .opt-disagree-1 { background-color: #FFF0F3; }
-        .opt-disagree-2 { background-color: #FFDDE4; }
-        .opt-disagree-3 { background-color: #FFCAD4; }
+        .opt-disagree-1 { background-color: #FFF0F3; color: #c9184a; }
+        .opt-disagree-2 { background-color: #FFDDE4; color: #c9184a; }
+        .opt-disagree-3 { background-color: #FFCAD4; color: #c9184a; }
 
-        /* 結果圖卡 */
-        .result-card-design { padding: 30px 15px; text-align: center; border-radius: 20px; background: #fff; }
-        #res-code { font-size: 3rem; color: #6C5CE7; margin: 10px 0; }
-        #res-desc { text-align: left; line-height: 1.7; color: #555; font-size: 0.95rem; }
-        .celebs-tag { background: #F8F9FA; padding: 10px; border-radius: 10px; margin-top: 15px; font-size: 0.85rem; }
+        /* 結果圖卡設計優化 */
+        #capture-area { 
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            padding: 40px 20px; text-align: center; border-radius: 20px; 
+            position: relative; overflow: hidden;
+        }
+        .result-card-design { 
+            background: rgba(255,255,255,0.9); padding: 30px 20px; 
+            border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border: 1px solid white;
+        }
+        #res-code { font-size: 3.5rem; color: var(--secondary); margin: 10px 0; letter-spacing: 2px; }
+        #res-name { color: #333; margin-bottom: 20px; font-size: 1.5rem; }
+        #res-desc { text-align: justify; line-height: 1.8; color: #444; font-size: 0.95rem; padding: 0 10px; }
+        .celebs-tag { background: var(--secondary); color: white; padding: 12px; border-radius: 12px; margin-top: 20px; font-size: 0.85rem; }
 
-        #final-image-wrapper img { width: 100%; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-top: 10px; }
-        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-primary { background: #6C5CE7; color: white; }
+        #final-image-wrapper img { width: 100%; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); margin-top: 10px; }
+        
+        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--secondary); color: white; }
         .btn-secondary { background: #eee; color: #666; }
+        .btn:active { transform: scale(0.95); }
+
+        /* 防止截圖時文字溢出 */
+        #capture-area * { word-break: break-all; }
     </style>
 </head>
 <body>
 
 <div id="mbti-app" class="mbti-container">
     <div id="quiz-intro" class="quiz-step">
-        <h2 style="color:#6C5CE7; text-align: center;">MBTI 性格傾向測驗</h2>
-        <p style="text-align: center; color: #666;">探索你的內在核心，發現你的靈魂色彩。</p>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fa-solid fa-compass-drafting" style="font-size: 4rem; color: var(--primary); margin-bottom: 15px;"></i>
+            <h2 style="color:var(--secondary);">MBTI 性格傾向測驗</h2>
+            <p style="color: #666; line-height: 1.6;">探索你的內在核心，發現你的靈魂色彩。<br>請根據第一直覺作答。</p>
+        </div>
         <div style="text-align: center; margin: 30px 0;">
-            <button class="btn btn-primary" style="padding: 15px 50px;" onclick="startQuiz()">開始深度測驗</button><br><br>
+            <button class="btn btn-primary" style="padding: 15px 50px; font-size: 1.1rem;" onclick="startQuiz()">開始深度測驗</button><br><br>
             <button class="btn btn-secondary" onclick="goHome()">返回首頁</button>
         </div>
-        <div style="text-align: center; font-size: 0.8rem; color: #bbb;">📝 60 題 | ⏱ 5 分鐘</div>
+        <div style="text-align: center; font-size: 0.8rem; color: #bbb;">📝 60 題 | ⏱ 預計 5-8 分鐘</div>
     </div>
 
     <div id="quiz-content" class="quiz-step" style="display:none;">
         <div class="quiz-top">
             <div class="progress-box"><div id="progress-bar"></div></div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #aaa;">
-                <span onclick="confirmExit()" style="cursor:pointer; padding: 5px;"><i class="fa-solid fa-xmark"></i> 放棄測驗</span>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #aaa; margin-bottom: 20px;">
+                <span onclick="confirmExit()" style="cursor:pointer;"><i class="fa-solid fa-xmark"></i> 放棄</span>
                 <span id="progress-text">0 / 60</span>
             </div>
         </div>
-        <h3 id="q-text" style="text-align: center; margin: 30px 0; min-height: 60px;">題目載入中...</h3>
+        <div style="min-height: 80px; display: flex; align-items: center; justify-content: center;">
+            <h3 id="q-text" style="text-align: center; margin: 0; color: #333; line-height: 1.4;">題目載入中...</h3>
+        </div>
         <div class="options-container">
             <button class="opt-btn opt-agree-3" onclick="handleAnswer(3)">非常同意</button>
             <button class="opt-btn opt-agree-2" onclick="handleAnswer(2)">同意</button>
@@ -84,11 +114,11 @@
             <button class="opt-btn opt-disagree-3" onclick="handleAnswer(-3)">非常不同意</button>
         </div>
         
-        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 30px; border-top: 1px dashed #eee; padding-top: 20px;">
-            <button id="prev-btn" onclick="prevQuestion()" style="display:none; color: #888; background: none; border: none; cursor: pointer; font-size: 0.9rem;">
+        <div style="display: flex; justify-content: center; gap: 30px; margin-top: 30px; border-top: 1px dashed #eee; padding-top: 20px;">
+            <button id="prev-btn" onclick="prevQuestion()" style="display:none; color: #aaa; background: none; border: none; cursor: pointer; font-size: 0.9rem;">
                 <i class="fa-solid fa-arrow-left"></i> 上一題
             </button>
-            <button onclick="confirmExit()" style="color: #888; background: none; border: none; cursor: pointer; font-size: 0.9rem;">
+            <button onclick="confirmExit()" style="color: #aaa; background: none; border: none; cursor: pointer; font-size: 0.9rem;">
                 <i class="fa-solid fa-house"></i> 回首頁
             </button>
         </div>
@@ -97,24 +127,34 @@
     <div id="result-page" class="quiz-step" style="display:none;">
         <div id="capture-area">
             <div class="result-card-design">
+                <div style="color:var(--secondary); font-weight:bold; font-size:0.8rem; margin-bottom:5px;">MBTI 鑑定報告</div>
                 <h1 id="res-code">----</h1>
                 <h2 id="res-name">人格稱號</h2>
                 <div id="res-desc"></div>
-                <div class="celebs-tag"><strong>代表人物：</strong> <span id="res-celebs"></span></div>
-                <div style="font-size: 10px; color:#ccc; margin-top: 15px;">小邦手心理測驗 | 2026 版</div>
+                <div class="celebs-tag">
+                    <div style="font-weight:bold; margin-bottom:5px; opacity:0.8;">代表人物</div>
+                    <span id="res-celebs"></span>
+                </div>
+                <div style="font-size: 10px; color:#bbb; margin-top: 20px;">小邦手心理測驗 | 2026 數位版</div>
             </div>
         </div>
-        <div id="final-image-wrapper"></div>
-        <p style="text-align: center; color:#6C5CE7; font-weight: bold;">💡 長按上方圖片即可另存報告</p>
-        <div style="display: flex; gap: 10px; justify-content: center;">
+        <div id="final-image-wrapper">
+            <div style="text-align: center; padding: 40px; color: #aaa;">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> 正在生成您的性格名片...
+            </div>
+        </div>
+        <p style="text-align: center; color:var(--secondary); font-weight: bold; margin-top: 15px; font-size: 0.9rem;">
+            <i class="fa-solid fa-download"></i> 長按上方圖片即可保存
+        </p>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
             <button class="btn btn-secondary" onclick="location.reload()">重新測驗</button>
-            <button class="btn btn-primary" onclick="goHome()">返回首頁</button>
+            <button class="btn btn-primary" onclick="goHome()">回首頁</button>
         </div>
     </div>
 </div>
 
 <script>
-// --- 資料庫：60 題題目 ---
+// (題目與資料庫部分保持原樣，僅微調 EI/SN 等邏輯順序確保準確)
 const mbtiQuestions = [
     { text: "在社交聚會中，你通常是主動找人交談的那一位。", dim: "EI", dir: 1 },
     { text: "即使是在熱鬧的場合待上一整天，你依然感到精力充沛。", dim: "EI", dir: 1 },
@@ -178,7 +218,6 @@ const mbtiQuestions = [
     { text: "你很容易因為生活中的小事而感到焦慮或挫折。", dim: "AT", dir: -1 }
 ];
 
-// --- 資料庫：16 型人格解析 ---
 const personalityData = {
     "INTJ": { name: "建築師", desc: "你擁有強大的意志與獨立思考能力，追求效率，是天生的戰略家。", celebs: "埃隆·馬斯克、尼采" },
     "INTP": { name: "邏輯學家", desc: "你對理論有著不懈熱情，比起現實，你更活在概念世界中。", celebs: "比爾·蓋茲、愛因斯坦" },
@@ -198,10 +237,9 @@ const personalityData = {
     "ESFP": { name: "表演者", desc: "天生表演者，充滿樂趣，能點燃氣氛，讓當下變得精彩。", celebs: "艾爾頓強、瑪麗蓮夢露" }
 };
 
-// --- 核心邏輯 ---
 let currentIdx = 0;
 let userScores = { EI: 0, SN: 0, TF: 0, JP: 0, AT: 0 };
-let scoreHistory = []; // 新增：記錄每一題的得分紀錄
+let scoreHistory = [];
 
 function startQuiz() {
     currentIdx = 0;
@@ -213,21 +251,18 @@ function startQuiz() {
 }
 
 function renderQuestion() {
+    window.scrollTo(0, 0); // 置頂
     const q = mbtiQuestions[currentIdx];
     document.getElementById('q-text').innerText = q.text;
     const progress = ((currentIdx + 1) / mbtiQuestions.length) * 100;
     document.getElementById('progress-bar').style.width = progress + "%";
     document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${mbtiQuestions.length}`;
-    
-    // 第一題不顯示「上一題」按鈕
     document.getElementById('prev-btn').style.display = currentIdx > 0 ? "inline-block" : "none";
 }
 
 function handleAnswer(value) {
     const q = mbtiQuestions[currentIdx];
     const points = value * q.dir;
-    
-    // 紀錄本次得分
     scoreHistory.push({ dim: q.dim, points: points });
     userScores[q.dim] += points;
 
@@ -239,7 +274,6 @@ function handleAnswer(value) {
     }
 }
 
-// 新增：上一題功能
 function prevQuestion() {
     if (currentIdx > 0) {
         currentIdx--;
@@ -260,8 +294,10 @@ function calculateFinalResult() {
 }
 
 function showResultPage(code) {
+    window.scrollTo(0, 0);
     document.getElementById('quiz-content').style.display = 'none';
     document.getElementById('result-page').style.display = 'block';
+    
     const baseCode = code.split('-')[0];
     const data = personalityData[baseCode];
 
@@ -271,27 +307,31 @@ function showResultPage(code) {
     document.getElementById('res-celebs').innerText = data.celebs;
 
     const captureArea = document.getElementById('capture-area');
+    
+    // 確保渲染後的延遲生成截圖
     setTimeout(() => {
-        html2canvas(captureArea, { backgroundColor: "#ffffff", scale: 2 }).then(canvas => {
+        html2canvas(captureArea, { 
+            backgroundColor: null, 
+            scale: 2,
+            logging: false,
+            useCORS: true
+        }).then(canvas => {
             const imgData = canvas.toDataURL("image/png");
             const finalImg = document.createElement('img');
             finalImg.src = imgData;
             const wrapper = document.getElementById('final-image-wrapper');
             wrapper.innerHTML = "";
             wrapper.appendChild(finalImg);
-            captureArea.style.display = "none"; 
+            captureArea.style.display = "none"; // 生成完後隱藏 DOM
         });
-    }, 600);
+    }, 800);
 }
 
 function goHome() { location.href = 'index.html'; }
 
-// 修改：增加測驗中的誤觸判斷
 function confirmExit() { 
     if (currentIdx > 0) {
-        if (confirm("測驗正在進行中，現在離開將不會保留進度。確定要返回首頁嗎？")) {
-            goHome();
-        }
+        if (confirm("離開將遺失進度，確定要返回首頁嗎？")) goHome();
     } else {
         goHome();
     }
@@ -300,4 +340,3 @@ function confirmExit() {
 
 </body>
 </html>
-
