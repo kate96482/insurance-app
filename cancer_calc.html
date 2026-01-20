@@ -22,21 +22,11 @@
         body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 8px; }
         
         .back-home {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            background: white;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
+            display: inline-flex; align-items: center; gap: 5px; color: var(--primary);
+            font-weight: bold; font-size: 0.9rem; margin-bottom: 10px; padding: 8px 15px;
+            border-radius: 20px; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
         }
-        .back-home:active { background: #eee; transform: scale(0.95); }
 
         .container { max-width: 850px; margin: auto; background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
         h2 { color: var(--primary); text-align: center; margin: 5px 0 12px; font-size: 1.15rem; }
@@ -49,38 +39,37 @@
         #ageInput { width: 50px; padding: 4px; text-align: center; border: 1.5px solid var(--primary); border-radius: 4px; font-weight: bold; }
         #ageSlider { flex: 1; accent-color: var(--primary); }
 
-        .chart-section { display: flex; gap: 6px; margin-bottom: 12px; overflow: hidden; }
-        .chart-card { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 0; background: #fff; min-width: 0; display: flex; flex-direction: column; height: 220px; position: relative; }
+        .chart-section { display: flex; gap: 6px; margin-bottom: 12px; }
+        .chart-card { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 0; background: #fff; display: flex; flex-direction: column; height: 200px; }
         .chart-title { font-size: 0.8rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 5px; }
         .chart-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
 
-        /* 新增：癌症時鐘與年齡分布樣式 */
+        /* 癌症時鐘與分佈圖區塊 */
         .visual-stats { display: flex; gap: 8px; margin-bottom: 15px; }
-        .stat-box { flex: 1; background: #f0f9ff; border-radius: 10px; padding: 10px; text-align: center; border: 1px solid #bae6fd; }
-        .clock-val { font-size: 1.8rem; font-weight: 900; color: var(--accent); margin: 5px 0; display: block; }
-        .clock-label { font-size: 0.7rem; color: #475569; }
-        .age-trend-img { width: 100%; height: 60px; object-fit: contain; margin-top: 5px; }
+        .stat-box { flex: 1; background: #fff; border-radius: 10px; padding: 8px; text-align: center; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; }
+        .clock-val { font-size: 1.8rem; font-weight: 900; color: var(--accent); line-height: 1; }
+        .clock-label { font-size: 0.65rem; color: #64748b; margin-top: 4px; }
+        .stat-box h4 { font-size: 0.75rem; margin: 0 0 5px 0; color: var(--primary); }
 
         .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px; }
         .result-item { background: #fff; border: 1px solid #cbd5e1; padding: 6px 2px; border-radius: 8px; text-align: center; }
-        .result-item .label { font-size: 0.65rem; color: #64748b; margin-bottom: 2px; }
+        .result-item .label { font-size: 0.65rem; color: #64748b; }
         .result-item .value { font-size: 0.85rem; color: var(--accent); font-weight: 800; }
         .result-item.highlight { border: 1.5px solid var(--primary); background: #f0f9ff; }
 
-        .section-subtitle { font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; color: #444; }
         .plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .plan-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 2px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .plan-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 2px; text-align: center; cursor: pointer; }
         .plan-card.active { border: 2px solid var(--primary); background: #f0f9ff; }
         .plan-card i { font-size: 18px; color: var(--primary); margin-bottom: 4px; }
-        .plan-card span { display: block; font-size: 0.65rem; font-weight: bold; line-height: 1.2; }
+        .plan-card span { display: block; font-size: 0.65rem; font-weight: bold; }
 
-        #detail-view { margin-top: 12px; padding: 12px; border-left: 4px solid var(--primary); background: #f8fafc; display: none; font-size: 0.85rem; border-radius: 0 8px 8px 0; }
+        #detail-view { margin-top: 12px; padding: 12px; border-left: 4px solid var(--primary); background: #f8fafc; display: none; border-radius: 0 8px 8px 0; }
 
         @media (max-width: 600px) {
-            .chart-card { height: 160px; }
             .result-grid { grid-template-columns: repeat(2, 1fr); }
             .plan-grid { grid-template-columns: repeat(2, 1fr); }
             .visual-stats { flex-direction: column; }
+            .stat-box { height: 120px; }
         }
     </style>
 </head>
@@ -92,6 +81,7 @@
 
 <div class="container">
     <h2>防癌無憂即時試算</h2>
+    
     <div class="control-group">
         <div class="gender-selector">
             <button class="gender-btn active" onclick="setGender('male', this)">男性</button>
@@ -117,20 +107,13 @@
 
     <div class="visual-stats">
         <div class="stat-box">
-            <div class="chart-title" style="margin:0"><i class="fa-solid fa-hourglass-half"></i> 癌症時鐘</div>
+            <h4><i class="fa-solid fa-hourglass-half"></i> 癌症時鐘</h4>
             <span class="clock-val">04:10</span>
             <span class="clock-label">每 4 分 10 秒即有一人罹癌</span>
         </div>
-        <div class="stat-box">
-            <div class="chart-title" style="margin:0"><i class="fa-solid fa-chart-line"></i> 罹癌年齡分布</div>
-            <div style="font-size: 0.75rem; font-weight: bold; color: var(--accent); margin: 4px 0;">20-49 歲發病率顯著攀升</div>
-            <div style="display:flex; align-items:flex-end; gap:3px; height:35px; justify-content:center;">
-                <div style="width:12%; height:20%; background:#cbd5e1;"></div>
-                <div style="width:12%; height:45%; background:var(--primary);"></div>
-                <div style="width:12%; height:75%; background:var(--primary);"></div>
-                <div style="width:12%; height:100%; background:#64748b;"></div>
-                <div style="width:12%; height:90%; background:#94a3b8;"></div>
-            </div>
+        <div class="stat-box" style="flex: 1.5;">
+            <h4><i class="fa-solid fa-chart-bar"></i> 罹癌年齡分佈趨勢</h4>
+            <div class="chart-wrapper" style="height: 80px;"><canvas id="ageDistChart"></canvas></div>
         </div>
     </div>
 
@@ -143,7 +126,7 @@
         <div class="result-item"><div class="label">累計至 75 歲止</div><div id="totalToMax" class="value">-</div></div>
     </div>
 
-    <div class="section-subtitle">最新檢測方案每年 8 選 1 (點選查看)</div>
+    <div class="section-subtitle" style="font-size:0.8rem; font-weight:bold; margin-bottom:8px;">最新檢測方案每年 8 選 1</div>
     <div class="plan-grid">
         <div class="plan-card" onclick="selectPlan(0, this)"><i class="fa-solid fa-dna"></i><span>CTC 循環</span></div>
         <div class="plan-card" onclick="selectPlan(1, this)"><i class="fa-solid fa-shield-heart"></i><span>肝甲狀腺</span></div>
@@ -156,14 +139,13 @@
     </div>
 
     <div id="detail-view">
-        <div id="pTitle" style="font-weight:bold; color:var(--primary); font-size:1rem;"></div>
-        <div id="pDesc" style="margin:8px 0; line-height:1.5; color:#334155;"></div>
-        <div id="pMethod" style="color:var(--accent); font-weight:bold; background:#fee2e2; padding:4px 8px; border-radius:4px; display:inline-block;"></div>
+        <div id="pTitle" style="font-weight:bold; color:var(--primary);"></div>
+        <div id="pDesc" style="margin:5px 0; line-height:1.4; font-size:0.8rem; color:#444;"></div>
+        <div id="pMethod" style="color:var(--accent); font-weight:bold; font-size:0.8rem;"></div>
     </div>
 </div>
 
 <script>
-    // iOS 全螢幕導覽修正
     function navTo(url, e) {
         if (e) e.preventDefault();
         if (("standalone" in window.navigator) && window.navigator.standalone) {
@@ -173,20 +155,19 @@
         }
     }
 
-    // 更新後的 8 選 1 詳細資料
     const plans = [
-        { t: "CTC 循環腫瘤細胞檢測", d: "新一代血液循環腫瘤細胞檢測及腫瘤標記，提供更安全便捷的早期癌症篩檢及術後監控。", m: "費用參考：$15,000 ~ $45,000" },
-        { t: "全方位肝及甲狀腺檢測", d: "針對肝炎、肝纖維化、肝癌數值，以及甲狀腺功能與甲狀腺癌進行深度評估。", m: "費用參考：$17,000 ~ $20,000" },
-        { t: "男性十大癌症基因套組", d: "針對男性高風險癌症如肺癌、肝癌等進行基因篩檢，涵蓋多項關鍵健康指標。", m: "費用參考：$25,800" },
-        { t: "女性十大癌症基因套組", d: "針對女性十大高風險癌症如乳癌、卵巢癌、子宮頸癌等進行專屬基因風險評估。", m: "費用參考：$25,800" },
-        { t: "特殊癌症早期警示基因", d: "針對胰臟、膽囊、基底細胞癌及黑色素瘤等較特殊或隱蔽的癌症提供早期預警。", m: "費用參考：$15,800" },
-        { t: "隱匿危機癌症風險預測", d: "預測較難察覺的癌症風險，包括膀胱癌、甲狀腺癌等潛在的隱匿性威脅。", m: "費用參考：$15,800" },
-        { t: "綜合血癌與心血管基因", d: "同時涵蓋血癌風險與心血管疾病（如心臟衰竭、冠狀動脈硬化）之基因篩查。", m: "費用參考：$15,800" },
-        { t: "腦癌與神經功能障礙套組", d: "針對腦部腫瘤及早發型神經病變（如阿茲海默症、帕金森氏症）進行預防性檢測。", m: "費用參考：$15,800" }
+        { t: "CTC 循環腫瘤細胞檢測", d: "新一代血液循環腫瘤細胞檢測，提供早期癌症篩檢及術後監控。", m: "費用參考：$15,000 ~ $45,000" },
+        { t: "全方位肝及甲狀腺檢測", d: "針對肝炎、肝纖維化及甲狀腺功能進行深度評估。", m: "費用參考：$17,000 ~ $20,000" },
+        { t: "男性十大癌症基因套組", d: "針對男性高風險癌症進行遺傳基因篩檢。", m: "費用參考：$25,800" },
+        { t: "女性十大癌症基因套組", d: "針對女性乳癌、卵巢癌等進行專屬風險評估。", m: "費用參考：$25,800" },
+        { t: "特殊癌症早期警示基因", d: "針對胰臟、膽囊等隱蔽癌症提供早期預警。", m: "費用參考：$15,800" },
+        { t: "隱匿危機癌症風險預測", d: "預測難以察覺的癌症風險，如膀胱癌、甲狀腺癌。", m: "費用參考：$15,800" },
+        { t: "綜合血癌與心血管基因", d: "涵蓋血癌風險與心血管疾病基因篩查。", m: "費用參考：$15,800" },
+        { t: "腦癌與神經功能障礙套組", d: "針對腦部腫瘤及早發型神經病變進行檢測。", m: "費用參考：$15,800" }
     ];
 
     let gender = 'male';
-    let sChart, cChart;
+    let sChart, cChart, aChart;
     Chart.register(ChartDataLabels);
 
     const data = {
@@ -224,12 +205,9 @@
 
         let t10=0, t20=0, tMax=0;
         for(let i=0; i<=45; i++){
-            let cur = age + i; 
-            if(cur > 75) break; 
+            let cur = age + i; if(cur > 75) break; 
             let p = (i===0) ? f : getRate(gender, cur, false);
-            if(i < 10) t10 += p;
-            if(i < 20) t20 += p;
-            tMax += p;
+            if(i < 10) t10 += p; if(i < 20) t20 += p; tMax += p;
         }
         document.getElementById('total10').innerText = '$' + t10.toLocaleString();
         document.getElementById('total20').innerText = '$' + t20.toLocaleString();
@@ -258,25 +236,15 @@
 
     window.onload = () => {
         const isMobile = window.innerWidth < 600;
+        
+        // 存活率與十大癌症 (圓餅圖)
         const commonOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            radius: isMobile ? '60%' : '75%', 
-            layout: { padding: isMobile ? 25 : 35 },
-            plugins: {
-                legend: { display: false },
-                datalabels: {
-                    anchor: 'end',
-                    align: 'end',
-                    offset: isMobile ? 2 : 8,
-                    color: '#444',
-                    font: { size: isMobile ? 9 : 10, weight: 'bold' },
-                    formatter: (v, ctx) => {
-                        if (isMobile && v < 7) return '';
-                        return ctx.chart.data.labels[ctx.dataIndex] + '\n' + v + '%';
-                    }
-                }
-            }
+            responsive: true, maintainAspectRatio: false,
+            radius: isMobile ? '60%' : '75%', layout: { padding: isMobile ? 25 : 30 },
+            plugins: { legend: { display: false }, datalabels: {
+                anchor: 'end', align: 'end', color: '#444', font: { size: 9, weight: 'bold' },
+                formatter: (v, ctx) => ctx.chart.data.labels[ctx.dataIndex] + '\n' + v + '%'
+            }}
         };
 
         sChart = new Chart(document.getElementById('survivalChart'), {
@@ -290,6 +258,28 @@
             data: { labels: [], datasets: [{ data: [], backgroundColor: ['#003f5c','#2f4b7c','#665191','#a05195','#d45087','#f95d6a','#ff7c43','#ffa600','#488f31','#de425b'], borderWidth: 0 }] },
             options: commonOptions
         });
+
+        // 新增：年齡分佈真實長條圖
+        aChart = new Chart(document.getElementById('ageDistChart'), {
+            type: 'bar',
+            data: {
+                labels: ['0-19', '20-39', '40-59', '60-79', '80+'],
+                datasets: [{
+                    data: [5, 15, 35, 30, 15],
+                    backgroundColor: ['#cbd5e1', '#005a92', '#005a92', '#94a3b8', '#cbd5e1'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 9 } } } },
+                plugins: { 
+                    legend: { display: false }, 
+                    datalabels: { anchor: 'end', align: 'top', font: { size: 8 }, formatter: (v) => v + '%' }
+                }
+            }
+        });
+
         render();
     };
 </script>
