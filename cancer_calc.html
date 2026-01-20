@@ -39,13 +39,12 @@
         #ageInput { width: 50px; padding: 4px; text-align: center; border: 1.5px solid var(--primary); border-radius: 4px; font-weight: bold; }
         #ageSlider { flex: 1; accent-color: var(--primary); }
 
-        /* --- 保持原始圓餅圖排版 --- */
         .chart-section { display: flex; gap: 6px; margin-bottom: 12px; overflow: hidden; }
         .chart-card { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 5px 0; background: #fff; min-width: 0; display: flex; flex-direction: column; height: 220px; }
         .chart-title { font-size: 0.8rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 2px; }
         .chart-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
 
-        /* --- 新增：癌症時鐘與趨勢 (完全獨立樣式) --- */
+        /* 獨立時鐘與趨勢樣式，避免衝突 */
         .v3-visual-stats { display: flex; gap: 6px; margin-bottom: 12px; }
         .v3-clock-box { 
             flex: 0 0 38%; background: #1e293b; border-radius: 10px; padding: 8px; 
@@ -61,7 +60,6 @@
         .v3-trend-box { flex: 1; min-width: 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 5px; display: flex; flex-direction: column; }
         .v3-trend-canvas { flex: 1; width: 100%; height: 80px; position: relative; }
 
-        /* --- 原始結果與方案排版 --- */
         .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px; }
         .result-item { background: #fff; border: 1px solid #cbd5e1; padding: 6px 2px; border-radius: 8px; text-align: center; }
         .result-item .label { font-size: 0.65rem; color: #64748b; margin-bottom: 2px; }
@@ -139,8 +137,8 @@
     <div class="plan-grid">
         <div class="plan-card" onclick="selectPlan(0, this)"><i class="fa-solid fa-dna"></i><span>CTC 循環</span></div>
         <div class="plan-card" onclick="selectPlan(1, this)"><i class="fa-solid fa-shield-virus"></i><span>肝甲狀腺</span></div>
-        <div class="plan-card" onclick="selectPlan(2, this)"><i class="fa-solid fa-mars"></i><span>男性十大</span></div>
-        <div class="plan-card" onclick="selectPlan(3, this)"><i class="fa-solid fa-venus"></i><span>女性十大</span></div>
+        <div class="plan-card" onclick="selectPlan(2, this)"><i class="fa-solid fa-mars"></i><span>男性基因</span></div>
+        <div class="plan-card" onclick="selectPlan(3, this)"><i class="fa-solid fa-venus"></i><span>女性基因</span></div>
         <div class="plan-card" onclick="selectPlan(4, this)"><i class="fa-solid fa-eye"></i><span>特殊癌</span></div>
         <div class="plan-card" onclick="selectPlan(5, this)"><i class="fa-solid fa-magnifying-glass-plus"></i><span>隱匿危機</span></div>
         <div class="plan-card" onclick="selectPlan(6, this)"><i class="fa-solid fa-heart-pulse"></i><span>癌心血管</span></div>
@@ -155,23 +153,21 @@
 </div>
 
 <script>
-    function navTo(url, e) {
-        if (e) e.preventDefault();
-        window.location.href = url;
-    }
+    function navTo(url, e) { if (e) e.preventDefault(); window.location.href = url; }
 
     let gender = 'male', sChart, cChart, aChart;
     Chart.register(ChartDataLabels);
 
+    // --- 已更新為最新的八大篩檢內容 ---
     const plans = [
-        { t: "CTC 循環腫瘤細胞檢測", d: "透過液體活檢捕捉血液中微小癌細胞病灶。", m: "檢測方式：抽血 10ml" },
-        { t: "肝與甲狀腺深度檢測", d: "針對高壓族群常見的代謝與內分泌系統篩查。", m: "檢測方式：超音波 + 血液指標" },
-        { t: "男性十大癌症基因風險", d: "檢測先天遺傳弱點，提早規劃防護路徑。", m: "檢測方式：口腔抹片" },
-        { t: "女性十大癌症基因風險", d: "針對乳腺、子宮等女性高風險癌症進行基因篩檢。", m: "檢測方式：口腔抹片" },
-        { t: "特殊癌症早期警示", d: "針對胰臟、膽囊等難以偵測的器官進行精密定序。", m: "檢測方式：血液精密定序" },
-        { t: "隱匿危機癌症監測", d: "偵測長期潛伏於體內的異常生長信號。", m: "檢測方式：全身癌症指標" },
-        { t: "綜合癌症與心血管風險", d: "同時評估癌症指標與心血管風險。", m: "檢測方式：抽血檢測" },
-        { t: "腦部與神經功能篩查", d: "針對中高齡族群預防早發型神經病變。", m: "檢測方式：功能性評估" }
+        { t: "CTC 循環腫瘤細胞檢測", d: "偵測血液中微量循環腫瘤細胞，早期發現風險。", m: "費用參考：$15,000 ~ $45,000" },
+        { t: "全方位肝及甲狀腺檢測", d: "深度評估肝炎及甲狀腺結節風險。", m: "費用參考：$17,000 ~ $20,000" },
+        { t: "男性十大癌症基因套組", d: "針對男性好發癌症基因篩查。", m: "費用參考：$25,800" },
+        { t: "女性十大癌症基因套組", d: "專為乳癌、卵巢癌設計之風險預警。", m: "費用參考：$25,800" },
+        { t: "特殊癌症早期警示基因", d: "涵蓋胰臟癌、膽囊癌等深層癌症基因。", m: "費用參考：$15,800" },
+        { t: "隱匿危機癌症風險預測", d: "預測甲狀腺癌、膀瘡癌等早期風險。", m: "費用參考：$15,800" },
+        { t: "綜合血癌與心血管基因", d: "檢測血液腫瘤與心血管高風險基因。", m: "費用參考：$15,800" },
+        { t: "腦癌與神經功能障礙套組", d: "評估腦部腫瘤及神經病變遺傳風險。", m: "費用參考：$15,800" }
     ];
 
     const data = {
