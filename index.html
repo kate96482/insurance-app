@@ -8,116 +8,39 @@
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="icon" type="image/png" href="logo.png">
     <meta name="apple-mobile-web-app-title" content="小邦手">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root {
-            --primary-color: #4CC9F0;
-            --secondary-color: #7209B7;
-            --bg-color: #F8F9FA;
-            --text-color: #333;
-        }
+        :root { --primary-color: #4CC9F0; --secondary-color: #7209B7; --bg-color: #F8F9FA; --text-color: #333; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .header { text-align: center; margin-bottom: 30px; margin-top: 20px; }
+        .header h1 { color: var(--secondary-color); margin: 0; font-size: 1.8rem; }
+        .header p { color: #666; margin-top: 8px; font-size: 0.9rem; }
+        .grid-container { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; max-width: 450px; }
+        @media (min-width: 600px) { .grid-container { max-width: 800px; grid-template-columns: 1fr 1fr; } }
 
-        body {
-            font-family: "Microsoft JhengHei", sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            margin-top: 20px;
-        }
-
-        .header h1 {
-            color: var(--secondary-color);
-            margin: 0;
-            font-size: 1.8rem;
-        }
-
-        .header p {
-            color: #666;
-            margin-top: 8px;
-            font-size: 0.9rem;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            width: 100%;
-            max-width: 450px;
-        }
-
-        @media (min-width: 600px) {
-            .grid-container {
-                max-width: 800px;
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        /* 這裡改為 .tool-card 設定，因為它不再是 <a> */
+        /* 關鍵修正：將 tool-card 改為 div 樣式 */
         .tool-card {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 1px solid #eee;
-            cursor: pointer; /* 讓它滑過去有手指圖案 */
-            -webkit-tap-highlight-color: transparent; /* 移除手機點擊時的藍色外框 */
+            background: white; border-radius: 20px; padding: 25px; 
+            display: flex; align-items: center; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+            transition: transform 0.2s; border: 1px solid #eee;
+            cursor: pointer; /* 讓鼠標變成手指 */
+            -webkit-tap-highlight-color: transparent; /* 消除手機點擊閃爍 */
         }
-
-        .tool-card:active {
-            transform: scale(0.96);
-            background-color: #f0f0f0;
-        }
-
-        .icon-box {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 20px;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .info-box h3 {
-            margin: 0;
-            font-size: 1.15rem;
-            color: #222;
-        }
-
-        .info-box p {
-            margin: 5px 0 0 0;
-            font-size: 0.85rem;
-            color: #888;
-        }
-
+        .tool-card:active { transform: scale(0.96); background-color: #f9f9f9; }
+        .icon-box { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-size: 1.5rem; color: white; }
+        .info-box h3 { margin: 0; font-size: 1.15rem; color: #222; }
+        .info-box p { margin: 5px 0 0 0; font-size: 0.85rem; color: #888; }
         .bg-cancer { background: linear-gradient(135deg, #FF6B6B, #EE5253); }
         .bg-numerology { background: linear-gradient(135deg, #4CC9F0, #4895EF); }
         .bg-money { background: linear-gradient(135deg, #B5EAD7, #88D8B0); } 
         .bg-mbti { background: linear-gradient(135deg, #A29BFE, #6C5CE7); }
-
-        .footer {
-            margin-top: 50px;
-            font-size: 0.75rem;
-            color: #BBB;
-        }
+        .footer { margin-top: 50px; font-size: 0.75rem; color: #BBB; }
     </style>
 </head>
 <body>
@@ -128,52 +51,28 @@
     </div>
 
     <div class="grid-container">
-        
-        <div onclick="location.href='cancer_calc.html';" class="tool-card">
-            <div class="icon-box bg-cancer">
-                <i class="fa-solid fa-file-medical"></i>
-            </div>
-            <div class="info-box">
-                <h3>防癌無憂試算</h3>
-                <p>即時計算保費與癌症數據對比</p>
-            </div>
+        <div onclick="window.location.assign('cancer_calc.html');" class="tool-card">
+            <div class="icon-box bg-cancer"><i class="fa-solid fa-file-medical"></i></div>
+            <div class="info-box"><h3>防癌無憂試算</h3><p>即時計算保費與癌症數據對比</p></div>
         </div>
 
-        <div onclick="location.href='numerology.html';" class="tool-card">
-            <div class="icon-box bg-numerology">
-                <i class="fa-solid fa-star"></i>
-            </div>
-            <div class="info-box">
-                <h3>生命靈數全解析</h3>
-                <p>九宮格連線與流年週期運勢</p>
-            </div>
+        <div onclick="window.location.assign('numerology.html');" class="tool-card">
+            <div class="icon-box bg-numerology"><i class="fa-solid fa-star"></i></div>
+            <div class="info-box"><h3>生命靈數全解析</h3><p>九宮格連線與流年週期運勢</p></div>
         </div>
         
-        <div onclick="location.href='money.html';" class="tool-card">
-            <div class="icon-box bg-money">
-                <i class="fa-solid fa-money-bill-trend-up"></i>
-            </div>
-            <div class="info-box">
-                <h3>貸款試算全攻略</h3>
-                <p>信貸周轉/購屋貸款/原屋融資</p>
-            </div>
+        <div onclick="window.location.assign('money.html');" class="tool-card">
+            <div class="icon-box bg-money"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+            <div class="info-box"><h3>貸款試算全攻略</h3><p>信貸周轉/購屋貸款/原屋融資</p></div>
         </div>
 
-        <div onclick="location.href='mbti.html';" class="tool-card">
-            <div class="icon-box bg-mbti">
-                <i class="fa-solid fa-puzzle-piece"></i>
-            </div>
-            <div class="info-box">
-                <h3>16型人格測驗</h3>
-                <p>探索內在核心與社交特質解析</p>
-            </div>
+        <div onclick="window.location.assign('mbti.html');" class="tool-card">
+            <div class="icon-box bg-mbti"><i class="fa-solid fa-puzzle-piece"></i></div>
+            <div class="info-box"><h3>16型人格測驗</h3><p>探索內在核心與社交特質解析</p></div>
         </div>
-
     </div>
 
-    <div class="footer">
-        &copy; 2026 數位工具箱 
-    </div>
+    <div class="footer">&copy; 2026 數位工具箱</div>
 
 </body>
 </html>
