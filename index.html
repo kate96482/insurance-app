@@ -51,22 +51,22 @@
     </div>
 
     <div class="grid-container">
-        <div onclick="navTo('cancer_calc.html');" class="tool-card">
+        <div onclick="navTo('cancer_calc.html', event);" class="tool-card">
             <div class="icon-box bg-cancer"><i class="fa-solid fa-file-medical"></i></div>
             <div class="info-box"><h3>防癌無憂試算</h3><p>即時計算保費與癌症數據對比</p></div>
         </div>
 
-        <div onclick="navTo('numerology.html');" class="tool-card">
+        <div onclick="navTo('numerology.html', event);" class="tool-card">
             <div class="icon-box bg-numerology"><i class="fa-solid fa-star"></i></div>
             <div class="info-box"><h3>生命靈數全解析</h3><p>九宮格連線與流年週期運勢</p></div>
         </div>
         
-        <div onclick="navTo('money.html');" class="tool-card">
+        <div onclick="navTo('money.html', event);" class="tool-card">
             <div class="icon-box bg-money"><i class="fa-solid fa-money-bill-trend-up"></i></div>
             <div class="info-box"><h3>貸款試算全攻略</h3><p>信貸周轉/購屋貸款/原屋融資</p></div>
         </div>
 
-        <div onclick="navTo('mbti.html');" class="tool-card">
+        <div onclick="navTo('mbti.html', event);" class="tool-card">
             <div class="icon-box bg-mbti"><i class="fa-solid fa-puzzle-piece"></i></div>
             <div class="info-box"><h3>16型人格測驗</h3><p>探索內在核心與社交特質解析</p></div>
         </div>
@@ -75,29 +75,30 @@
     <div class="footer">&copy; 2026 數位工具箱</div>
 
     <script>
-        // 【核心修正】這段腳本會強制在當前 PWA 視窗內跳轉，不再彈出打叉視窗
-        function navTo(url) {
+        // 核心修正：導航函數
+        function navTo(url, e) {
+            if (e) e.preventDefault(); // 阻斷原生點擊，防止 iOS 彈出網頁框
+            
             if (("standalone" in window.navigator) && window.navigator.standalone) {
-                // 如果是 iOS PWA 模式，強制使用 location.assign 
-                // 並且確保不觸發系統預設的新視窗行為
-                window.location.assign(url);
+                // PWA 模式：使用 replace 讓系統認為是「頁面更新」而非「開啟連結」
+                window.location.replace(url);
             } else {
-                // 普通網頁模式
                 window.location.href = url;
             }
         }
 
-        // 另外增加一個全局攔截，防止所有意外的視窗彈出
+        // 全域攔截器：防止頁面內任何 <a> 標籤意外觸發彈窗
         (function(document, navigator, standalone) {
             if ((standalone in navigator) && navigator[standalone]) {
                 document.addEventListener('click', function(e) {
                     let noddy = e.target;
-                    while (noddy.nodeName !== "A" && noddy.nodeName !== "HTML") {
+                    while (noddy && noddy.nodeName !== "A" && noddy.nodeName !== "HTML") {
                         noddy = noddy.parentNode;
                     }
-                    if ("href" in noddy && noddy.href.indexOf('http') === -1 && (noddy.href.indexOf(window.location.host) !== -1)) {
+                    // 只要點擊的是同網域連結，一律攔截並強制內部跳轉
+                    if (noddy && "href" in noddy && noddy.hostname === window.location.hostname) {
                         e.preventDefault();
-                        window.location.href = noddy.href;
+                        window.location.replace(noddy.href);
                     }
                 }, false);
             }
