@@ -60,7 +60,7 @@
         <div class="quiz-top">
             <div class="progress-box"><div id="progress-bar"></div></div>
             <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #aaa;">
-                <span onclick="confirmExit()" style="cursor:pointer;">✕ 放棄測驗</span>
+                <span onclick="confirmExit()" style="cursor:pointer; padding: 5px;"><i class="fa-solid fa-xmark"></i> 放棄測驗</span>
                 <span id="progress-text">0 / 60</span>
             </div>
         </div>
@@ -73,6 +73,15 @@
             <button class="opt-btn opt-disagree-1" onclick="handleAnswer(-1)">稍微不同意</button>
             <button class="opt-btn opt-disagree-2" onclick="handleAnswer(-2)">不同意</button>
             <button class="opt-btn opt-disagree-3" onclick="handleAnswer(-3)">非常不同意</button>
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 30px; border-top: 1px dashed #eee; padding-top: 20px;">
+            <button id="prev-btn" onclick="prevQuestion()" style="display:none; color: #888; background: none; border: none; cursor: pointer; font-size: 0.9rem;">
+                <i class="fa-solid fa-arrow-left"></i> 上一題
+            </button>
+            <button onclick="confirmExit()" style="color: #888; background: none; border: none; cursor: pointer; font-size: 0.9rem;">
+                <i class="fa-solid fa-house"></i> 回首頁
+            </button>
         </div>
     </div>
 
@@ -183,10 +192,12 @@ const personalityData = {
 // --- 核心邏輯 ---
 let currentIdx = 0;
 let userScores = { EI: 0, SN: 0, TF: 0, JP: 0, AT: 0 };
+let scoreHistory = []; // 新增：記錄每一題的得分紀錄
 
 function startQuiz() {
     currentIdx = 0;
     userScores = { EI: 0, SN: 0, TF: 0, JP: 0, AT: 0 };
+    scoreHistory = [];
     document.getElementById('quiz-intro').style.display = 'none';
     document.getElementById('quiz-content').style.display = 'block';
     renderQuestion();
@@ -198,16 +209,34 @@ function renderQuestion() {
     const progress = ((currentIdx + 1) / mbtiQuestions.length) * 100;
     document.getElementById('progress-bar').style.width = progress + "%";
     document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${mbtiQuestions.length}`;
+    
+    // 第一題不顯示「上一題」按鈕
+    document.getElementById('prev-btn').style.display = currentIdx > 0 ? "inline-block" : "none";
 }
 
 function handleAnswer(value) {
     const q = mbtiQuestions[currentIdx];
-    userScores[q.dim] += value * q.dir;
+    const points = value * q.dir;
+    
+    // 紀錄本次得分
+    scoreHistory.push({ dim: q.dim, points: points });
+    userScores[q.dim] += points;
+
     currentIdx++;
     if (currentIdx < mbtiQuestions.length) {
         renderQuestion();
     } else {
         calculateFinalResult();
+    }
+}
+
+// 新增：上一題功能
+function prevQuestion() {
+    if (currentIdx > 0) {
+        currentIdx--;
+        const lastScore = scoreHistory.pop();
+        userScores[lastScore.dim] -= lastScore.points;
+        renderQuestion();
     }
 }
 
@@ -241,13 +270,23 @@ function showResultPage(code) {
             const wrapper = document.getElementById('final-image-wrapper');
             wrapper.innerHTML = "";
             wrapper.appendChild(finalImg);
-            captureArea.style.display = "none"; // 隱藏原本的 HTML 顯示生成的圖片
+            captureArea.style.display = "none"; 
         });
     }, 600);
 }
 
 function goHome() { location.href = 'index.html'; }
-function confirmExit() { if (confirm("確定要離開測驗嗎？進度將不會保留。")) goHome(); }
+
+// 修改：增加測驗中的誤觸判斷
+function confirmExit() { 
+    if (currentIdx > 0) {
+        if (confirm("測驗正在進行中，現在離開將不會保留進度。確定要返回首頁嗎？")) {
+            goHome();
+        }
+    } else {
+        goHome();
+    }
+}
 </script>
 
 </body>
