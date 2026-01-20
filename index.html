@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -47,7 +49,6 @@
             font-size: 0.9rem;
         }
 
-        /* 網格佈局：手機 1 欄，平板以上 2 欄 */
         .grid-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -63,7 +64,6 @@
             }
         }
 
-        /* 卡片樣式 */
         .tool-card {
             background: white;
             border-radius: 20px;
@@ -105,7 +105,6 @@
             color: #888;
         }
 
-        /* 不同功能的專屬顏色 */
         .bg-cancer { background: linear-gradient(135deg, #FF6B6B, #EE5253); }
         .bg-numerology { background: linear-gradient(135deg, #4CC9F0, #4895EF); }
         .bg-money { background: linear-gradient(135deg, #B5EAD7, #88D8B0); } 
@@ -118,3 +117,60 @@
         }
     </style>
 </head>
+<body>
+
+    <div class="header">
+        <h1>數位工具箱</h1>
+        <p>提供您專業且便捷的試算服務</p>
+    </div>
+
+    <div class="grid-container">
+        
+        <a href="cancer_calc.html" class="tool-card">
+            <div class="icon-box bg-cancer">
+                <i class="fa-solid fa-file-medical"></i>
+            </div>
+            <div class="info-box">
+                <h3>防癌無憂試算</h3>
+                <p>即時計算保費與癌症數據對比</p>
+            </div>
+        </a>
+
+        <a href="numerology.html" class="tool-card">
+            <div class="icon-box bg-numerology">
+                <i class="fa-solid fa-star"></i>
+            </div>
+            <div class="info-box">
+                <h3>生命靈數全解析</h3>
+                <p>九宮格連線與流年週期運勢</p>
+            </div>
+        </a>
+        
+        <a href="money.html" class="tool-card">
+            <div class="icon-box bg-money">
+                <i class="fa-solid fa-money-bill-trend-up"></i>
+            </div>
+            <div class="info-box">
+                <h3>貸款試算全攻略</h3>
+                <p>信貸周轉/購屋貸款/原屋融資</p>
+            </div>
+        </a>
+
+        <a href="mbti.html" class="tool-card">
+            <div class="icon-box bg-mbti">
+                <i class="fa-solid fa-puzzle-piece"></i>
+            </div>
+            <div class="info-box">
+                <h3>16型人格測驗</h3>
+                <p>探索內在核心與社交特質解析</p>
+            </div>
+        </a>
+
+    </div>
+
+    <div class="footer">
+        &copy; 2026 數位工具箱 
+    </div>
+
+</body>
+</html>
