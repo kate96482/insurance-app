@@ -1,0 +1,66 @@
+<div id="mbti-app" class="mbti-container">
+    
+    <div id="quiz-intro" class="quiz-step">
+        <div class="mbti-header">
+            <h2>MBTI 性格傾向測驗</h2>
+            <p>探索你的內在核心，發現 16 型人格中屬於你的靈魂色彩。</p>
+        </div>
+        <div class="intro-actions">
+            <button class="btn btn-primary" onclick="startQuiz()">開始深度測驗</button>
+            <button class="btn btn-link" onclick="goHome()">返回首頁</button>
+        </div>
+        <div class="quiz-info">
+            <span>📝 總共 60 題</span>
+            <span>⏱ 預計 5-8 分鐘</span>
+        </div>
+    </div>
+
+    <div id="quiz-content" class="quiz-step" style="display:none;">
+        <div class="quiz-top">
+            <button class="btn-exit" onclick="confirmExit()">✕ 放棄</button>
+            <div class="progress-box">
+                <div id="progress-bar"></div>
+            </div>
+            <span id="progress-text">0 / 60</span>
+        </div>
+
+        <div id="question-area">
+            <h3 id="q-text">題目載入中...</h3>
+            <div class="options-container">
+                <button class="opt-btn opt-agree-3" onclick="handleAnswer(3)">非常同意</button>
+                <button class="opt-btn opt-agree-2" onclick="handleAnswer(2)">同意</button>
+                <button class="opt-btn opt-agree-1" onclick="handleAnswer(1)">稍微同意</button>
+                <button class="opt-btn opt-neutral" onclick="handleAnswer(0)">中立</button>
+                <button class="opt-btn opt-disagree-1" onclick="handleAnswer(-1)">稍微不同意</button>
+                <button class="opt-btn opt-disagree-2" onclick="handleAnswer(-2)">不同意</button>
+                <button class="opt-btn opt-disagree-3" onclick="handleAnswer(-3)">非常不同意</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-page" class="quiz-step" style="display:none;">
+        <div id="capture-area">
+            <div id="result-card-inner" class="result-card-design">
+                <div id="res-avatar-box"></div>
+                <h1 id="res-code">----</h1>
+                <h2 id="res-name">人格稱號</h2>
+                <div id="res-description"></div>
+                <div id="res-celebrity-box" class="celebs-tag">
+                    <strong>代表人物：</strong> <span id="res-celebs"></span>
+                </div>
+                <div class="card-watermark">小邦手心理測驗 | 2026 版</div>
+            </div>
+        </div>
+
+        <div id="final-image-wrapper"></div>
+        
+        <p class="save-hint">💡 長按上方圖片即可另存解析報告</p>
+
+        <div class="result-actions">
+            <button class="btn btn-secondary" onclick="location.reload()">重新測驗</button>
+            <button class="btn btn-primary" onclick="goHome()">返回首頁</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
