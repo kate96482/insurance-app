@@ -2,17 +2,15 @@
 <html lang="zh-TW">
 <head>
     <link rel="apple-touch-icon" href="logo.png">
-<link rel="icon" type="image/png" href="logo.png">
-
-<meta name="apple-mobile-web-app-title" content="小邦手">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta name="apple-mobile-web-app-title" content="小邦手">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>防癌試算 - 圖表縮小完整版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>防癌試算 - 小邦手</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,21 +19,23 @@
         * { box-sizing: border-box; }
         body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 8px; }
         
-        /* 新增：左上角返回按鈕樣式 */
+        /* 修正：將返回按鈕改為 div 點擊樣式 */
         .back-home {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            text-decoration: none;
             color: var(--primary);
             font-weight: bold;
             font-size: 0.9rem;
             margin-bottom: 10px;
-            padding: 5px 10px;
+            padding: 8px 15px; /* 稍微加大一點好點擊 */
             border-radius: 20px;
             background: white;
             box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
+        .back-home:active { background: #eee; transform: scale(0.95); }
 
         .container { max-width: 850px; margin: auto; background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
         h2 { color: var(--primary); text-align: center; margin: 5px 0 12px; font-size: 1.15rem; }
@@ -48,20 +48,18 @@
         #ageInput { width: 50px; padding: 4px; text-align: center; border: 1.5px solid var(--primary); border-radius: 4px; font-weight: bold; }
         #ageSlider { flex: 1; accent-color: var(--primary); }
 
-        /* 圖表區：固定高度，溢出顯示 */
         .chart-section { display: flex; gap: 6px; margin-bottom: 12px; overflow: hidden; }
         .chart-card { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 5px 0; background: #fff; min-width: 0; display: flex; flex-direction: column; height: 220px; }
         .chart-title { font-size: 0.8rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 2px; }
         .chart-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
 
-        /* 數據格 */
         .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px; }
         .result-item { background: #fff; border: 1px solid #cbd5e1; padding: 6px 2px; border-radius: 8px; text-align: center; }
         .result-item .label { font-size: 0.65rem; color: #64748b; margin-bottom: 2px; }
         .result-item .value { font-size: 0.85rem; color: #d9534f; font-weight: 800; }
         .result-item.highlight { border: 1.5px solid var(--primary); background: #f0f9ff; }
 
-        /* 方案按鈕 */
+        .section-subtitle { font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; color: #444; }
         .plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
         .plan-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 2px; text-align: center; cursor: pointer; }
         .plan-card.active { border: 2px solid var(--primary); background: #f0f9ff; }
@@ -71,7 +69,7 @@
         #detail-view { margin-top: 12px; padding: 10px; border-left: 4px solid var(--primary); background: #f8fafc; display: none; font-size: 0.85rem; }
 
         @media (max-width: 600px) {
-            .chart-card { height: 150px; } /* 手機高度進一步縮減 */
+            .chart-card { height: 150px; }
             .result-grid { grid-template-columns: repeat(2, 1fr); }
             .plan-grid { grid-template-columns: repeat(2, 1fr); }
         }
@@ -79,9 +77,9 @@
 </head>
 <body>
 
-<a href="index.html" class="back-home">
+<div onclick="window.location.assign('index.html');" class="back-home">
     <i class="fa-solid fa-house"></i> 返回首頁
-</a>
+</div>
 
 <div class="container">
     <h2>防癌無憂即時試算</h2>
@@ -137,6 +135,22 @@
 </div>
 
 <script>
+    // 防跳轉核心腳本：攔截該頁面所有剩餘的 A 標籤
+    (function(doc, nav, standalone) {
+        if ((standalone in nav) && nav[standalone]) {
+            doc.addEventListener('click', function(event) {
+                var cnode = event.target;
+                while (cnode && cnode.nodeName !== 'A' && cnode.nodeName !== 'HTML') {
+                    cnode = cnode.parentNode;
+                }
+                if (cnode && 'href' in cnode && cnode.href.indexOf('.html') !== -1) {
+                    event.preventDefault();
+                    window.location.assign(cnode.href);
+                }
+            }, false);
+        }
+    })(document, window.navigator, 'standalone');
+
     let gender = 'male';
     let sChart, cChart;
     Chart.register(ChartDataLabels);
@@ -148,7 +162,7 @@
         { t: "女性十大癌症基因風險", d: "針對乳腺、子宮等女性高風險癌症進行基因篩檢。", m: "檢測方式：口腔抹片" },
         { t: "特殊癌症早期警示", d: "針對胰臟、膽囊等難以偵測的器官進行精密定序。", m: "檢測方式：血液精密定序" },
         { t: "隱匿危機癌症監測", d: "偵測長期潛伏於體內的異常生長信號。", m: "檢測方式：全身癌症指標" },
-        { t: "綜合癌症與心血管風險", d: "同時評估癌症指標與心血管硬化風險。", m: "檢測方式：抽血檢測" },
+        { t: "綜合癌症與心血管風險", d: "同時評估癌症指標與心血管風險。", m: "檢測方式：抽血檢測" },
         { t: "腦部與神經功能篩查", d: "針對中高齡族群預防早發型神經病變。", m: "檢測方式：功能性評估" }
     ];
 
@@ -224,9 +238,7 @@
             responsive: true,
             maintainAspectRatio: false,
             radius: isMobile ? '60%' : '75%', 
-            layout: { 
-                padding: isMobile ? 25 : 35 
-            },
+            layout: { padding: isMobile ? 25 : 35 },
             plugins: {
                 legend: { display: false },
                 datalabels: {
@@ -234,10 +246,7 @@
                     align: 'end',
                     offset: isMobile ? 2 : 8,
                     color: '#444',
-                    font: { 
-                        size: isMobile ? 9 : 10, 
-                        weight: 'bold' 
-                    },
+                    font: { size: isMobile ? 9 : 10, weight: 'bold' },
                     formatter: (v, ctx) => {
                         if (isMobile && v < 7) return '';
                         return ctx.chart.data.labels[ctx.dataIndex] + '\n' + v + '%';
@@ -262,7 +271,3 @@
 </script>
 </body>
 </html>
-
-
-
-
