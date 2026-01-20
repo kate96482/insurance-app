@@ -1,66 +1,254 @@
-<div id="mbti-app" class="mbti-container">
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MBTI 測驗 - 小邦手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
+    <style>
+        :root {
+            --primary-color: #A29BFE;
+            --bg-color: #F8F9FA;
+        }
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .mbti-container { width: 100%; max-width: 500px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        
+        /* 進度條樣式 */
+        .progress-box { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #A29BFE, #6C5CE7); transition: 0.3s; }
+        
+        /* 選項按鈕樣式 */
+        .options-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .opt-btn { border: none; padding: 15px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        .opt-agree-3 { background-color: #D1E9FF; }
+        .opt-agree-2 { background-color: #E3F2FF; }
+        .opt-agree-1 { background-color: #F0F8FF; }
+        .opt-neutral { background-color: #F1F3F5; color: #888; }
+        .opt-disagree-1 { background-color: #FFF0F3; }
+        .opt-disagree-2 { background-color: #FFDDE4; }
+        .opt-disagree-3 { background-color: #FFCAD4; }
+
+        /* 結果圖卡 */
+        .result-card-design { padding: 30px 15px; text-align: center; border-radius: 20px; background: #fff; }
+        #res-code { font-size: 3rem; color: #6C5CE7; margin: 10px 0; }
+        #res-desc { text-align: left; line-height: 1.7; color: #555; font-size: 0.95rem; }
+        .celebs-tag { background: #F8F9FA; padding: 10px; border-radius: 10px; margin-top: 15px; font-size: 0.85rem; }
+
+        #final-image-wrapper img { width: 100%; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-top: 10px; }
+        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-primary { background: #6C5CE7; color: white; }
+        .btn-secondary { background: #eee; color: #666; }
+    </style>
+</head>
+<body>
+
+<div id="mbti-app" class="mbti-container">
     <div id="quiz-intro" class="quiz-step">
-        <div class="mbti-header">
-            <h2>MBTI 性格傾向測驗</h2>
-            <p>探索你的內在核心，發現 16 型人格中屬於你的靈魂色彩。</p>
+        <h2 style="color:#6C5CE7; text-align: center;">MBTI 性格傾向測驗</h2>
+        <p style="text-align: center; color: #666;">探索你的內在核心，發現你的靈魂色彩。</p>
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn btn-primary" style="padding: 15px 50px;" onclick="startQuiz()">開始深度測驗</button><br><br>
+            <button class="btn btn-secondary" onclick="goHome()">返回首頁</button>
         </div>
-        <div class="intro-actions">
-            <button class="btn btn-primary" onclick="startQuiz()">開始深度測驗</button>
-            <button class="btn btn-link" onclick="goHome()">返回首頁</button>
-        </div>
-        <div class="quiz-info">
-            <span>📝 總共 60 題</span>
-            <span>⏱ 預計 5-8 分鐘</span>
-        </div>
+        <div style="text-align: center; font-size: 0.8rem; color: #bbb;">📝 60 題 | ⏱ 5 分鐘</div>
     </div>
 
     <div id="quiz-content" class="quiz-step" style="display:none;">
         <div class="quiz-top">
-            <button class="btn-exit" onclick="confirmExit()">✕ 放棄</button>
-            <div class="progress-box">
-                <div id="progress-bar"></div>
+            <div class="progress-box"><div id="progress-bar"></div></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #aaa;">
+                <span onclick="confirmExit()" style="cursor:pointer;">✕ 放棄測驗</span>
+                <span id="progress-text">0 / 60</span>
             </div>
-            <span id="progress-text">0 / 60</span>
         </div>
-
-        <div id="question-area">
-            <h3 id="q-text">題目載入中...</h3>
-            <div class="options-container">
-                <button class="opt-btn opt-agree-3" onclick="handleAnswer(3)">非常同意</button>
-                <button class="opt-btn opt-agree-2" onclick="handleAnswer(2)">同意</button>
-                <button class="opt-btn opt-agree-1" onclick="handleAnswer(1)">稍微同意</button>
-                <button class="opt-btn opt-neutral" onclick="handleAnswer(0)">中立</button>
-                <button class="opt-btn opt-disagree-1" onclick="handleAnswer(-1)">稍微不同意</button>
-                <button class="opt-btn opt-disagree-2" onclick="handleAnswer(-2)">不同意</button>
-                <button class="opt-btn opt-disagree-3" onclick="handleAnswer(-3)">非常不同意</button>
-            </div>
+        <h3 id="q-text" style="text-align: center; margin: 30px 0; min-height: 60px;">題目載入中...</h3>
+        <div class="options-container">
+            <button class="opt-btn opt-agree-3" onclick="handleAnswer(3)">非常同意</button>
+            <button class="opt-btn opt-agree-2" onclick="handleAnswer(2)">同意</button>
+            <button class="opt-btn opt-agree-1" onclick="handleAnswer(1)">稍微同意</button>
+            <button class="opt-btn opt-neutral" onclick="handleAnswer(0)">中立</button>
+            <button class="opt-btn opt-disagree-1" onclick="handleAnswer(-1)">稍微不同意</button>
+            <button class="opt-btn opt-disagree-2" onclick="handleAnswer(-2)">不同意</button>
+            <button class="opt-btn opt-disagree-3" onclick="handleAnswer(-3)">非常不同意</button>
         </div>
     </div>
 
     <div id="result-page" class="quiz-step" style="display:none;">
         <div id="capture-area">
-            <div id="result-card-inner" class="result-card-design">
-                <div id="res-avatar-box"></div>
+            <div class="result-card-design">
                 <h1 id="res-code">----</h1>
                 <h2 id="res-name">人格稱號</h2>
-                <div id="res-description"></div>
-                <div id="res-celebrity-box" class="celebs-tag">
-                    <strong>代表人物：</strong> <span id="res-celebs"></span>
-                </div>
-                <div class="card-watermark">小邦手心理測驗 | 2026 版</div>
+                <div id="res-desc"></div>
+                <div class="celebs-tag"><strong>代表人物：</strong> <span id="res-celebs"></span></div>
+                <div style="font-size: 10px; color:#ccc; margin-top: 15px;">小邦手心理測驗 | 2026 版</div>
             </div>
         </div>
-
         <div id="final-image-wrapper"></div>
-        
-        <p class="save-hint">💡 長按上方圖片即可另存解析報告</p>
-
-        <div class="result-actions">
+        <p style="text-align: center; color:#6C5CE7; font-weight: bold;">💡 長按上方圖片即可另存報告</p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
             <button class="btn btn-secondary" onclick="location.reload()">重新測驗</button>
             <button class="btn btn-primary" onclick="goHome()">返回首頁</button>
         </div>
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+// --- 資料庫：60 題題目 ---
+const mbtiQuestions = [
+    { text: "在社交聚會中，你通常是主動找人交談的那一位。", dim: "EI", dir: 1 },
+    { text: "即使是在熱鬧的場合待上一整天，你依然感到精力充沛。", dim: "EI", dir: 1 },
+    { text: "你更喜歡在安靜、私密的環境下工作，而不是開放式的辦公室。", dim: "EI", dir: -1 },
+    { text: "當你需要放鬆時，與朋友聚會通常比獨自看書更有效。", dim: "EI", dir: 1 },
+    { text: "你喜歡成為群眾矚目的焦點。", dim: "EI", dir: 1 },
+    { text: "在打電話之前，你通常會先在腦中演練一遍要說的話。", dim: "EI", dir: -1 },
+    { text: "參加社交活動後，你通常會感到精疲力竭，需要時間獨處。", dim: "EI", dir: -1 },
+    { text: "你在團體討論中往往能很快地發表意見。", dim: "EI", dir: 1 },
+    { text: "你傾向於先行動再思考，而不是先思考再行動。", dim: "EI", dir: 1 },
+    { text: "對你來說，認識新朋友是一件輕鬆且令人興奮的事。", dim: "EI", dir: 1 },
+    { text: "你不介意成為一個大型項目的領導者或發言人。", dim: "EI", dir: 1 },
+    { text: "你通常更喜歡深層的一對一對話，而不是多人的小型寒暄。", dim: "EI", dir: -1 },
+    { text: "你更專注於當下的現實情況，而非未來的可能性。", dim: "SN", dir: 1 },
+    { text: "你喜歡研究抽象的概念和理論。", dim: "SN", dir: -1 },
+    { text: "處理具體的數據和事實比思考未來的藍圖更讓你感到踏實。", dim: "SN", dir: 1 },
+    { text: "你經常陷入沉思，以至於忽視了周圍發生的事情。", dim: "SN", dir: -1 },
+    { text: "在執行任務時，你偏好遵循經過驗證的傳統方法。", dim: "SN", dir: 1 },
+    { text: "你經常會去思考「如果...會怎樣」這類的假設性問題。", dim: "SN", dir: -1 },
+    { text: "你認為具備常識比擁有過人的想像力更重要。", dim: "SN", dir: 1 },
+    { text: "你更喜歡閱讀文學名著或科幻作品，而不是寫實的新聞報導。", dim: "SN", dir: -1 },
+    { text: "對你來說，事情的細節往往比整體的輪廓更吸引你。", dim: "SN", dir: 1 },
+    { text: "你擅長在看似無關的事物之間發現隱藏的聯結。", dim: "SN", dir: -1 },
+    { text: "你偏向於務實地解決問題，而不是尋求創新的突破。", dim: "SN", dir: 1 },
+    { text: "你經常會夢想著未來各種可能發生的驚人改變。", dim: "SN", dir: -1 },
+    { text: "在做決定時，你認為邏輯分析比情感考量更重要。", dim: "TF", dir: 1 },
+    { text: "你非常在意他人的感受，儘管有時這會影響你的判斷。", dim: "TF", dir: -1 },
+    { text: "在爭論中，你更在乎誰才是事實上的正確，而不是誰會受傷。", dim: "TF", dir: 1 },
+    { text: "你通常會為了維持團體的和諧而做出讓步。", dim: "TF", dir: -1 },
+    { text: "你認為一個好的決策應該是客觀且不偏不倚的。", dim: "TF", dir: 1 },
+    { text: "你很容易被感人的電影或故事觸動而流淚。", dim: "TF", dir: -1 },
+    { text: "朋友找你傾訴時，你通常會先提供解決建議，而不是情感安慰。", dim: "TF", dir: 1 },
+    { text: "你認為追求真理比保持圓滑的人際關係更為重要。", dim: "TF", dir: 1 },
+    { text: "你在做重要決定前，會反覆思考這對其他人會產生什麼影響。", dim: "TF", dir: -1 },
+    { text: "你通常被認為是一個冷靜、理性甚至有點冷酷的人。", dim: "TF", dir: 1 },
+    { text: "你很難拒絕他人的請求，因為你害怕讓對方失望。", dim: "TF", dir: -1 },
+    { text: "你認為遵守規則與公平原則，比給予個案特殊同情更重要。", dim: "TF", dir: 1 },
+    { text: "在旅行前，你通常會制定詳細的行程計畫。", dim: "JP", dir: 1 },
+    { text: "你喜歡保留靈活的彈性，不喜歡把時間表排得太死。", dim: "JP", dir: -1 },
+    { text: "看到東西亂放或環境混亂時，你會感到焦慮。", dim: "JP", dir: 1 },
+    { text: "你經常等到最後一刻截止日期快到了，才開始全力衝刺。", dim: "JP", dir: -1 },
+    { text: "你的工作空間與電腦檔案通常整齊劃一、井然有序。", dim: "JP", dir: 1 },
+    { text: "你更喜歡隨性而至的冒險，而不是按部就班的安排。", dim: "JP", dir: -1 },
+    { text: "你傾向於在開始一項新任務前，先把所有的步驟都想好。", dim: "JP", dir: 1 },
+    { text: "你認為「計畫趕不上變化」，所以沒必要設定太嚴密的目標。", dim: "JP", dir: -1 },
+    { text: "完成一件清單上的任務會讓你感到巨大的滿足感。", dim: "JP", dir: 1 },
+    { text: "你經常在不同的任務之間跳來跳去，而不是專注完成一項再做下一項。", dim: "JP", dir: -1 },
+    { text: "你不喜歡驚喜，更希望事情按照預期的方向發展。", dim: "JP", dir: 1 },
+    { text: "你認為生活應該是充滿自發性的，而不是被各種規矩束縛。", dim: "JP", dir: -1 },
+    { text: "面對突發的巨大壓力，你通常能保持冷靜且情緒穩定。", dim: "AT", dir: 1 },
+    { text: "你經常會擔心自己做錯了決定或說錯了話。", dim: "AT", dir: -1 },
+    { text: "你對自己的能力非常有信心，不太需要他人的認同。", dim: "AT", dir: 1 },
+    { text: "你是一個完美主義者，常為了細小的瑕疵而感到焦慮。", dim: "AT", dir: -1 },
+    { text: "即使遇到了挫折，你也能很快地重新站起來。", dim: "AT", dir: 1 },
+    { text: "你非常在意他人對你的評價和看法。", dim: "AT", dir: -1 },
+    { text: "你很少會對過去發生的事情感到遺憾或後悔。", dim: "AT", dir: 1 },
+    { text: "你經常覺得生活壓力讓你喘不過氣。", dim: "AT", dir: -1 },
+    { text: "在社交場合，你通常感到很自在，不會覺得尷尬。", dim: "AT", dir: 1 },
+    { text: "你經常反覆思考剛剛與他人的對話，擔心自己表現不佳。", dim: "AT", dir: -1 },
+    { text: "你認為自己是一個情緒非常穩定的人。", dim: "AT", dir: 1 },
+    { text: "你很容易因為生活中的小事而感到焦慮或挫折。", dim: "AT", dir: -1 }
+];
+
+// --- 資料庫：16 型人格解析 ---
+const personalityData = {
+    "INTJ": { name: "建築師", desc: "你擁有強大的意志與獨立思考能力，追求效率，是天生的戰略家。", celebs: "埃隆·馬斯克、尼采" },
+    "INTP": { name: "邏輯學家", desc: "你對理論有著不懈熱情，比起現實，你更活在概念世界中。", celebs: "比爾·蓋茲、愛因斯坦" },
+    "ENTJ": { name: "指揮官", desc: "具備強大領導力與遠見，能迅速果斷地帶領團隊達成目標。", celebs: "賈伯斯、撒切爾夫人" },
+    "ENTP": { name: "辯論家", desc: "腦中充滿新穎點子，喜歡挑戰現狀，在碰撞中尋求創新。", celebs: "艾迪生、鋼鐵人" },
+    "INFJ": { name: "提倡者", desc: "安靜而深沉的理想主義者，擁有敏銳洞察力，渴望改變世界。", celebs: "馬丁路德金、柏拉圖" },
+    "INFP": { name: "調解者", desc: "溫柔富有同理心的夢想家，堅守內在價值，尋找生活意義。", celebs: "莎士比亞、JK羅琳" },
+    "ENFJ": { name: "主人公", desc: "充滿感染力的領袖，善於鼓舞人心，帶領大眾走向和諧。", celebs: "歐普拉、歐巴馬" },
+    "ENFP": { name: "競選者", desc: "自由奔放的靈魂，對生活充滿好奇，擅長激發他人潛能。", celebs: "迪士尼、小勞勃道尼" },
+    "ISTJ": { name: "物流師", desc: "務實可靠，責任感強。重視秩序與傳統，是社會的中流砥柱。", celebs: "傑夫貝佐斯、華盛頓" },
+    "ISFJ": { name: "守護者", desc: "溫和堅毅，總是默默關懷他人，細心維護周圍人的福祉。", celebs: "德蕾莎修女、凱特王妃" },
+    "ESTJ": { name: "總管", desc: "傑出的組織者，注重事實與規則，執行力極高且井然有序。", celebs: "洛克菲勒、希拉蕊" },
+    "ESFJ": { name: "執政官", desc: "熱情友好的社交專家，重視和諧，是建立社區聯結的關鍵。", celebs: "泰勒絲、休傑克曼" },
+    "ISTP": { name: "鑑賞家", desc: "冷靜且充滿好奇心，喜歡動手解決問題，適應能力極強。", celebs: "麥可喬丹、印第安納瓊斯" },
+    "ISFP": { name: "藝術家", desc: "低調且富有美感，熱愛感官體驗，用獨特方式表達感受。", celebs: "萊昂納多、艾薇兒" },
+    "ESTP": { name: "企業家", desc: "充滿活力的冒險家，活在當下，對機會敏銳，在行動中學習。", celebs: "川普、瑪丹娜" },
+    "ESFP": { name: "表演者", desc: "天生表演者，充滿樂趣，能點燃氣氛，讓當下變得精彩。", celebs: "艾爾頓強、瑪麗蓮夢露" }
+};
+
+// --- 核心邏輯 ---
+let currentIdx = 0;
+let userScores = { EI: 0, SN: 0, TF: 0, JP: 0, AT: 0 };
+
+function startQuiz() {
+    currentIdx = 0;
+    userScores = { EI: 0, SN: 0, TF: 0, JP: 0, AT: 0 };
+    document.getElementById('quiz-intro').style.display = 'none';
+    document.getElementById('quiz-content').style.display = 'block';
+    renderQuestion();
+}
+
+function renderQuestion() {
+    const q = mbtiQuestions[currentIdx];
+    document.getElementById('q-text').innerText = q.text;
+    const progress = ((currentIdx + 1) / mbtiQuestions.length) * 100;
+    document.getElementById('progress-bar').style.width = progress + "%";
+    document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${mbtiQuestions.length}`;
+}
+
+function handleAnswer(value) {
+    const q = mbtiQuestions[currentIdx];
+    userScores[q.dim] += value * q.dir;
+    currentIdx++;
+    if (currentIdx < mbtiQuestions.length) {
+        renderQuestion();
+    } else {
+        calculateFinalResult();
+    }
+}
+
+function calculateFinalResult() {
+    let mbti = "";
+    mbti += userScores.EI >= 0 ? "E" : "I";
+    mbti += userScores.SN >= 0 ? "S" : "N";
+    mbti += userScores.TF >= 0 ? "T" : "F";
+    mbti += userScores.JP >= 0 ? "J" : "P";
+    const identity = userScores.AT >= 0 ? "A" : "T";
+    showResultPage(`${mbti}-${identity}`);
+}
+
+function showResultPage(code) {
+    document.getElementById('quiz-content').style.display = 'none';
+    document.getElementById('result-page').style.display = 'block';
+    const baseCode = code.split('-')[0];
+    const data = personalityData[baseCode];
+
+    document.getElementById('res-code').innerText = code;
+    document.getElementById('res-name').innerText = data.name;
+    document.getElementById('res-desc').innerHTML = `<p>${data.desc}</p>`;
+    document.getElementById('res-celebs').innerText = data.celebs;
+
+    const captureArea = document.getElementById('capture-area');
+    setTimeout(() => {
+        html2canvas(captureArea, { backgroundColor: "#ffffff", scale: 2 }).then(canvas => {
+            const imgData = canvas.toDataURL("image/png");
+            const finalImg = document.createElement('img');
+            finalImg.src = imgData;
+            const wrapper = document.getElementById('final-image-wrapper');
+            wrapper.innerHTML = "";
+            wrapper.appendChild(finalImg);
+            captureArea.style.display = "none"; // 隱藏原本的 HTML 顯示生成的圖片
+        });
+    }, 600);
+}
+
+function goHome() { location.href = 'index.html'; }
+function confirmExit() { if (confirm("確定要離開測驗嗎？進度將不會保留。")) goHome(); }
+</script>
+
+</body>
+</html>
