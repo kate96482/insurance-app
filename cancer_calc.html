@@ -9,17 +9,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>防癌試算 - 小邦手</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root { --primary: #005a92; --bg: #f4f7f9; }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 8px; }
         
-        /* 修正：將返回按鈕改為 div 點擊樣式 */
+        /* 返回按鈕樣式 */
         .back-home {
             display: inline-flex;
             align-items: center;
@@ -28,7 +30,7 @@
             font-weight: bold;
             font-size: 0.9rem;
             margin-bottom: 10px;
-            padding: 8px 15px; /* 稍微加大一點好點擊 */
+            padding: 8px 15px;
             border-radius: 20px;
             background: white;
             box-shadow: 0 1px 4px rgba(0,0,0,0.1);
@@ -77,7 +79,7 @@
 </head>
 <body>
 
-<div onclick="window.location.assign('index.html');" class="back-home">
+<div onclick="navTo('index.html', event);" class="back-home">
     <i class="fa-solid fa-house"></i> 返回首頁
 </div>
 
@@ -135,7 +137,16 @@
 </div>
 
 <script>
-    // 防跳轉核心腳本：攔截該頁面所有剩餘的 A 標籤
+    // 修正 2：統一的導航與防跳窗腳本
+    function navTo(url, e) {
+        if (e) e.preventDefault();
+        if (("standalone" in window.navigator) && window.navigator.standalone) {
+            window.location.replace(url); // 用 replace 更有 App 感
+        } else {
+            window.location.href = url;
+        }
+    }
+
     (function(doc, nav, standalone) {
         if ((standalone in nav) && nav[standalone]) {
             doc.addEventListener('click', function(event) {
@@ -143,14 +154,15 @@
                 while (cnode && cnode.nodeName !== 'A' && cnode.nodeName !== 'HTML') {
                     cnode = cnode.parentNode;
                 }
-                if (cnode && 'href' in cnode && cnode.href.indexOf('.html') !== -1) {
+                if (cnode && 'href' in cnode && cnode.hostname === window.location.hostname) {
                     event.preventDefault();
-                    window.location.assign(cnode.href);
+                    window.location.replace(cnode.href);
                 }
             }, false);
         }
     })(document, window.navigator, 'standalone');
 
+    // 以下為原本的業務邏輯
     let gender = 'male';
     let sChart, cChart;
     Chart.register(ChartDataLabels);
@@ -269,28 +281,6 @@
         render();
     };
 </script>
-    <script>
-    // 這是消除「打叉網頁感」的關鍵腳本
-    (function(document, navigator, standalone) {
-        if ((standalone in navigator) && navigator[standalone]) {
-            var curnode, location = document.location, stop = /^(a|html)$/i;
-            document.addEventListener('click', function(e) {
-                curnode = e.target;
-                while (!(stop).test(curnode.nodeName)) {
-                    curnode = curnode.parentNode;
-                }
-                // 只要是站內連結，就強制在 App 內部跳轉
-                if('href' in curnode && (curnode.href.indexOf('http') === -1 || ~curnode.href.indexOf(location.host))) {
-                    e.preventDefault();
-                    location.href = curnode.href;
-                }
-            }, false);
-        }
-    })(document, window.navigator, 'standalone');
-</script>
 
 </body>
 </html>
-</body>
-</html>
-
