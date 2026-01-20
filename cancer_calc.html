@@ -269,5 +269,28 @@
         render();
     };
 </script>
+    <script>
+    // 這是消除「打叉網頁感」的關鍵腳本
+    (function(document, navigator, standalone) {
+        if ((standalone in navigator) && navigator[standalone]) {
+            var curnode, location = document.location, stop = /^(a|html)$/i;
+            document.addEventListener('click', function(e) {
+                curnode = e.target;
+                while (!(stop).test(curnode.nodeName)) {
+                    curnode = curnode.parentNode;
+                }
+                // 只要是站內連結，就強制在 App 內部跳轉
+                if('href' in curnode && (curnode.href.indexOf('http') === -1 || ~curnode.href.indexOf(location.host))) {
+                    e.preventDefault();
+                    location.href = curnode.href;
+                }
+            }, false);
+        }
+    })(document, window.navigator, 'standalone');
+</script>
+
 </body>
 </html>
+</body>
+</html>
+
