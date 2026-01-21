@@ -53,7 +53,6 @@
             margin-top: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 9, 183, 0.2);
         }
 
-        /* 结果區域設為相對定位，方便覆蓋圖片 */
         .result-card { 
             margin-top: 20px; display: none; text-align: center; 
             animation: fadeIn 0.5s ease; position: relative;
@@ -61,7 +60,6 @@
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 隱藏的 Canvas 圖片層，專門用來給用戶長按 */
         #save-image-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0; z-index: 100; pointer-events: auto;
@@ -216,10 +214,17 @@
         6: "關懷責任", 7: "邏輯真理", 8: "執行成就", 9: "博愛夢想"
     };
 
-    const lines = [
+    const lines3 = [
         {ids:[1,2,3], name:"美感"}, {ids:[4,5,6], name:"組織"}, {ids:[7,8,9], name:"貴人"},
         {ids:[1,4,7], name:"物質"}, {ids:[2,5,8], name:"情感"}, {ids:[3,6,9], name:"智慧"},
         {ids:[1,5,9], name:"事業"}, {ids:[3,5,7], name:"爭議"}
+    ];
+
+    const lines2 = [
+        { ids: [2,4], name: "靈巧線" },
+        { ids: [2,6], name: "和平線" },
+        { ids: [6,8], name: "財運線" },
+        { ids: [4,8], name: "穩定執行線" }
     ];
 
     function getFullNumbers(y, m, d) {
@@ -281,7 +286,6 @@
         }
     }
 
-    // 1. 優化：連線虛線置中與顏色微調
     function drawLines(containerId, canvasId, data) {
         setTimeout(() => {
             const container = document.getElementById(containerId);
@@ -289,59 +293,56 @@
             const rect = container.getBoundingClientRect();
             canvas.width = rect.width; canvas.height = rect.height;
             const ctx = canvas.getContext('2d');
-            
-            ctx.strokeStyle = "var(--m-blue)"; // 設為藍色虛線
-            ctx.lineWidth = 1.5; 
-            ctx.setLineDash([3, 3]); 
-            ctx.globalAlpha = 0.7;
-            
-            lines.forEach(l => {
-                const countPresent = l.ids.filter(id => data.counts[id]).length;
-                // 只要有 2 個數字以上有數，就畫連線
-                if(countPresent >= 2) {
-                    const activeIds = l.ids.filter(id => data.counts[id]);
-                    const startEl = container.children[activeIds[0]-1];
-                    const endEl = container.children[activeIds[activeIds.length-1]-1];
-                    
-                    // 確保獲取的是格子中心點
-                    const startX = startEl.offsetLeft + startEl.offsetWidth / 2;
-                    const startY = startEl.offsetTop + startEl.offsetHeight / 2;
-                    const endX = endEl.offsetLeft + endEl.offsetWidth / 2;
-                    const endY = endEl.offsetTop + endEl.offsetHeight / 2;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 3]);
 
-                    ctx.beginPath();
-                    ctx.moveTo(startX, startY);
-                    ctx.lineTo(endX, endY);
-                    ctx.stroke();
+            const getPos = (id) => {
+                const el = container.children[id-1];
+                return { x: el.offsetLeft + el.offsetWidth/2, y: el.offsetTop + el.offsetHeight/2 };
+            };
+
+            // 1. 三數連線 (粉色)
+            ctx.strokeStyle = "#F72585";
+            lines3.forEach(l => {
+                if (l.ids.every(id => data.counts[id])) {
+                    const pStart = getPos(l.ids[0]), pEnd = getPos(l.ids[2]);
+                    ctx.beginPath(); ctx.moveTo(pStart.x, pStart.y); ctx.lineTo(pEnd.x, pEnd.y); ctx.stroke();
                 }
             });
-        }, 150);
+
+            // 2. 兩數連線 (淺藍)
+            ctx.strokeStyle = "#4CC9F0";
+            lines2.forEach(l => {
+                if (l.ids.every(id => data.counts[id])) {
+                    const pStart = getPos(l.ids[0]), pEnd = getPos(l.ids[1]);
+                    ctx.beginPath(); ctx.moveTo(pStart.x, pStart.y); ctx.lineTo(pEnd.x, pEnd.y); ctx.stroke();
+                }
+            });
+        }, 200);
     }
 
     function renderTextAnalysis(divId, data) {
         const div = document.getElementById(divId);
         let missing = [];
         for(let i=1; i<=9; i++) if(!data.counts[i]) missing.push(i);
-        let activeLines = lines.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
+        
+        let active3 = lines3.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
+        let active2 = lines2.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
+        let allLines = [...active3, ...active2];
+
         div.innerHTML = `
             <div class="ana-title">數據解析</div>
             <div class="ana-item"><span class="ana-sub">1.本命數 ${data.destiny}</span>${numBrief[data.destiny]}</div>
             <div class="ana-item"><span class="ana-sub">2.缺數分析</span>${missing.join(',') || '無'}</div>
-            <div class="ana-item"><span class="ana-sub">3.連線分析</span>${activeLines.join(',') || '無'}</div>
+            <div class="ana-item"><span class="ana-sub">3.連線分析</span>${allLines.join(',') || '無'}</div>
         `;
     }
 
-    // 2. 優化：將分析结果轉為圖片以供長按儲存
     async function captureToImage() {
         const resultCard = document.getElementById('resultCard');
-        // 等待繪圖完成
-        await new Promise(r => setTimeout(r, 500));
-        
+        await new Promise(r => setTimeout(r, 600));
         html2canvas(resultCard, {
-            useCORS: true,
-            scale: 2, // 提高解析度
-            backgroundColor: "#FFFFFF",
-            logging: false
+            useCORS: true, scale: 2, backgroundColor: "#FFFFFF", logging: false
         }).then(canvas => {
             const imageData = canvas.toDataURL("image/png");
             let imgLayer = document.getElementById('save-image-layer');
@@ -386,8 +387,6 @@
         renderTextAnalysis('ana-p2', d2);
         
         document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
-
-        // 計算完畢後立即執行擷取圖片，讓用戶可以長按
         captureToImage();
     }
 </script>
