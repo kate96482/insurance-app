@@ -225,31 +225,51 @@
         document.getElementById('view-quiz').style.display = 'none';
         document.getElementById('view-report').style.display = 'block';
         
-        const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
-        const [t1, t2, t3, t4] = sorted;
+        // 1. 先排序，再過濾掉分數為 0 的項目
+        const sortedAll = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+        const validTraits = sortedAll.filter(item => item[1] > 0); // 只保留分數 > 0 的特質
+        
+        // 取出過濾後的項目 (防止陣列長度不足報錯，給予預設值)
+        const t1 = validTraits[0] || ["?", 0];
+        const t2 = validTraits[1] || null;
+        const t3 = validTraits[2] || null;
 
-        // 第一層
+        // --- 第一層分析 (永遠存在) ---
         document.getElementById('label-1').innerText = `● 第一層：${t1[0]} 單一特質分析`;
-        document.getElementById('desc-1').innerText = depthLib[t1[0]];
+        document.getElementById('desc-1').innerText = depthLib[t1[0]] || "尚未偵測到明顯特質。";
 
-        // 第二層
-        const d_code = t1[0] + t2[0];
-        document.getElementById('label-2').innerText = `● 第二層：${d_code} 雙重特質分析`;
-        document.getElementById('desc-2').innerText = depthLib[d_code] || depthLib[t2[0] + t1[0]] || "展現出靈活的雙重人格特質。";
+        // --- 第二層分析 (只有當有第二種特質得分時才顯示) ---
+        const card2 = document.getElementById('label-2').parentElement;
+        if (t2) {
+            const d_code = t1[0] + t2[0];
+            document.getElementById('label-2').innerText = `● 第二層：${d_code} 雙重特質分析`;
+            document.getElementById('desc-2').innerText = depthLib[d_code] || depthLib[t2[0] + t1[0]] || "展現出靈活的雙重人格特質。";
+            card2.style.display = "block";
+        } else {
+            card2.style.display = "none"; // 沒有第二特質就隱藏卡片
+        }
 
-        // 第三層
-        const tr_code = t1[0] + t2[0] + t3[0];
-        document.getElementById('label-3').innerText = `● 第三層：${tr_code} 三重特質分析`;
-        document.getElementById('desc-3').innerText = depthLib[tr_code] || "在複雜情境下具備高度的行為適應力。";
+        // --- 第三層分析 (只有當有第三種特質得分時才顯示) ---
+        const card3 = document.getElementById('label-3').parentElement;
+        if (t3) {
+            const tr_code = t1[0] + t2[0] + t3[0];
+            document.getElementById('label-3').innerText = `● 第三層：${tr_code} 三重特質分析`;
+            document.getElementById('desc-3').innerText = depthLib[tr_code] || "在複雜情境下具備高度的行為適應力。";
+            card3.style.display = "block";
+        } else {
+            card3.style.display = "none"; // 沒有第三特質就隱藏卡片
+        }
 
+        // 設定標題與最終代碼 (代碼由所有 >0 的特質組成)
+        const finalCode = validTraits.map(item => item[0]).join("");
         document.getElementById('out-name').innerText = userName + " 的行為風格報告";
-        document.getElementById('out-code').innerText = tr_code;
+        document.getElementById('out-code').innerText = finalCode;
+        
         const imgMap = { D: "tiger.png", I: "peacock.png", S: "koala.png", C: "owl.png" };
-        document.getElementById('out-img').src = imgMap[t1[0]];
+        document.getElementById('out-img').src = imgMap[t1[0]] || "";
 
         drawChart();
     }
-
     function drawChart() {
         new Chart(document.getElementById('discChart'), {
             type: 'bar',
@@ -287,4 +307,5 @@
 </script>
 </body>
 </html>
+
 
