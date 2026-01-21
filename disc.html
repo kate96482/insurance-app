@@ -35,7 +35,7 @@
 </head>
 <body>
 
-    <nav class="navbar"><button class="btn-home" onclick="window.location.href='index.html'"><i class="fa-solid fa-chevron-left"></i> 返回首頁</button></nav>
+    <nav class="navbar"><button class="btn-home" onclick="handleBack()"><i class="fa-solid fa-chevron-left"></i> 返回首頁</button></nav>
 
     <div id="view-name" class="welcome-card">
         <div class="welcome-header">
@@ -57,6 +57,7 @@
             <div class="progress-container"><div id="pb" class="progress-bar"></div></div>
             <h3 id="q-title"></h3>
             <div id="options-box"></div>
+            <div id="back-step-box" style="text-align: center; margin-top: 15px;"></div>
         </div>
 
         <div id="view-report" style="display:none; text-align: center;">
@@ -89,32 +90,22 @@
 
 <script>
     const depthLib = {
-    // === 第一層：單一屬性 ===
     "D": "老虎型（支配者）：具備強大決斷力，以目標為導向，不畏挑戰。",
     "I": "孔雀型（影響者）：展現極佳社交魅力，擅長說服他人並營造氣氛。",
     "S": "無尾熊型（穩健者）：重視和諧與團隊，是穩定且值得信賴的合作夥伴。",
     "C": "貓頭鷹型（分析者）：講求邏輯與精確，對品質與細節有極高標準。",
-
-    // === 第二層：雙重組合（區分主從關係） ===
     "DI": "【開拓影響者】以目標為先，利用社交魅力來開拓疆土，是具感召力的領導者。",
     "ID": "【熱情推動者】以人際為先，利用果敢的行動力來激勵他人，是極佳的說服者。",
-    
     "DS": "【穩健執行者】老虎的實踐力配上無尾熊的耐性，做事有始有終且穩定。",
     "SD": "【務實變革者】平日穩健，但在關鍵時刻能展現決斷力來守護團隊，是可靠的後盾。",
-    
     "DC": "【完美統籌者】老虎的結果導向結合貓頭鷹的嚴謹，執行精確且有效率。",
     "CD": "【邏輯執行者】以規則為先，利用決斷力排除錯誤，是冷靜且講求標準的守門員。",
-    
     "IS": "【親和協調者】孔雀的魅力加上無尾熊的親切，重視人際和諧與信任。",
     "SI": "【溫馨支持者】以穩健為核心，輔以溫暖的社交感染力，是團隊中最棒的黏著劑。",
-    
     "IC": "【邏輯推廣者】孔雀的創意與貓頭鷹的分析，能用數據支持感性想法。",
     "CI": "【理性溝通者】以數據分析為底蘊，輔以適度的社交表達，能客觀地傳遞深度見解。",
-    
     "SC": "【謹慎幕僚】無尾熊的穩定加上貓頭鷹的細緻，凡事講求流程與準確。",
     "CS": "【程序守望者】極度重視品質與規範，在穩定的節奏中追求完美的細節控管。",
-
-    // === 第三層：三重組合（代表性典型） ===
     "DIC": "【全才型決策者】具備掌控、影響與分析力，能在變動中快速做出理性決策。",
     "DIS": "【熱情實踐家】兼具行動力、社交與耐力，能衝鋒陷陣也能安撫人心。",
     "ISC": "【全方位協調官】融合社交、穩定與嚴謹，擅長在規則與情感間取得平衡。",
@@ -125,8 +116,6 @@
     "ICS": "【和諧分析師】結合社交、精確與穩定，擅長在複雜的人際中推行標準化流程。",
     "SCD": "【精銳執行者】結合穩定、細緻與決斷，默默耕耘並在關鍵時刻給出精確一擊。",
     "SCI": "【專業協調人】結合穩定、嚴謹與社交，以專業素養贏得信任並維持體系運作。",
-
-    // === 特殊型態 ===
     "變色龍": "【變色龍型】：您的分數非常平均，具備極高的環境適應力與彈性，能根據不同情境快速調整自己的行為風格，是極佳的協調者。",
     "default": "展現出多樣化的行為風格，具備極高的環境適應能力。"
     };
@@ -157,6 +146,28 @@
     let scores = { D: 0, I: 0, S: 0, C: 0 };
     let currentIdx = 0;
     let userName = "";
+    let scoreHistory = []; // 新增：用於返回上一題
+
+    // 離開確認邏輯
+    function handleBack() {
+        const isQuizActive = document.getElementById('quiz-container').style.display === 'block' && 
+                            document.getElementById('view-quiz').style.display !== 'none';
+        if (isQuizActive) {
+            if (confirm("測驗正在進行中，現在離開將不會儲存進度，確定要返回首頁嗎？")) {
+                window.location.href = 'index.html';
+            }
+        } else {
+            window.location.href = 'index.html';
+        }
+    }
+
+    // 瀏覽器關閉/重新整理警示
+    window.onbeforeunload = function() {
+        if (document.getElementById('quiz-container').style.display === 'block' && 
+            document.getElementById('view-quiz').style.display !== 'none') {
+            return "進度將遺失，確定離開嗎？";
+        }
+    };
 
     function nextToStart() {
         userName = document.getElementById('user-name').value.trim();
@@ -173,69 +184,80 @@
         const box = document.getElementById('options-box');
         box.innerHTML = "";
         const types = ['D', 'I', 'S', 'C'];
+        
         q.o.forEach((txt, i) => {
             const btn = document.createElement('button');
             btn.className = "option-btn";
             btn.innerText = txt;
             btn.onclick = () => {
-                scores[types[i]]++;
+                const type = types[i];
+                scores[type]++;
+                scoreHistory.push(type); // 紀錄選擇
                 currentIdx++;
                 if(currentIdx < 20) renderQuestion(); else showReport();
             };
             box.appendChild(btn);
         });
+
+        // 渲染返回上一題按鈕
+        const backBox = document.getElementById('back-step-box');
+        backBox.innerHTML = "";
+        if (currentIdx > 0) {
+            const backLink = document.createElement('a');
+            backLink.innerHTML = "<i class='fa-solid fa-rotate-left'></i> 返回上一題";
+            backLink.style = "color: #aaa; font-size: 0.85rem; cursor: pointer; text-decoration: underline;";
+            backLink.onclick = () => {
+                const lastType = scoreHistory.pop();
+                scores[lastType]--;
+                currentIdx--;
+                renderQuestion();
+            };
+            backBox.appendChild(backLink);
+        }
     }
 
     function showReport() {
-    document.getElementById('view-quiz').style.display = 'none';
-    document.getElementById('view-report').style.display = 'block';
-    
-    // 1. 根據分數從高到低排序
-    const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
-    const validTraits = sorted.filter(t => t[1] > 0);
-    const maxScore = sorted[0][1];
-    const minScore = sorted[3][1];
-    
-    // 2. 判斷是否為變色龍
-    const isChameleon = (maxScore - minScore <= 2) && minScore > 0;
-    
-    const list = document.getElementById('analysis-list');
-    list.innerHTML = "";
-    let finalTypeLabel = "";
+        document.getElementById('view-quiz').style.display = 'none';
+        document.getElementById('view-report').style.display = 'block';
+        
+        const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+        const validTraits = sorted.filter(t => t[1] > 0);
+        const maxScore = sorted[0][1];
+        const minScore = sorted[3][1];
+        const isChameleon = (maxScore - minScore <= 2) && minScore > 0;
+        
+        const list = document.getElementById('analysis-list');
+        list.innerHTML = "";
+        let finalTypeLabel = "";
 
-    if (isChameleon) {
-        finalTypeLabel = "變色龍型";
-        document.getElementById('out-img').src = "chameleon.png"; 
-        addCard(list, "平衡特質分析", depthLib["變色龍"]);
-    } else {
-        // --- 核心修改處：不使用 sort()，保留原始分數高低順序 ---
-        const topTrait = sorted[0][0]; // 第一名 (例如 D)
-        const traitNames = { D: "老虎型", I: "孔雀型", S: "無尾熊型", C: "貓頭鷹型" };
-        finalTypeLabel = traitNames[topTrait];
-        document.getElementById('out-img').src = { D: "tiger.png", I: "peacock.png", S: "koala.png", C: "owl.png" }[topTrait];
+        if (isChameleon) {
+            finalTypeLabel = "變色龍型";
+            document.getElementById('out-img').src = "chameleon.png"; 
+            addCard(list, "平衡特質分析", depthLib["變色龍"]);
+        } else {
+            const topTrait = sorted[0][0]; 
+            const traitNames = { D: "老虎型", I: "孔雀型", S: "無尾熊型", C: "貓頭鷹型" };
+            finalTypeLabel = traitNames[topTrait];
+            document.getElementById('out-img').src = { D: "tiger.png", I: "peacock.png", S: "koala.png", C: "owl.png" }[topTrait];
 
-        // 層級 1：單一主特質 (例如 D)
-        const code1 = validTraits.slice(0, 1).map(x => x[0]).join("");
-        addCard(list, `層級 1：核心性格`, depthLib[code1] || depthLib["default"]);
+            const code1 = validTraits.slice(0, 1).map(x => x[0]).join("");
+            addCard(list, `層級 1：核心性格`, depthLib[code1] || depthLib["default"]);
 
-        // 層級 2：雙重組合 (例如 DI 或 ID)
-        if (validTraits.length >= 2) {
-            const code2 = validTraits.slice(0, 2).map(x => x[0]).join("");
-            addCard(list, `層級 2：交互行為 (${code2})`, depthLib[code2] || depthLib["default"]);
+            if (validTraits.length >= 2) {
+                const code2 = validTraits.slice(0, 2).map(x => x[0]).join("");
+                addCard(list, `層級 2：交互行為 (${code2})`, depthLib[code2] || depthLib["default"]);
+            }
+
+            if (validTraits.length >= 3) {
+                const code3 = validTraits.slice(0, 3).map(x => x[0]).join("");
+                addCard(list, `層級 3：深度特質 (${code3})`, depthLib[code3] || depthLib["default"]);
+            }
         }
 
-        // 層級 3：三重組合 (例如 DIC 或 DCI)
-        if (validTraits.length >= 3) {
-            const code3 = validTraits.slice(0, 3).map(x => x[0]).join("");
-            addCard(list, `層級 3：深度特質 (${code3})`, depthLib[code3] || depthLib["default"]);
-        }
+        document.getElementById('out-name').innerText = userName + " 的行為風格報告";
+        document.getElementById('out-code').innerText = finalTypeLabel;
+        drawChartAndCapture();
     }
-
-    document.getElementById('out-name').innerText = userName + " 的行為風格報告";
-    document.getElementById('out-code').innerText = finalTypeLabel;
-
-    drawChartAndCapture();
-}
 
     function addCard(parent, title, text) {
         const div = document.createElement('div');
@@ -280,4 +302,3 @@
 </script>
 </body>
 </html>
-
