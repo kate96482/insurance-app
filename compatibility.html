@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>雙人合盤分析 - 小邦手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --m-blue: #4CC9F0; --m-pink: #F72585;
+            --m-purple: #7209B7; --m-mint: #B5EAD7; --bg: #F8F9FA;
+            --primary: #7209B7;
+        }
+
+        body { 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            background: var(--bg); margin: 0; padding: 10px; color: #333;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .nav-header {
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 450px; margin: 0 auto 10px auto;
+        }
+
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            color: var(--primary); font-weight: bold; font-size: 0.9rem;
+            padding: 8px 15px; border-radius: 20px; background: white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1); cursor: pointer;
+        }
+
+        .container { 
+            max-width: 450px; margin: auto; background: white; 
+            padding: 15px; border-radius: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
+        
+        h2 { color: var(--m-pink); margin: 5px 0 15px 0; font-size: 1.4rem; text-align: center; }
+        
+        /* 雙人輸入框樣式 */
+        .pair-input-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .person-box { background: #F8F9FA; padding: 12px; border-radius: 15px; border-left: 5px solid var(--m-blue); }
+        .person-box.p2 { border-left-color: var(--m-pink); }
+        .box-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; color: #666; }
+        
+        .input-row { display: flex; gap: 5px; }
+        input, select { padding: 8px; border-radius: 8px; border: 1px solid #DDD; font-size: 0.9rem; flex: 1; outline: none; }
+
+        .calc-btn {
+            width: 100%; padding: 12px; background: linear-gradient(135deg, var(--m-blue), var(--m-purple));
+            color: white; border: none; border-radius: 15px; font-weight: bold; font-size: 1rem;
+            margin-top: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 9, 183, 0.2);
+        }
+        .calc-btn:active { transform: scale(0.98); }
+
+        /* 結果展示區域 */
+        .result-card { 
+            margin-top: 20px; display: none; text-align: center; 
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .score-circle {
+            width: 80px; height: 80px; border-radius: 50%; background: var(--m-pink);
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; font-weight: 900; margin: 10px auto;
+            box-shadow: 0 0 20px rgba(247, 37, 133, 0.3);
+        }
+
+        .rel-tag {
+            display: inline-block; padding: 4px 12px; border-radius: 10px;
+            background: var(--m-mint); color: #2d6a4f; font-weight: bold; font-size: 0.9rem;
+        }
+
+        .analysis-text {
+            background: #fff; border: 1px dashed var(--m-blue); border-radius: 15px;
+            padding: 15px; margin-top: 15px; text-align: left; line-height: 1.6; font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-header">
+    <div onclick="history.back();" class="back-btn">
+        <i class="fa-solid fa-chevron-left"></i> 返回分析
+    </div>
+</div>
+
+<div class="container">
+    <h2><i class="fa-solid fa-heart"></i> 雙人合盤分析</h2>
+
+    <div class="pair-input-section">
+        <div class="person-box p1">
+            <div class="box-title"><i class="fa-solid fa-user"></i> 第一位 (通常是你)</div>
+            <div class="input-row">
+                <select id="p1-y"></select><select id="p1-m"></select><select id="p1-d"></select>
+            </div>
+        </div>
+
+        <div class="person-box p2">
+            <div class="box-title"><i class="fa-solid fa-heart"></i> 第二位 (對方)</div>
+            <div class="input-row">
+                <select id="p2-y"></select><select id="p2-m"></select><select id="p2-d"></select>
+            </div>
+        </div>
+        
+        <button class="calc-btn" onclick="analyzeCompatibility()">開始計算契合度</button>
+    </div>
+
+    <div id="resultCard" class="result-card">
+        <div class="rel-tag" id="rel-type">契合模式</div>
+        <div class="score-circle" id="rel-number">?</div>
+        <div style="font-weight: bold; color: var(--m-purple); margin-bottom: 10px;">關係數：生命靈數 <span id="rel-num-text"></span></div>
+        
+        <div class="analysis-text" id="analysis-content">
+            這裡將顯示你們的相處建議...
+        </div>
+    </div>
+</div>
+
+<script>
+    // 初始化下拉選單 (複製原本的邏輯)
+    function initSelect(prefix) {
+        const sy = document.getElementById(`${prefix}-y`), 
+              sm = document.getElementById(`${prefix}-m`), 
+              sd = document.getElementById(`${prefix}-d`);
+        for(let i=2026; i>=1920; i--) sy.options.add(new Option(i+'年', i));
+        for(let i=1; i<=12; i++) sm.options.add(new Option(i+'月', i));
+        for(let i=1; i<=31; i++) sd.options.add(new Option(i+'日', i));
+        sy.value = 1995;
+    }
+    initSelect('p1'); initSelect('p2');
+
+    const relData = {
+        1: "【開創與領導】這是一段充滿動力的關係。你們會互相激發對方的野心，但要注意爭奪主導權的問題。建議多聽取對方的意見。",
+        2: "【和諧與溝通】你們非常契合！這是一段溫柔且感性的關係，擅長互相扶持。唯一的缺點是可能因為怕傷害對方而不敢說真心話。",
+        3: "【創意與歡樂】如果你們在一起，生活永遠不會無聊。這段關係充滿歡笑與創意，但要注意財務管理與長遠計畫的落實。",
+        4: "【穩定與務實】這是一段非常有安全感的關係。你們都追求穩定，適合長期發展或組建家庭，但要記得在規律生活中加入一點驚喜。",
+        5: "【自由與冒險】你們是彼此的冒險夥伴！這段關係充滿新鮮感與變化，但要小心因為兩人都太愛自由而缺乏穩定的束縛力。",
+        6: "【責任與愛護】這是一段充滿照顧與療癒的關係。你們會互相承擔責任，但也容易因為「過度期待」對方而產生壓力。",
+        7: "【靈魂與智慧】你們的連結在於心靈層面。這是一段深刻、甚至帶有神祕感的關係，適合一起探索知識或宗教，但外人可能覺得你們較疏離。",
+        8: "【成就與物質】這是一段強強聯手的關係！你們能在一起創造物質財富或事業成就，但要小心別讓金錢成為衡量感情的唯一標準。",
+        9: "【大愛與夢想】你們是彼此的精神支柱。這段關係充滿理想主義色彩，會一起為了某個夢想努力，但現實生活的細節（如家事）可能是軟肋。"
+    };
+
+    function getDestinyNumber(y, m, d) {
+        const str = `${y}${m.toString().padStart(2,'0')}${d.toString().padStart(2,'0')}`;
+        let sum = str.split("").map(Number).reduce((a, b) => a + b, 0);
+        while (sum > 9) {
+            sum = sum.toString().split("").map(Number).reduce((a, b) => a + b, 0);
+        }
+        return sum;
+    }
+
+    function analyzeCompatibility() {
+        const p1Num = getDestinyNumber(document.getElementById('p1-y').value, document.getElementById('p1-m').value, document.getElementById('p1-d').value);
+        const p2Num = getDestinyNumber(document.getElementById('p2-y').value, document.getElementById('p2-m').value, document.getElementById('p2-d').value);
+
+        // 關係數計算：兩者相加
+        let relNum = p1Num + p2Num;
+        while (relNum > 9) {
+            relNum = relNum.toString().split("").map(Number).reduce((a, b) => a + b, 0);
+        }
+
+        // 顯示結果
+        document.getElementById('resultCard').style.display = 'block';
+        document.getElementById('rel-number').innerText = relNum;
+        document.getElementById('rel-num-text').innerText = relNum;
+        document.getElementById('analysis-content').innerText = relData[relNum];
+
+        // 判斷契合模式
+        const typeTag = document.getElementById('rel-type');
+        if (p1Num === p2Num) {
+            typeTag.innerText = "靈魂伴侶模式 (相似型)";
+            typeTag.style.background = "#B5EAD7";
+        } else if ((p1Num + p2Num) % 2 === 0) {
+            typeTag.innerText = "互補成長模式 (和諧型)";
+            typeTag.style.background = "#FFDAC1";
+        } else {
+            typeTag.innerText = "火花挑戰模式 (火花型)";
+            typeTag.style.background = "#FFB7B2";
+        }
+        
+        // 自動捲動到結果區
+        document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
