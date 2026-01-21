@@ -11,9 +11,9 @@
             --m-blue: #4CC9F0; --m-pink: #F72585;
             --m-purple: #7209B7; --m-mint: #B5EAD7; --bg: #F8F9FA;
             --primary: #7209B7;
-            /* 定義截圖友好的透明色 */
-            --line-pink: rgba(247, 37, 133, 0.45);
-            --line-blue: rgba(76, 201, 240, 0.45);
+            /* 修正：使用不透明或高飽和色彩，確保截圖不褪色 */
+            --line-pink: #F72585;
+            --line-blue: #4CC9F0;
         }
 
         body { 
@@ -59,13 +59,14 @@
         .result-card { 
             margin-top: 20px; display: none; text-align: center; 
             animation: fadeIn 0.5s ease; position: relative;
-            background: white; padding-bottom: 20px;
+            background: #FFFFFF; padding-bottom: 20px;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* 修正：確保覆蓋層是全透明但存在的，不影響 html2canvas 對下層的捕捉 */
         #save-image-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0; z-index: 100; pointer-events: auto;
+            opacity: 0; z-index: 1000; pointer-events: auto;
         }
 
         .score-circle {
@@ -87,7 +88,7 @@
 
         .grid-container { 
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; 
-            width: 100%; aspect-ratio: 1/1; 
+            width: 100%; aspect-ratio: 1/1; background: #FFFFFF;
         }
         .grid-item { 
             background: #FFF; border: 1px solid #eee; border-radius: 8px;
@@ -98,7 +99,7 @@
         .active-num .num-label { color: #333; }
         
         .circles-wrap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-        .circle { position: absolute; border: 0.8px solid; border-radius: 50%; opacity: 0.5; }
+        .circle { position: absolute; border: 1.5px solid; border-radius: 50%; opacity: 1; } /* 修正：提高線條粗細並取消透明度 */
         
         .triangle-marker { 
             position: absolute; bottom: 2px; width: 0; height: 0; 
@@ -213,7 +214,7 @@
         6: "【責任與愛護】這是一段充滿照顧與療癒的關係。你們會互相承擔責任。",
         7: "【靈魂與智慧】你們的連結在於心靈層面。這是一段深刻、甚至帶有神祕感的關係。",
         8: "【成就與物質】這是一段強強聯手的關係！你們能在一起創造物質財富。",
-        9: "【大愛與夢夢想】你們是彼此的精神支柱。這段關係充滿理想主義色彩。"
+        9: "【大愛與夢想】你們是彼此的精神支柱。這段關係充滿理想主義色彩。"
     };
 
     const numBrief = {
@@ -269,7 +270,7 @@
                         circle.className = `circle`;
                         circle.style.width = (35 + c*12) + '%';
                         circle.style.height = (35 + c*12) + '%';
-                        circle.style.borderColor = "var(--m-pink)";
+                        circle.style.borderColor = "#F72585"; // 修正：直接給飽和色
                         wrap.appendChild(circle);
                     }
                 }
@@ -278,14 +279,14 @@
                     const c1 = document.createElement('div');
                     c1.className = `circle`;
                     c1.style.width = '55%'; c1.style.height = '55%';
-                    c1.style.borderColor = "var(--m-blue)"; c1.style.borderWidth = "2px";
+                    c1.style.borderColor = "#4CC9F0"; c1.style.borderWidth = "2.5px";
                     wrap.appendChild(c1);
                 }
                 if(hasP2) {
                     const c2 = document.createElement('div');
                     c2.className = `circle`;
                     c2.style.width = '80%'; c2.style.height = '80%';
-                    c2.style.borderColor = "var(--m-pink)"; c2.style.borderWidth = "2px";
+                    c2.style.borderColor = "#F72585"; c2.style.borderWidth = "2.5px";
                     wrap.appendChild(c2);
                 }
             }
@@ -300,13 +301,18 @@
             const items = container.querySelectorAll('.grid-item');
             const rect = container.getBoundingClientRect();
             
-            canvas.width = rect.width * 2; // 提高畫布解析度
-            canvas.height = rect.height * 2;
+            // 修正：大幅提高 Canvas 物理像素密度，解決截圖淡化問題
+            const dpr = window.devicePixelRatio || 2;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+
             const ctx = canvas.getContext('2d');
-            ctx.scale(2, 2);
+            ctx.scale(dpr, dpr);
             ctx.clearRect(0, 0, rect.width, rect.height);
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 5]);
+            ctx.lineWidth = 3; // 修正：線條加粗，防止截圖變細
+            ctx.setLineDash([6, 4]);
 
             const getCenter = (idx) => {
                 const el = items[idx-1];
@@ -317,41 +323,37 @@
                 };
             };
 
-            // 畫三數連線
             lines3.forEach(l => {
                 if (l.ids.every(id => data.counts[id])) {
                     const p1 = getCenter(l.ids[0]), p2 = getCenter(l.ids[2]);
                     ctx.beginPath();
-                    ctx.strokeStyle = "rgba(247, 37, 133, 0.6)"; // 稍微加強透明度以利截圖
+                    ctx.strokeStyle = "#F72585"; // 修正：使用實色繪製
                     ctx.moveTo(p1.x, p1.y);
                     ctx.lineTo(p2.x, p2.y);
                     ctx.stroke();
                 }
             });
 
-            // 畫兩數連線
             lines2.forEach(l => {
                 if (l.ids.every(id => data.counts[id])) {
                     const p1 = getCenter(l.ids[0]), p2 = getCenter(l.ids[1]);
                     ctx.beginPath();
-                    ctx.strokeStyle = "rgba(76, 201, 240, 0.6)";
+                    ctx.strokeStyle = "#4CC9F0"; // 修正：使用實色繪製
                     ctx.moveTo(p1.x, p1.y);
                     ctx.lineTo(p2.x, p2.y);
                     ctx.stroke();
                 }
             });
-        }, 500); 
+        }, 600); 
     }
 
     function renderTextAnalysis(divId, data) {
         const div = document.getElementById(divId);
         let missing = [];
         for(let i=1; i<=9; i++) if(!data.counts[i]) missing.push(i);
-        
         let active3 = lines3.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
         let active2 = lines2.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
         let allLines = [...active3, ...active2];
-
         div.innerHTML = `
             <div class="ana-title">數據解析</div>
             <div class="ana-item"><span class="ana-sub">1.本命數 ${data.destiny}</span>${numBrief[data.destiny]}</div>
@@ -362,17 +364,18 @@
 
     async function captureToImage() {
         const resultCard = document.getElementById('resultCard');
-        // 增加延遲確保連線畫布穩定
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1500)); // 給予足夠渲染時間
         
+        // 修正：html2canvas 配置優化
         html2canvas(resultCard, {
             useCORS: true, 
-            scale: 2, 
+            scale: 3, // 提高縮放倍率，保證細節與顏色飽和度
             backgroundColor: "#FFFFFF",
             logging: false,
-            allowTaint: true
+            allowTaint: false,
+            removeContainer: true
         }).then(canvas => {
-            const imageData = canvas.toDataURL("image/png");
+            const imageData = canvas.toDataURL("image/png", 1.0);
             let imgLayer = document.getElementById('save-image-layer');
             if(!imgLayer) {
                 imgLayer = document.createElement('img');
@@ -380,6 +383,7 @@
                 resultCard.appendChild(imgLayer);
             }
             imgLayer.src = imageData;
+            console.log("Image Updated");
         });
     }
 
@@ -390,7 +394,8 @@
         let relNum = d1.destiny + d2.destiny;
         while (relNum > 9) relNum = relNum.toString().split("").map(Number).reduce((a, b) => a + b, 0);
 
-        document.getElementById('resultCard').style.display = 'block';
+        const card = document.getElementById('resultCard');
+        card.style.display = 'block';
         document.getElementById('rel-number').innerText = relNum;
         document.getElementById('rel-num-text').innerText = relNum;
         document.getElementById('analysis-content').innerText = relData[relNum];
@@ -414,7 +419,7 @@
         renderTextAnalysis('ana-p1', d1);
         renderTextAnalysis('ana-p2', d2);
         
-        document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+        card.scrollIntoView({ behavior: 'smooth' });
         captureToImage();
     }
 </script>
