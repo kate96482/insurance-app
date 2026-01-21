@@ -290,15 +290,24 @@
         setTimeout(() => {
             const container = document.getElementById(containerId);
             const canvas = document.getElementById(canvasId);
+            
+            // 修正 Canvas 尺寸以匹配 Grid Container
             const rect = container.getBoundingClientRect();
-            canvas.width = rect.width; canvas.height = rect.height;
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
             const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.lineWidth = 2;
             ctx.setLineDash([4, 3]);
 
             const getPos = (id) => {
                 const el = container.children[id-1];
-                return { x: el.offsetLeft + el.offsetWidth/2, y: el.offsetTop + el.offsetHeight/2 };
+                // 使用相對位置確保精準對齊數字中心
+                return { 
+                    x: el.offsetLeft + el.offsetWidth / 2, 
+                    y: el.offsetTop + el.offsetHeight / 2 
+                };
             };
 
             // 1. 三數連線 (粉色)
@@ -306,7 +315,10 @@
             lines3.forEach(l => {
                 if (l.ids.every(id => data.counts[id])) {
                     const pStart = getPos(l.ids[0]), pEnd = getPos(l.ids[2]);
-                    ctx.beginPath(); ctx.moveTo(pStart.x, pStart.y); ctx.lineTo(pEnd.x, pEnd.y); ctx.stroke();
+                    ctx.beginPath(); 
+                    ctx.moveTo(pStart.x, pStart.y); 
+                    ctx.lineTo(pEnd.x, pEnd.y); 
+                    ctx.stroke();
                 }
             });
 
@@ -315,10 +327,13 @@
             lines2.forEach(l => {
                 if (l.ids.every(id => data.counts[id])) {
                     const pStart = getPos(l.ids[0]), pEnd = getPos(l.ids[1]);
-                    ctx.beginPath(); ctx.moveTo(pStart.x, pStart.y); ctx.lineTo(pEnd.x, pEnd.y); ctx.stroke();
+                    ctx.beginPath(); 
+                    ctx.moveTo(pStart.x, pStart.y); 
+                    ctx.lineTo(pEnd.x, pEnd.y); 
+                    ctx.stroke();
                 }
             });
-        }, 200);
+        }, 300); // 稍微增加延遲確保 DOM 已完全排版
     }
 
     function renderTextAnalysis(divId, data) {
@@ -340,7 +355,7 @@
 
     async function captureToImage() {
         const resultCard = document.getElementById('resultCard');
-        await new Promise(r => setTimeout(r, 600));
+        await new Promise(r => setTimeout(r, 800));
         html2canvas(resultCard, {
             useCORS: true, scale: 2, backgroundColor: "#FFFFFF", logging: false
         }).then(canvas => {
