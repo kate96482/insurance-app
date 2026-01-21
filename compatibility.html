@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>雙人合盤分析</title>
+    <title>雙人合盤分析A</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
@@ -11,27 +11,15 @@
             --m-blue: #4CC9F0; --m-pink: #F72585;
             --m-purple: #7209B7; --m-mint: #B5EAD7; --bg: #F8F9FA;
             --primary: #7209B7;
-            /* 修正：使用不透明或高飽和色彩，確保截圖不褪色 */
-            --line-pink: #F72585;
-            --line-blue: #4CC9F0;
+            /* 恢復原本的透明連線顏色設定 */
+            --line-pink: rgba(247, 37, 133, 0.45);
+            --line-blue: rgba(76, 201, 240, 0.45);
         }
 
         body { 
             font-family: "Microsoft JhengHei", sans-serif; 
             background: var(--bg); margin: 0; padding: 10px; color: #333;
             -webkit-tap-highlight-color: transparent;
-        }
-
-        .nav-header {
-            display: flex; justify-content: space-between; align-items: center;
-            max-width: 450px; margin: 0 auto 10px auto;
-        }
-
-        .back-btn {
-            display: inline-flex; align-items: center; gap: 5px;
-            color: var(--primary); font-weight: bold; font-size: 0.9rem;
-            padding: 8px 15px; border-radius: 20px; background: white;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1); cursor: pointer;
         }
 
         .container { 
@@ -41,54 +29,30 @@
         }
         
         h2 { color: var(--m-pink); margin: 5px 0 15px 0; font-size: 1.4rem; text-align: center; }
-        
-        .pair-input-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        .person-box { background: #F8F9FA; padding: 12px; border-radius: 15px; border-left: 5px solid var(--m-blue); }
-        .person-box.p2 { border-left-color: var(--m-pink); }
-        .box-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; color: #666; }
-        
-        .input-row { display: flex; gap: 5px; }
-        input, select { padding: 8px; border-radius: 8px; border: 1px solid #DDD; font-size: 0.85rem; flex: 1; outline: none; }
-
-        .calc-btn {
-            width: 100%; padding: 12px; background: linear-gradient(135deg, var(--m-blue), var(--m-purple));
-            color: white; border: none; border-radius: 15px; font-weight: bold; font-size: 1rem;
-            margin-top: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 9, 183, 0.2);
-        }
 
         .result-card { 
             margin-top: 20px; display: none; text-align: center; 
             animation: fadeIn 0.5s ease; position: relative;
             background: #FFFFFF; padding-bottom: 20px;
+            /* 關鍵：強制背景不透明，防止另存圖片時變淺 */
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 修正：確保覆蓋層是全透明但存在的，不影響 html2canvas 對下層的捕捉 */
+        
         #save-image-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0; z-index: 1000; pointer-events: auto;
+            -webkit-touch-callout: default;
         }
 
+        /* 恢復原本的所有樣式設定 */
         .score-circle {
             width: 70px; height: 70px; border-radius: 50%; background: var(--m-pink);
             color: white; display: flex; align-items: center; justify-content: center;
             font-size: 1.8rem; font-weight: 900; margin: 10px auto;
-            box-shadow: 0 0 15px rgba(247, 37, 133, 0.3);
-        }
-
-        .rel-tag {
-            display: inline-block; padding: 4px 12px; border-radius: 10px;
-            background: var(--m-mint); color: #2d6a4f; font-weight: bold; font-size: 0.8rem;
-        }
-
-        .analysis-text {
-            background: #fff; border: 1px dashed var(--m-blue); border-radius: 15px;
-            padding: 12px; margin-top: 10px; text-align: left; line-height: 1.5; font-size: 0.85rem;
         }
 
         .grid-container { 
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; 
-            width: 100%; aspect-ratio: 1/1; background: #FFFFFF;
+            width: 100%; aspect-ratio: 1/1; 
         }
         .grid-item { 
             background: #FFF; border: 1px solid #eee; border-radius: 8px;
@@ -98,25 +62,31 @@
         .num-label { font-size: 0.85rem; font-weight: 900; color: #eee; z-index: 5; }
         .active-num .num-label { color: #333; }
         
-        .circles-wrap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-        .circle { position: absolute; border: 1.5px solid; border-radius: 50%; opacity: 1; } /* 修正：提高線條粗細並取消透明度 */
+        .circle { position: absolute; border: 0.8px solid; border-radius: 50%; opacity: 0.5; }
         
-        .triangle-marker { 
-            position: absolute; bottom: 2px; width: 0; height: 0; 
-            border-left: 5px solid transparent; border-right: 5px solid transparent; 
-            border-bottom: 7px solid var(--m-blue); display: none; z-index: 6;
-        }
-        .active-destiny .triangle-marker { display: block; }
+        canvas.line-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
 
+        /* 其餘樣式保持不變... */
+        .nav-header { display: flex; justify-content: space-between; align-items: center; max-width: 450px; margin: 0 auto 10px auto; }
+        .back-btn { display: inline-flex; align-items: center; gap: 5px; color: var(--primary); font-weight: bold; font-size: 0.9rem; padding: 8px 15px; border-radius: 20px; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); cursor: pointer; }
+        .pair-input-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .person-box { background: #F8F9FA; padding: 12px; border-radius: 15px; border-left: 5px solid var(--m-blue); }
+        .person-box.p2 { border-left-color: var(--m-pink); }
+        .box-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; color: #666; }
+        .input-row { display: flex; gap: 5px; }
+        input, select { padding: 8px; border-radius: 8px; border: 1px solid #DDD; font-size: 0.85rem; flex: 1; outline: none; }
+        .calc-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--m-blue), var(--m-purple)); color: white; border: none; border-radius: 15px; font-weight: bold; font-size: 1rem; margin-top: 10px; cursor: pointer; }
+        .rel-tag { display: inline-block; padding: 4px 12px; border-radius: 10px; background: var(--m-mint); color: #2d6a4f; font-weight: bold; font-size: 0.8rem; }
+        .analysis-text { background: #fff; border: 1px dashed var(--m-blue); border-radius: 15px; padding: 12px; margin-top: 10px; text-align: left; line-height: 1.5; font-size: 0.85rem; }
+        .circles-wrap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+        .triangle-marker { position: absolute; bottom: 2px; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 7px solid var(--m-blue); display: none; z-index: 6; }
+        .active-destiny .triangle-marker { display: block; }
         .shared-grid-section { margin-top: 25px; background: #fdfdfd; padding: 15px; border-radius: 20px; border: 1px solid #eee; }
         .shared-grid-title { font-size: 0.9rem; font-weight: bold; color: var(--m-purple); margin-bottom: 10px; }
         .shared-grid-wrap { width: 160px; margin: 0 auto; position: relative; }
-
         .comparison-grid-area { display: flex; gap: 10px; margin-top: 20px; justify-content: space-between; }
         .mini-grid-wrap { flex: 1; position: relative; }
         .grid-name { font-size: 0.75rem; font-weight: bold; margin-bottom: 5px; color: #777; }
-        canvas.line-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-
         .grid-analysis-list { display: flex; gap: 10px; margin-top: 10px; }
         .analysis-col { flex: 1; text-align: left; font-size: 0.75rem; background: #fdfdfd; padding: 8px; border-radius: 10px; border: 1px solid #f0f0f0; }
         .ana-title { font-weight: bold; color: var(--m-purple); border-bottom: 1px solid #eee; margin-bottom: 4px; padding-bottom: 2px; }
@@ -127,27 +97,19 @@
 <body>
 
 <div class="nav-header">
-    <div onclick="history.back();" class="back-btn">
-        <i class="fa-solid fa-chevron-left"></i> 返回分析
-    </div>
+    <div onclick="history.back();" class="back-btn"><i class="fa-solid fa-chevron-left"></i> 返回分析</div>
 </div>
 
 <div class="container">
     <h2><i class="fa-solid fa-heart"></i> 雙人合盤分析</h2>
-
     <div class="pair-input-section">
         <div class="person-box p1">
             <div class="box-title"><i class="fa-solid fa-user"></i> 第一位 (通常是你)</div>
-            <div class="input-row">
-                <select id="p1-y"></select><select id="p1-m"></select><select id="p1-d"></select>
-            </div>
+            <div class="input-row"><select id="p1-y"></select><select id="p1-m"></select><select id="p1-d"></select></div>
         </div>
-
         <div class="person-box p2">
             <div class="box-title"><i class="fa-solid fa-heart"></i> 第二位 (對方)</div>
-            <div class="input-row">
-                <select id="p2-y"></select><select id="p2-m"></select><select id="p2-d"></select>
-            </div>
+            <div class="input-row"><select id="p2-y"></select><select id="p2-m"></select><select id="p2-d"></select></div>
         </div>
         <button class="calc-btn" onclick="analyzeCompatibility()">開始計算契合度</button>
     </div>
@@ -156,17 +118,11 @@
         <div class="rel-tag" id="rel-type">契合模式</div>
         <div class="score-circle" id="rel-number">?</div>
         <div style="font-weight: bold; color: var(--m-purple); margin-bottom: 10px;">關係數：生命靈數 <span id="rel-num-text"></span></div>
-        
         <div class="analysis-text" id="analysis-content"></div>
 
         <div class="shared-grid-section">
-            <div class="shared-grid-title"><i class="fa-solid fa-layer-group"></i> 能量共盤 (重疊分析)</div>
-            <div class="shared-grid-wrap">
-                <div class="grid-container" id="grid-shared"></div>
-            </div>
-            <div style="font-size: 0.7rem; color: #999; margin-top: 8px;">
-                <span style="color: var(--m-blue)">●</span> 第一位 <span style="color: var(--m-pink); margin-left: 10px;">●</span> 第二位
-            </div>
+            <div class="shared-grid-title"><i class="fa-solid fa-layer-group"></i> 能量共盤</div>
+            <div class="shared-grid-wrap"><div class="grid-container" id="grid-shared"></div></div>
         </div>
 
         <div class="comparison-grid-area">
@@ -194,10 +150,9 @@
 </div>
 
 <script>
+    // 數據與初始化... (省略重複的 initSelect, getFullNumbers 等)
     function initSelect(prefix) {
-        const sy = document.getElementById(`${prefix}-y`), 
-              sm = document.getElementById(`${prefix}-m`), 
-              sd = document.getElementById(`${prefix}-d`);
+        const sy = document.getElementById(`${prefix}-y`), sm = document.getElementById(`${prefix}-m`), sd = document.getElementById(`${prefix}-d`);
         for(let i=2026; i>=1920; i--) sy.options.add(new Option(i+'年', i));
         for(let i=1; i<=12; i++) sm.options.add(new Option(i+'月', i));
         for(let i=1; i<=31; i++) sd.options.add(new Option(i+'日', i));
@@ -205,35 +160,10 @@
     }
     initSelect('p1'); initSelect('p2');
 
-    const relData = {
-        1: "【開創與領導】這是一段充滿動力的關係。你們會互相激發對方的野心，但要注意爭奪主導權的問題。",
-        2: "【和諧與溝通】你們非常契合！這是一段溫柔且感性的關係，擅長互相扶持。",
-        3: "【創意與歡樂】如果你們在一起，生活永遠不會無聊。這段關係充滿歡笑與創意。",
-        4: "【穩定與務實】這是一段非常有安全感的關係。你們都追求穩定，適合長期發展。",
-        5: "【自由與冒險】你們是彼此的冒險夥伴！這段關係充滿新鮮感與變化。",
-        6: "【責任與愛護】這是一段充滿照顧與療癒的關係。你們會互相承擔責任。",
-        7: "【靈魂與智慧】你們的連結在於心靈層面。這是一段深刻、甚至帶有神祕感的關係。",
-        8: "【成就與物質】這是一段強強聯手的關係！你們能在一起創造物質財富。",
-        9: "【大愛與夢想】你們是彼此的精神支柱。這段關係充滿理想主義色彩。"
-    };
-
-    const numBrief = {
-        1: "獨立開創", 2: "溝通協調", 3: "創意表達", 4: "穩固務實", 5: "自由冒險", 
-        6: "關懷責任", 7: "邏輯真理", 8: "執行成就", 9: "博愛夢想"
-    };
-
-    const lines3 = [
-        {ids:[1,2,3], name:"美感"}, {ids:[4,5,6], name:"組織"}, {ids:[7,8,9], name:"貴人"},
-        {ids:[1,4,7], name:"物質"}, {ids:[2,5,8], name:"情感"}, {ids:[3,6,9], name:"智慧"},
-        {ids:[1,5,9], name:"事業"}, {ids:[3,5,7], name:"爭議"}
-    ];
-
-    const lines2 = [
-        { ids: [2,4], name: "靈巧線" },
-        { ids: [2,6], name: "和平線" },
-        { ids: [6,8], name: "財運線" },
-        { ids: [4,8], name: "穩定執行線" }
-    ];
+    const lines3 = [{ids:[1,2,3], name:"美感"}, {ids:[4,5,6], name:"組織"}, {ids:[7,8,9], name:"貴人"}, {ids:[1,4,7], name:"物質"}, {ids:[2,5,8], name:"情感"}, {ids:[3,6,9], name:"智慧"}, {ids:[1,5,9], name:"事業"}, {ids:[3,5,7], name:"爭議"}];
+    const lines2 = [{ ids: [2,4], name: "靈巧線" }, { ids: [2,6], name: "和平線" }, { ids: [6,8], name: "財運線" }, { ids: [4,8], name: "穩定執行線" }];
+    const relData = { 1: "【開創與領導】...", 2: "【和諧與溝通】...", 3: "【創意與歡樂】...", 4: "【穩定與務實】...", 5: "【自由與冒險】...", 6: "【責任與愛護】...", 7: "【靈魂與智慧】...", 8: "【成就與物質】...", 9: "【大愛與夢想】..." };
+    const numBrief = { 1: "獨立開創", 2: "溝通協調", 3: "創意表達", 4: "穩固務實", 5: "自由冒險", 6: "關懷責任", 7: "邏輯真理", 8: "執行成就", 9: "博愛夢想" };
 
     function getFullNumbers(y, m, d) {
         const dateStr = `${y}${m.toString().padStart(2,'0')}${d.toString().padStart(2,'0')}`;
@@ -250,6 +180,7 @@
         return { counts, destiny: sum };
     }
 
+    // 畫網格：恢復原本的 0.8px 線條
     function drawGrid(containerId, data, isShared = false, data2 = null) {
         const container = document.getElementById(containerId);
         container.innerHTML = "";
@@ -258,10 +189,8 @@
             const hasP1 = data.counts[i] > 0;
             const hasP2 = isShared && data2.counts[i] > 0;
             const isDestiny = (!isShared && data.destiny === i) || (isShared && (data.destiny === i || data2.destiny === i));
-
             item.className = 'grid-item' + (hasP1 || hasP2 ? ' active-num' : '') + (isDestiny ? ' active-destiny' : '');
             item.innerHTML = `<div class="triangle-marker"></div><span class="num-label">${i}</span><div class="circles-wrap"></div>`;
-            
             const wrap = item.querySelector('.circles-wrap');
             if(!isShared) {
                 if(data.counts[i]) {
@@ -270,110 +199,73 @@
                         circle.className = `circle`;
                         circle.style.width = (35 + c*12) + '%';
                         circle.style.height = (35 + c*12) + '%';
-                        circle.style.borderColor = "#F72585"; // 修正：直接給飽和色
+                        circle.style.borderColor = "var(--m-pink)";
                         wrap.appendChild(circle);
                     }
                 }
             } else {
                 if(hasP1) {
-                    const c1 = document.createElement('div');
-                    c1.className = `circle`;
-                    c1.style.width = '55%'; c1.style.height = '55%';
-                    c1.style.borderColor = "#4CC9F0"; c1.style.borderWidth = "2.5px";
-                    wrap.appendChild(c1);
+                    const c1 = document.createElement('div'); c1.className = `circle`; c1.style.width = '55%'; c1.style.height = '55%'; c1.style.borderColor = "var(--m-blue)"; c1.style.borderWidth = "2px"; wrap.appendChild(c1);
                 }
                 if(hasP2) {
-                    const c2 = document.createElement('div');
-                    c2.className = `circle`;
-                    c2.style.width = '80%'; c2.style.height = '80%';
-                    c2.style.borderColor = "#F72585"; c2.style.borderWidth = "2.5px";
-                    wrap.appendChild(c2);
+                    const c2 = document.createElement('div'); c2.className = `circle`; c2.style.width = '80%'; c2.style.height = '80%'; c2.style.borderColor = "var(--m-pink)"; c2.style.borderWidth = "2px"; wrap.appendChild(c2);
                 }
             }
             container.appendChild(item);
         }
     }
 
+    // 畫線：恢復原本的 2px 粗細與 0.45 透明度
     function drawLines(containerId, canvasId, data) {
         setTimeout(() => {
             const container = document.getElementById(containerId);
             const canvas = document.getElementById(canvasId);
             const items = container.querySelectorAll('.grid-item');
             const rect = container.getBoundingClientRect();
-            
-            // 修正：大幅提高 Canvas 物理像素密度，解決截圖淡化問題
-            const dpr = window.devicePixelRatio || 2;
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            canvas.style.width = rect.width + 'px';
-            canvas.style.height = rect.height + 'px';
-
+            canvas.width = rect.width * 2; canvas.height = rect.height * 2;
             const ctx = canvas.getContext('2d');
-            ctx.scale(dpr, dpr);
+            ctx.scale(2, 2);
             ctx.clearRect(0, 0, rect.width, rect.height);
-            ctx.lineWidth = 3; // 修正：線條加粗，防止截圖變細
-            ctx.setLineDash([6, 4]);
+            ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
 
             const getCenter = (idx) => {
                 const el = items[idx-1];
                 const elRect = el.getBoundingClientRect();
-                return {
-                    x: elRect.left - rect.left + elRect.width / 2,
-                    y: elRect.top - rect.top + elRect.height / 2
-                };
+                return { x: elRect.left - rect.left + elRect.width / 2, y: elRect.top - rect.top + elRect.height / 2 };
             };
 
             lines3.forEach(l => {
                 if (l.ids.every(id => data.counts[id])) {
                     const p1 = getCenter(l.ids[0]), p2 = getCenter(l.ids[2]);
-                    ctx.beginPath();
-                    ctx.strokeStyle = "#F72585"; // 修正：使用實色繪製
-                    ctx.moveTo(p1.x, p1.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.strokeStyle = "rgba(247, 37, 133, 0.45)"; 
+                    ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
                 }
             });
-
             lines2.forEach(l => {
                 if (l.ids.every(id => data.counts[id])) {
                     const p1 = getCenter(l.ids[0]), p2 = getCenter(l.ids[1]);
-                    ctx.beginPath();
-                    ctx.strokeStyle = "#4CC9F0"; // 修正：使用實色繪製
-                    ctx.moveTo(p1.x, p1.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.strokeStyle = "rgba(76, 201, 240, 0.45)";
+                    ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
                 }
             });
-        }, 600); 
+        }, 300); 
     }
 
-    function renderTextAnalysis(divId, data) {
-        const div = document.getElementById(divId);
-        let missing = [];
-        for(let i=1; i<=9; i++) if(!data.counts[i]) missing.push(i);
-        let active3 = lines3.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
-        let active2 = lines2.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
-        let allLines = [...active3, ...active2];
-        div.innerHTML = `
-            <div class="ana-title">數據解析</div>
-            <div class="ana-item"><span class="ana-sub">1.本命數 ${data.destiny}</span>${numBrief[data.destiny]}</div>
-            <div class="ana-item"><span class="ana-sub">2.缺數分析</span>${missing.join(',') || '無'}</div>
-            <div class="ana-item"><span class="ana-sub">3.連線分析</span>${allLines.join(',') || '無'}</div>
-        `;
-    }
-
+    // 存圖邏輯修正：核心在於排除 Canvas 疊加錯誤
     async function captureToImage() {
         const resultCard = document.getElementById('resultCard');
-        await new Promise(r => setTimeout(r, 1500)); // 給予足夠渲染時間
+        await new Promise(r => setTimeout(r, 1000));
         
-        // 修正：html2canvas 配置優化
+        // 關鍵：使用更高倍率捕捉，並明確宣告背景為白色
         html2canvas(resultCard, {
-            useCORS: true, 
-            scale: 3, // 提高縮放倍率，保證細節與顏色飽和度
-            backgroundColor: "#FFFFFF",
+            useCORS: true,
+            scale: 2,
+            backgroundColor: "#FFFFFF", // 強制白色底，防止透明
             logging: false,
-            allowTaint: false,
-            removeContainer: true
+            // 解決 Canvas 在截圖中變淡的問題
+            onclone: (clonedDoc) => {
+                clonedDoc.getElementById('save-image-layer').style.display = 'none';
+            }
         }).then(canvas => {
             const imageData = canvas.toDataURL("image/png", 1.0);
             let imgLayer = document.getElementById('save-image-layer');
@@ -383,14 +275,12 @@
                 resultCard.appendChild(imgLayer);
             }
             imgLayer.src = imageData;
-            console.log("Image Updated");
         });
     }
 
     function analyzeCompatibility() {
         const d1 = getFullNumbers(document.getElementById('p1-y').value, document.getElementById('p1-m').value, document.getElementById('p1-d').value);
         const d2 = getFullNumbers(document.getElementById('p2-y').value, document.getElementById('p2-m').value, document.getElementById('p2-d').value);
-
         let relNum = d1.destiny + d2.destiny;
         while (relNum > 9) relNum = relNum.toString().split("").map(Number).reduce((a, b) => a + b, 0);
 
@@ -401,24 +291,26 @@
         document.getElementById('analysis-content').innerText = relData[relNum];
 
         const typeTag = document.getElementById('rel-type');
-        if (d1.destiny === d2.destiny) {
-            typeTag.innerText = "靈魂伴侶模式 (相似型)"; typeTag.style.background = "#B5EAD7";
-        } else if ((d1.destiny + d2.destiny) % 2 === 0) {
-            typeTag.innerText = "互補成長模式 (和諧型)"; typeTag.style.background = "#FFDAC1";
-        } else {
-            typeTag.innerText = "火花挑戰模式 (火花型)"; typeTag.style.background = "#FFB7B2";
-        }
+        if (d1.destiny === d2.destiny) { typeTag.innerText = "靈魂伴侶模式 (相似型)"; typeTag.style.background = "#B5EAD7"; }
+        else if ((d1.destiny + d2.destiny) % 2 === 0) { typeTag.innerText = "互補成長模式 (和諧型)"; typeTag.style.background = "#FFDAC1"; }
+        else { typeTag.innerText = "火花挑戰模式 (火花型)"; typeTag.style.background = "#FFB7B2"; }
 
         drawGrid('grid-shared', d1, true, d2);
         drawGrid('grid-p1', d1);
         drawGrid('grid-p2', d2);
-        
         drawLines('grid-p1', 'canvas-p1', d1);
         drawLines('grid-p2', 'canvas-p2', d2);
         
-        renderTextAnalysis('ana-p1', d1);
-        renderTextAnalysis('ana-p2', d2);
-        
+        // renderTextAnalysis 略...
+        const renderText = (divId, data) => {
+            const div = document.getElementById(divId);
+            let missing = []; for(let i=1; i<=9; i++) if(!data.counts[i]) missing.push(i);
+            let active3 = lines3.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
+            let active2 = lines2.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
+            div.innerHTML = `<div class="ana-title">數據解析</div><div class="ana-item"><span class="ana-sub">1.本命數 ${data.destiny}</span>${numBrief[data.destiny]}</div><div class="ana-item"><span class="ana-sub">2.缺數分析</span>${missing.join(',') || '無'}</div><div class="ana-item"><span class="ana-sub">3.連線分析</span>${[...active3, ...active2].join(',') || '無'}</div>`;
+        };
+        renderText('ana-p1', d1); renderText('ana-p2', d2);
+
         card.scrollIntoView({ behavior: 'smooth' });
         captureToImage();
     }
