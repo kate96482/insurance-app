@@ -10,69 +10,32 @@
     <style>
         :root { --primary: #6C5CE7; --secondary: #A29BFE; --bg: #f4f7f6; }
         body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
-        
-        /* 導覽列 */
         .navbar { position: fixed; top: 0; width: 100%; height: 50px; background: rgba(255,255,255,0.9); backdrop-filter: blur(5px); display: flex; align-items: center; padding: 0 20px; z-index: 1000; box-sizing: border-box; }
         .btn-home { background: #eee; border: none; padding: 5px 15px; border-radius: 8px; cursor: pointer; color: #555; }
-
-        /* 啟動頁美化樣式 */
-        .welcome-card {
-            background: white; border-radius: 30px; overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center;
-            margin: 80px auto 20px; max-width: 450px; width: 90%;
-        }
+        .welcome-card { background: white; border-radius: 30px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; margin: 80px auto 20px; max-width: 450px; width: 90%; }
         .welcome-header { background: linear-gradient(135deg, #6C5CE7, #8E78FF); padding: 40px 20px; color: white; }
         .welcome-header i { font-size: 3rem; margin-bottom: 15px; }
         .welcome-header h2 { margin: 0; font-size: 1.6rem; letter-spacing: 2px; }
-        
         .input-section { padding: 40px 30px; }
         .input-group { position: relative; margin-bottom: 30px; }
         .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
-        
-        input[type="text"] {
-            width: 100%; padding: 15px 15px 15px 45px; border: 2px solid #f0f0f0;
-            border-radius: 15px; font-size: 1rem; box-sizing: border-box; transition: all 0.3s;
-            outline: none; background: #f9f9f9;
-        }
-        input[type="text"]:focus { border-color: var(--primary); background: white; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.1); }
-        
-        /* 測驗與報告容器 */
+        input[type="text"] { width: 100%; padding: 15px 15px 15px 45px; border: 2px solid #f0f0f0; border-radius: 15px; font-size: 1rem; box-sizing: border-box; transition: all 0.3s; outline: none; background: #f9f9f9; }
         .container { max-width: 650px; margin: 80px auto 20px; background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); display: none; }
-
-        /* --- 修正後的測驗 UI 樣式 --- */
         #q-title { font-size: 1.2rem; line-height: 1.6; margin-bottom: 25px; color: #2D3436; min-height: 3.6rem; text-align: left; }
-        
-        .option-btn {
-            display: block; width: 100%; padding: 18px 20px; margin: 12px 0;
-            background: #fff; border: 2px solid #f0f0f0; border-radius: 15px;
-            cursor: pointer; text-align: left; font-size: 1rem; color: #444;
-            transition: all 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-        .option-btn:hover { border-color: var(--secondary); background: #fdfcff; }
+        .option-btn { display: block; width: 100%; padding: 18px 20px; margin: 12px 0; background: #fff; border: 2px solid #f0f0f0; border-radius: 15px; cursor: pointer; text-align: left; font-size: 1rem; color: #444; transition: all 0.2s ease; }
         .option-btn:active { transform: scale(0.98); background: #f0edff; border-color: var(--primary); color: var(--primary); }
-
         .progress-container { background: #eee; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
         .progress-bar { background: linear-gradient(90deg, var(--secondary), var(--primary)); height: 100%; width: 0%; transition: 0.3s; }
-        
-        .btn-prev-style { margin-top: 15px; border: none; background: none; color: var(--primary); cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-
-        /* 報告與分析卡片樣式 */
         .report-header { background: linear-gradient(135deg, #6C5CE7, #8E78FF); color: white; padding: 30px 20px; border-radius: 15px 15px 0 0; text-align: center; }
-        .analysis-card { background: #fdfdfd; border-left: 5px solid var(--primary); padding: 18px; margin-bottom: 15px; border-radius: 0 10px 10px 0; text-align: left; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .analysis-card { background: #fdfdfd; border-left: 5px solid var(--primary); padding: 18px; margin-bottom: 15px; border-radius: 0 10px 10px 0; text-align: left; }
         .analysis-card h4 { margin: 0 0 8px 0; color: var(--primary); font-size: 1.05rem; }
         .analysis-card p { margin: 0; font-size: 0.95rem; line-height: 1.6; color: #555; }
-
-        .btn-main {
-            width: 100%; padding: 16px; background: var(--primary); color: white;
-            border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold;
-            cursor: pointer; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3); transition: transform 0.2s;
-        }
-        .btn-main:active { transform: scale(0.98); }
+        .btn-main { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar"><button class="btn-home" onclick="confirmExit()"><i class="fa-solid fa-chevron-left"></i> 返回</button></nav>
+    <nav class="navbar"><button class="btn-home" onclick="location.reload()"><i class="fa-solid fa-chevron-left"></i> 返回</button></nav>
 
     <div id="view-name" class="welcome-card">
         <div class="welcome-header">
@@ -86,51 +49,41 @@
                 <input type="text" id="user-name" placeholder="請輸入您的姓名或暱稱">
             </div>
             <button class="btn-main" onclick="nextToStart()">開始探索之旅</button>
-            <p style="margin-top: 20px; color: #999; font-size: 0.8rem;">預計耗時：3 分鐘 | 20 題心理測試</p>
         </div>
     </div>
 
     <div class="container" id="quiz-container">
         <div id="view-quiz">
-            <div class="progress-container">
-                <div id="pb" class="progress-bar"></div>
-            </div>
+            <div class="progress-container"><div id="pb" class="progress-bar"></div></div>
             <h3 id="q-title"></h3>
             <div id="options-box"></div>
-            <button id="btn-prev" class="btn-prev-style" style="display:none;" onclick="prevQuestion()">
-                <i class="fa-solid fa-arrow-left"></i> 回上一題
-            </button>
         </div>
 
-        <div id="view-report" style="display:none;">
-            <div id="capture-area">
+        <div id="view-report" style="display:none; text-align: center;">
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;"><i class="fa-solid fa-circle-info"></i> 長按下方圖片即可另存分析結果</p>
+            
+            <div id="report-img-container"></div>
+
+            <div id="capture-area" style="position: absolute; left: -9999px; width: 600px;">
                 <div class="report-header">
                     <h2 id="out-name" style="margin:0;"></h2>
                     <p style="opacity: 0.9; margin: 5px 0 0 0;">DISC Professional Analysis Report</p>
                 </div>
-                <div style="padding:25px; border:1px solid #eee; border-top:none; border-radius: 0 0 15px 15px; background: white;">
+                <div style="padding:25px; background: white; border-radius: 0 0 15px 15px; border: 1px solid #eee; border-top: none;">
                     <div style="display:flex; justify-content:center; align-items:center; gap:25px; margin:20px 0;">
                         <img id="out-img" src="" style="width:100px; height:100px; object-fit: contain;">
                         <div style="text-align:left;">
-                            <span style="color:#888; font-size: 0.9rem;">性格代碼組合</span>
-                            <h2 id="out-code" style="color:var(--primary); margin:0; font-size: 1.8rem;"></h2>
+                            <span style="color:#888; font-size: 0.9rem;">主屬性特質</span>
+                            <h2 id="out-code" style="color:var(--primary); margin:0; font-size: 2rem;"></h2>
                         </div>
                     </div>
-                    
                     <div style="height:250px; margin-bottom: 30px;"><canvas id="discChart"></canvas></div>
-                    
-                    <div class="analysis-card"><h4 id="label-1"></h4><p id="desc-1"></p></div>
-                    <div class="analysis-card"><h4 id="label-2"></h4><p id="desc-2"></p></div>
-                    <div class="analysis-card"><h4 id="label-3"></h4><p id="desc-3"></p></div>
-                    
+                    <div id="analysis-list"></div>
                     <div style="text-align:right; font-size:0.7rem; color:#ccc; margin-top:15px;">數位工具箱專業測驗模組 © 2026</div>
                 </div>
             </div>
-            
-            <div style="margin-top: 25px;">
-                <button class="btn-main" onclick="downloadReport()">另存完整報告圖片</button>
-                <button class="btn-main" style="background:#666; margin-top:10px;" onclick="location.reload()">重新測驗</button>
-            </div>
+
+            <button class="btn-main" style="background:#666; margin-top:20px;" onclick="location.reload()">重新測驗</button>
         </div>
     </div>
 
@@ -140,44 +93,33 @@
         "I": "孔雀型（影響者）：展現極佳社交魅力，擅長說服他人並營造氣氛。",
         "S": "無尾熊型（穩健者）：重視和諧與團隊，是穩定且值得信賴的合作夥伴。",
         "C": "貓頭鷹型（分析者）：講求邏輯與精確，對品質與細節有極高標準。",
-        "DI": "【開拓影響者】結合老虎的果敢與孔雀的熱情，是具感召力的領導者。",
-        "DS": "【穩健執行者】老虎的實踐力配上無尾熊的耐性，做事有始有終且穩定。",
-        "DC": "【完美統籌者】老虎的結果導向結合貓頭鷹的嚴謹，執行精確且有效率。",
-        "IS": "【親和協調者】孔雀的魅力加上無尾熊的親切，重視人際和諧與信任。",
-        "IC": "【邏輯推廣者】孔雀的創意與貓頭鷹的分析，能用數據支持感性想法。",
-        "SC": "【謹慎幕僚】無尾熊的穩定加上貓頭鷹的細緻，凡事講求流程與準確。",
-        "DIC": "【全才型決策者】具備掌控、影響與分析力，能在變動中快速做出決策。",
-        "DIS": "【熱情實踐家】兼具行動力、社交與耐力，能衝鋒陷陣也能安撫人心。",
-        "ISC": "【全方位協調官】融合社交、穩定與嚴謹，擅長在規則與情感間取平衡。",
-        "DSC": "【精準執行長】擁有強大的任務執行與品質控管能力，穩定達成目標。",
-        "default": "展現出多樣化的行為風格，具備極高的環境適應能力。"
+        "變色龍": "變色龍型：您的分數非常平均，具備極高的環境適應力與彈性，能根據不同情境快速調整自己的行為風格，是極佳的協調者。"
     };
 
     const questions = [
         { q: "1. 當你和朋友一起用餐時，在選擇吃什麼時，你常是：", o: ["決定者", "氣氛製造者", "附和者", "意見提供者"] },
-        { q: "2. 當你買衣服時，你是：", o: ["心中自有定見", "售貨員親切促成購買", "找熟悉的店購買", "注意品質與價錢比例"] },
-        { q: "3. 你的消費習慣是：", o: ["找到東西付錢走人", "很隨意的逛", "不愛變化", "注意東西好壞與成本"] },
+        { q: "2. 當你買衣服時，你是：", o: ["心中自有定見", "售貨員親切促成", "找熟悉的店購買", "注意品質與價錢"] },
+        { q: "3. 你的消費習慣是：", o: ["找到東西付錢走人", "很隨意的逛", "不愛變化", "注意品質與成本"] },
         { q: "4. 你的朋友通常形容你：", o: ["蠻鴨霸的", "熱情洋溢", "溫和斯文", "要求完美"] },
         { q: "5. 你自認哪種形容最貼切：", o: ["果敢能接受挑戰", "生動活潑", "愛傾聽喜歡穩定", "處世謹慎重數據"] },
         { q: "6. 做事重點應該是：", o: ["What (重結果)", "Who (重感受)", "How (重執行)", "Why (重品質)"] },
-        { q: "7. 與同事衝突時：", o: ["說服對方聽自己的", "尋求支持", "退讓以和為貴", "協調找最佳方案"] },
+        { q: "7. 與同事衝突時：", o: ["說服對方", "尋求支持", "退讓以和為貴", "協調找最佳方案"] },
         { q: "8. 哪種環境最能鼓舞你：", o: ["能決定事情", "相處愉快受歡迎", "穩定中求發展", "講品質重效率"] },
         { q: "9. 溝通方式最符合的是：", o: ["直接權威", "表情肢體豐富", "溫和表達", "冷靜理多於情"] },
-        { q: "10. 會議中的角色：", o: ["據理力爭者", "協調者", "贊同多數者", "分析所有提案"] },
+        { q: "10. 會議中的角色：", o: ["據理力爭者", "協調者", "贊同多數者", "分析提案"] },
         { q: "11. 關於做事與目標：", o: ["快速得到結果", "喜歡跟人交往", "不強出頭", "守紀律自律"] },
         { q: "12. 環境偏好：", o: ["激烈競爭", "喜歡社交招待", "固守程序", "花時間研究"] },
         { q: "13. 關於成功與冒險：", o: ["只要成功就好", "在意他人意見", "少冒險較好", "高標準期望"] },
         { q: "14. 關於工作熱情：", o: ["處理棘手問題", "熱心喜歡共事", "委婉溫和", "較少閒聊"] },
         { q: "15. 關於團體意識：", o: ["有競爭才有潛能", "不注意細節", "順著群眾", "講求證據"] },
-        { q: "16. 關於能力與細節：", o: ["追求能力與權威", "有時較情緒化", "穩紮穩打", "注意事務細節"] },
-        { q: "17. 關於掌握與傾向：", o: ["掌握支配他人", "喜歡打成一片", "遵守傳統步驟", "掌握事實真相"] },
-        { q: "18. 關於溝通直接度：", o: ["不兜圈子", "喜歡幫助人", "要穩定安全", "要求準確高品質"] },
-        { q: "19. 關於標準程序：", o: ["不喜人逗開心", "喜歡團體活動", "有耐心靜靜做", "要有計劃程序"] },
-        { q: "20. 關於被支配感：", o: ["討厭被告訴如何做", "生氣勃勃", "喜歡獨處", "會找更多資料"] }
+        { q: "16. 關於能力與細節：", o: ["追求能力權威", "有時情緒化", "穩紮穩打", "注意細節"] },
+        { q: "17. 關於掌握與傾向：", o: ["掌握支配他人", "喜歡打成一片", "遵守步驟", "掌握事實"] },
+        { q: "18. 關於溝通直接度：", o: ["不兜圈子", "喜歡幫助人", "要穩定安全", "高品質要求"] },
+        { q: "19. 關於標準程序：", o: ["不喜人逗開心", "喜歡團體活動", "有耐心靜靜做", "要有計劃"] },
+        { q: "20. 關於被支配感：", o: ["討厭被告知如何做", "生氣勃勃", "喜歡獨處", "會找更多資料"] }
     ];
 
     let scores = { D: 0, I: 0, S: 0, C: 0 };
-    let history = [];
     let currentIdx = 0;
     let userName = "";
 
@@ -193,8 +135,6 @@
         const q = questions[currentIdx];
         document.getElementById('q-title').innerText = q.q;
         document.getElementById('pb').style.width = ((currentIdx / 20) * 100) + "%";
-        document.getElementById('btn-prev').style.display = currentIdx > 0 ? "flex" : "none";
-        
         const box = document.getElementById('options-box');
         box.innerHTML = "";
         const types = ['D', 'I', 'S', 'C'];
@@ -204,7 +144,6 @@
             btn.innerText = txt;
             btn.onclick = () => {
                 scores[types[i]]++;
-                history.push(types[i]);
                 currentIdx++;
                 if(currentIdx < 20) renderQuestion(); else showReport();
             };
@@ -212,71 +151,52 @@
         });
     }
 
-    function prevQuestion() {
-        if(currentIdx > 0) {
-            currentIdx--;
-            const lastType = history.pop();
-            scores[lastType]--;
-            renderQuestion();
-        }
-    }
-
     function showReport() {
         document.getElementById('view-quiz').style.display = 'none';
         document.getElementById('view-report').style.display = 'block';
         
-        // 1. 先排序，再過濾掉分數為 0 的項目
-        const sortedAll = Object.entries(scores).sort((a,b) => b[1] - a[1]);
-        const validTraits = sortedAll.filter(item => item[1] > 0); // 只保留分數 > 0 的特質
+        const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+        const maxScore = sorted[0][1];
+        const minScore = sorted[3][1];
         
-        // 取出過濾後的項目 (防止陣列長度不足報錯，給予預設值)
-        const t1 = validTraits[0] || ["?", 0];
-        const t2 = validTraits[1] || null;
-        const t3 = validTraits[2] || null;
+        // 變色龍邏輯：最高與最低差距 <= 2 且最低分 > 0
+        const isChameleon = (maxScore - minScore <= 2) && minScore > 0;
+        
+        const list = document.getElementById('analysis-list');
+        list.innerHTML = "";
+        let finalTypeLabel = "";
 
-        // --- 第一層分析 (永遠存在) ---
-        document.getElementById('label-1').innerText = `● 第一層：${t1[0]} 單一特質分析`;
-        document.getElementById('desc-1').innerText = depthLib[t1[0]] || "尚未偵測到明顯特質。";
-
-        // --- 第二層分析 (只有當有第二種特質得分時才顯示) ---
-        const card2 = document.getElementById('label-2').parentElement;
-        if (t2) {
-            const d_code = t1[0] + t2[0];
-            document.getElementById('label-2').innerText = `● 第二層：${d_code} 雙重特質分析`;
-            document.getElementById('desc-2').innerText = depthLib[d_code] || depthLib[t2[0] + t1[0]] || "展現出靈活的雙重人格特質。";
-            card2.style.display = "block";
+        if (isChameleon) {
+            finalTypeLabel = "變色龍型";
+            document.getElementById('out-img').src = "chameleon.png"; 
+            addCard(list, "核心人格分析", depthLib["變色龍"]);
         } else {
-            card2.style.display = "none"; // 沒有第二特質就隱藏卡片
+            const topTrait = sorted[0][0];
+            const traitNames = { D: "老虎型", I: "孔雀型", S: "無尾熊型", C: "貓頭鷹型" };
+            finalTypeLabel = traitNames[topTrait];
+            document.getElementById('out-img').src = { D: "tiger.png", I: "peacock.png", S: "koala.png", C: "owl.png" }[topTrait];
+            addCard(list, `主要性格特質：${finalTypeLabel}`, depthLib[topTrait]);
         }
 
-        // --- 第三層分析 (只有當有第三種特質得分時才顯示) ---
-        const card3 = document.getElementById('label-3').parentElement;
-        if (t3) {
-            const tr_code = t1[0] + t2[0] + t3[0];
-            document.getElementById('label-3').innerText = `● 第三層：${tr_code} 三重特質分析`;
-            document.getElementById('desc-3').innerText = depthLib[tr_code] || "在複雜情境下具備高度的行為適應力。";
-            card3.style.display = "block";
-        } else {
-            card3.style.display = "none"; // 沒有第三特質就隱藏卡片
-        }
-
-        // 設定標題與最終代碼 (代碼由所有 >0 的特質組成)
-        const finalCode = validTraits.map(item => item[0]).join("");
         document.getElementById('out-name').innerText = userName + " 的行為風格報告";
-        document.getElementById('out-code').innerText = finalCode;
-        
-        const imgMap = { D: "tiger.png", I: "peacock.png", S: "koala.png", C: "owl.png" };
-        document.getElementById('out-img').src = imgMap[t1[0]] || "";
+        document.getElementById('out-code').innerText = finalTypeLabel;
 
-        drawChart();
+        drawChartAndCapture();
     }
-    function drawChart() {
+
+    function addCard(parent, title, text) {
+        const div = document.createElement('div');
+        div.className = "analysis-card";
+        div.innerHTML = `<h4>● ${title}</h4><p>${text}</p>`;
+        parent.appendChild(div);
+    }
+
+    function drawChartAndCapture() {
         new Chart(document.getElementById('discChart'), {
             type: 'bar',
             data: {
                 labels: ['D 老虎', 'I 孔雀', 'S 無尾熊', 'C 貓頭鷹'],
                 datasets: [{
-                    label: '特質分數',
                     data: [scores.D, scores.I, scores.S, scores.C],
                     backgroundColor: ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF'],
                     borderRadius: 5
@@ -284,28 +204,26 @@
             },
             options: { 
                 indexAxis: 'y', 
-                maintainAspectRatio: false, 
+                maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: { x: { beginAtZero: true, max: 20 } }
+                animation: {
+                    onComplete: function() {
+                        html2canvas(document.getElementById('capture-area'), { scale: 2 }).then(canvas => {
+                            const img = new Image();
+                            img.src = canvas.toDataURL("image/png");
+                            img.style.width = "100%";
+                            img.style.maxWidth = "500px";
+                            img.style.borderRadius = "15px";
+                            img.style.boxShadow = "0 10px 30px rgba(0,0,0,0.1)";
+                            const container = document.getElementById('report-img-container');
+                            container.innerHTML = "";
+                            container.appendChild(img);
+                        });
+                    }
+                }
             }
         });
-    }
-
-    function downloadReport() {
-        const target = document.getElementById('capture-area');
-        html2canvas(target, { scale: 2, useCORS: true }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `DISC_Report_${userName}.png`;
-            link.href = canvas.toDataURL("image/png");
-            link.click();
-        });
-    }
-
-    function confirmExit() {
-        if(confirm("確定要返回嗎？進度將不會保存。")) location.href = "index.html";
     }
 </script>
 </body>
 </html>
-
-
