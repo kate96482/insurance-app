@@ -2,51 +2,39 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DISC 行為風格診斷小助手</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root {
-            --primary: #6C5CE7;
-            --bg: #f8f9fa;
-        }
-        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding-top: 60px; }
+        :root { --primary: #6C5CE7; --bg: #f8f9fa; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding-top: 60px; -webkit-user-select: none; }
         
         /* 頂端導覽列 */
-        .navbar {
-            position: fixed; top: 0; width: 100%; height: 50px;
-            background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex; align-items: center; padding: 0 20px; z-index: 1000;
-        }
-        .btn-home {
-            background: #eee; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;
-        }
-        .btn-home:hover { background: #ddd; }
+        .navbar { position: fixed; top: 0; width: 100%; height: 50px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; padding: 0 20px; z-index: 1000; box-sizing: border-box; }
+        .btn-home { background: #eee; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; }
 
-        .container { max-width: 600px; margin: 20px auto; background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        
-        /* UI 元件 */
-        h2, h3 { color: #333; text-align: center; }
-        .input-group { margin: 20px 0; text-align: center; }
-        input[type="text"] { padding: 12px; width: 80%; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; }
-        input[type="text"]:focus { border-color: var(--primary); }
-        .btn-primary { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; margin-top: 10px; transition: 0.3s; }
-        .btn-primary:hover { opacity: 0.9; }
+        .container { max-width: 600px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         
         /* 測驗區 */
         .progress-container { background: #eee; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
         .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: 0.3s; }
         .option-btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #fff; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.2s; font-size: 1rem; }
-        .option-btn:hover { background: #f0edff; border-color: var(--primary); }
+        .option-btn:active { background: #f0edff; border-color: var(--primary); }
+
+        .nav-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-secondary { flex: 1; padding: 12px; background: #f1f1f1; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; color: #666; }
 
         /* 報告區 */
         #capture-area { background: #fff; padding: 25px; border: 1px solid #eee; border-radius: 10px; }
         .result-header { text-align: center; margin-bottom: 20px; }
-        .animal-icon { width: 120px; height: 120px; margin: 10px auto; display: block; object-fit: contain; }
-        .chart-box { margin: 20px 0; }
-        .analysis-text { background: #f9f9f9; padding: 20px; border-radius: 10px; line-height: 1.8; color: #444; }
+        .animal-icon { width: 140px; height: 140px; margin: 10px auto; display: block; object-fit: contain; -webkit-user-select: auto; }
+        .chart-box { margin: 20px 0; height: 250px; }
+        .analysis-text { background: #f9f9f9; padding: 20px; border-radius: 10px; line-height: 1.8; color: #444; text-align: left; }
         .analysis-text strong { color: var(--primary); font-size: 1.1rem; }
+        
+        .save-hint { text-align: center; color: #ff6b6b; font-size: 0.9rem; margin: 10px 0; font-weight: bold; }
+        .btn-primary { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -59,7 +47,7 @@
         <div id="view-name">
             <h2>DISC 測驗小助手</h2>
             <p style="text-align: center; color: #666;">開始前，請告訴我們您的稱呼：</p>
-            <div class="input-group">
+            <div style="text-align: center;">
                 <input type="text" id="user-name" placeholder="請輸入您的姓名">
                 <button class="btn-primary" onclick="goToStart()">下一步</button>
             </div>
@@ -67,7 +55,7 @@
 
         <div id="view-start" style="display:none;">
             <h3>您好，<span id="display-name"></span>！</h3>
-            <p style="line-height: 1.6;">本測驗包含 20 題選擇題，請根據您的直覺，選出在生活中最符合您行為模式的選項。不需過度思考，大約耗時 3 分鐘。</p>
+            <p style="line-height: 1.6;">本測驗包含 20 題，請按直覺選出答案。您的每一次選擇都會被記錄，隨時可以返回上一題修改。</p>
             <button class="btn-primary" onclick="startQuiz()">開始測驗</button>
         </div>
 
@@ -75,6 +63,9 @@
             <div class="progress-container"><div class="progress-bar" id="pb"></div></div>
             <h3 id="q-title" style="text-align: left; min-height: 60px;"></h3>
             <div id="options-box"></div>
+            <div class="nav-actions">
+                <button id="btn-back" class="btn-secondary" onclick="prevQuestion()" style="display:none;">回上一題</button>
+            </div>
         </div>
 
         <div id="view-report" style="display:none;">
@@ -87,43 +78,41 @@
                 </div>
                 <div class="chart-box"><canvas id="discChart"></canvas></div>
                 <div class="analysis-text">
-                    <strong>【主屬性特色】</strong><br>
-                    <span id="main-desc"></span><br><br>
-                    <strong>【深度解析】</strong><br>
-                    <span id="depth-desc"></span>
+                    <strong>【人格特質解析】</strong><br>
+                    <span id="depth-desc"></span><br><br>
+                    <strong>【屬性特色說明】</strong><br>
+                    <span id="main-desc"></span>
                 </div>
             </div>
-            <button class="btn-primary" onclick="downloadImage()">另存分析報告圖片</button>
+            
+            <p class="save-hint">💡 提示：手機用戶可長按圖片另存分析圖</p>
+            <button class="btn-primary" onclick="downloadImage()">點此另存分析報告圖檔</button>
             <button class="btn-primary" style="background:#666;" onclick="location.reload()">重新測驗</button>
         </div>
     </div>
 
 <script>
-    // 深度分析文案庫
+    // 深度解析文案資料庫
     const depthAnalysisLib = {
-        // 雙重組合
-        "DI": "【開拓影響者】結合了老虎的果敢與孔雀的熱情。您是充滿魅力的領導者，既能設定目標，又能帶動氣氛並說服他人。",
-        "ID": "【開拓影響者】結合了孔雀的魅力與老虎的行動力。您在社交中極具主導權，能用熱情驅動結果。",
-        "DS": "【穩健執行者】老虎的實踐力配上無尾熊的耐性。做事有始有終，既能承受挑戰，也能在過程中保持穩定。",
-        "SD": "【穩健執行者】無尾熊的穩定結合老虎的底氣。平時溫和，但在關鍵時刻展現出驚人的執行力與堅持。",
-        "DC": "【完美統籌者】老虎的結果導向結合貓頭鷹的嚴謹。對品質要求極高，做事精確且有效率，是專業的代名詞。",
-        "CD": "【完美統籌者】貓頭鷹的邏輯結合老虎的果敢。凡事講求證據，並能快速將分析轉化為實質的行動。",
-        "IS": "【親和協調者】孔雀的魅力加上無尾熊的親切。您是天生的協調高手，重視人際和諧，能贏得他人信任。",
-        "SI": "【親和協調者】無尾熊的耐性結合孔雀的感性。擅長傾聽並給予熱情回饋，是團隊中最受歡迎的潤滑劑。",
-        "IC": "【邏輯推廣者】孔雀的創意與貓頭鷹的分析。您能用精準的數據支持感性的想法，說服力極強。",
-        "CI": "【邏輯推廣者】貓頭鷹的嚴謹配上孔雀的社交。在專業領域中展現幽愛與親和，讓深奧的知識變得易懂。",
-        "SC": "【謹慎幕僚】無尾熊的穩定加上貓頭鷹的細緻。您是完美的技術派，凡事講求流程與準確，讓人非常放心。",
-        "CS": "【謹慎幕僚】貓頭鷹的精確結合無尾熊的耐心。穩定且高品質的產出是您的商標，適合長期鑽研專業。",
-        // 三重組合
-        "DIC": "【全才型決策者】具備掌控、影響與分析力。能在變動中快速分析並做出具有感召力的決策。",
-        "DIS": "【熱情實踐家】兼具行動力、社交與耐力。既能衝鋒陷陣也能安撫人心，是非常優秀的人際領袖。",
-        "ISC": "【全方位協調官】融合社交、穩定與嚴謹。擅長在規則與情感之間找到平衡，是極佳的管理者。",
-        "DSC": "【精準執行長】擁有強大的任務執行與品質控管能力。專注於如何穩定、精確地達成目標。",
-        "default": "您的特質分布較為獨特，展現出多樣化的行為風格，建議參考各項屬性的詳細說明來了解自己。"
+        "D": "【單一老虎型】具備強大的開創力與決斷力。您是天生的領導者，專注於達成目標，不畏懼衝突與挑戰。",
+        "I": "【單一孔雀型】擁有極佳的人際吸引力。您擅長帶動氣氛，透過熱情與語言影響他人，是團隊中的發光體。",
+        "S": "【單一無尾熊型】展現極高的穩定性與耐心。您重視人際和諧與程序，是值得信賴且溫暖的合作夥伴。",
+        "C": "【單一貓頭鷹型】強調邏輯與精確。您對品質有極高要求，擅長分析與規劃，確保每件事都能準確無誤。",
+        "DI": "【DI 雙重特質：開拓影響者】結合了老虎的果敢與孔雀的熱情。您既能設定目標，又能帶動氣氛並說服他人。",
+        "DS": "【DS 雙重特質：穩健執行者】老虎的實踐力配上無尾熊的耐性。做事有始有終，既能承受挑戰也能保持穩定。",
+        "DC": "【DC 雙重特質：完美統籌者】老虎的結果導向結合貓頭鷹的嚴謹。對品質要求極高，做事精確且有效率。",
+        "IS": "【IS 雙重特質：親和協調者】孔雀的魅力加上無尾熊的親切。您是天生的協調高手，重視人際和諧，能贏得信任。",
+        "IC": "【IC 雙重特質：邏輯推廣者】孔雀的創意與貓頭鷹的分析。您能用精準的數據支持感性的想法，說服力極強。",
+        "SC": "【SC 雙重特質：謹慎幕僚】無尾熊的穩定加上貓頭鷹的細緻。您是完美的技術派，凡事講求流程與準確。",
+        "DIC": "【DIC 三重特質：全才型決策者】具備掌控、影響與分析力。能在變動中快速分析並做出具感召力的決策。",
+        "DIS": "【DIS 三重特質：熱情實踐家】兼具行動力、社交與耐力。既能衝鋒陷陣也能安撫人心，是非常優秀的人際領袖。",
+        "ISC": "【ISC 三重特質：全方位協調官】融合社交、穩定與嚴謹。擅長在規則與情感之間找到平衡。",
+        "DSC": "【DSC 三重特質：精準執行長】擁有強大的任務執行與品質控管能力。專注於穩定、精確地達成目標。",
+        "變色龍": "【變色龍型：全方位平衡】您在不同環境中能快速調整角色，具備極佳的適應力與交涉能力。"
     };
 
     const questions = [
-        { q: "1. 當你和朋友一起用餐時，在選擇用餐或是吃什麼時，你常是：", o: ["決定者", "氣氛製造者", "附和者", "意見提供者"] },
+        { q: "1. 當你和朋友一起用餐時，在選擇吃什麼時，你常是：", o: ["決定者", "氣氛製造者", "附和者", "意見提供者"] },
         { q: "2. 當你買衣服時，你是：", o: ["心中自有定見", "售貨員親切感常促成購買", "找熟悉的店購買", "注意品質與價錢比例"] },
         { q: "3. 你的消費習慣是：", o: ["找到要買的東西，付錢走人", "很隨意的逛，不特定買什麼", "有一定的消費習慣，不太喜歡變化", "注意東西好不好，有成本觀念"] },
         { q: "4. 你的朋友，以一句話來形容你，他們會說：", o: ["蠻「鴨霸」的", "熱情洋溢", "溫和斯文", "要求完美"] },
@@ -146,13 +135,14 @@
     ];
 
     let userName = "";
-    let currentQ = 0;
+    let currentIdx = 0;
     let scores = { D: 0, I: 0, S: 0, C: 0 };
+    let choiceHistory = []; // 紀錄每題選了什麼類型
     let quizActive = false;
 
     function goToStart() {
         userName = document.getElementById('user-name').value.trim();
-        if(!userName) return alert("請輸入您的姓名以進行測驗");
+        if(!userName) return alert("請輸入您的姓名");
         document.getElementById('view-name').style.display = 'none';
         document.getElementById('view-start').style.display = 'block';
         document.getElementById('display-name').innerText = userName;
@@ -166,9 +156,10 @@
     }
 
     function renderQuestion() {
-        const q = questions[currentQ];
+        const q = questions[currentIdx];
         document.getElementById('q-title').innerText = q.q;
-        document.getElementById('pb').style.width = ((currentQ / 20) * 100) + "%";
+        document.getElementById('pb').style.width = ((currentIdx / 20) * 100) + "%";
+        document.getElementById('btn-back').style.display = currentIdx > 0 ? "block" : "none";
         
         const box = document.getElementById('options-box');
         box.innerHTML = "";
@@ -178,12 +169,23 @@
             btn.className = "option-btn";
             btn.innerText = txt;
             btn.onclick = () => {
-                scores[types[i]]++;
-                currentQ++;
-                if(currentQ < 20) renderQuestion(); else showReport();
+                const type = types[i];
+                scores[type]++;
+                choiceHistory.push(type);
+                currentIdx++;
+                if(currentIdx < 20) renderQuestion(); else showReport();
             };
             box.appendChild(btn);
         });
+    }
+
+    function prevQuestion() {
+        if (currentIdx > 0) {
+            currentIdx--;
+            const lastType = choiceHistory.pop();
+            scores[lastType]--;
+            renderQuestion();
+        }
     }
 
     function showReport() {
@@ -200,46 +202,42 @@
         let finalType = "";
         let animal = "";
         let mainDesc = "";
-        let depthDesc = "";
 
-        // 變色龍判定
         if (top1[1] - top4[1] <= 1) {
             finalType = "變色龍";
             animal = "chameleon.png";
-            mainDesc = "全方位平衡性格。";
-            depthDesc = "您在不同環境中能快速調整角色，具備極佳的適應力與交涉能力，不輕易顯露極端的個性。";
+            mainDesc = "您的各項數值非常平均，具備極強的環境適應能力。";
         } else {
-            // 判定深度屬性組合 (差距 3 分內)
-            finalType = top1[0];
-            if (top1[1] - top2[1] <= 3) finalType += top2[0];
-            if (top1[1] - top3[1] <= 3) finalType += top3[0];
-            
+            // 自動組合代號 (如 IDS, ID, D)
+            let typeCode = top1[0];
+            if (top1[1] - top2[1] <= 3) typeCode += top2[0];
+            if (top1[1] - top3[1] <= 3) typeCode += top3[0];
+            finalType = typeCode;
+
             const map = { D: "老虎", I: "孔雀", S: "無尾熊", C: "貓頭鷹" };
             const imgMap = { D: "tiger.png", I: "peacock.png", S: "koala.png", C: "owl.png" };
             const descMap = {
-                D: "老虎（支配型）：目標導向、果断、具領導力，熱愛挑戰且重效率。",
-                I: "孔雀（影響型）：社交性強、熱情樂觀、擅長說服且重視人際氛圍。",
-                S: "無尾熊（穩健型）：安定平穩、有耐性、善於傾聽且重視團隊忠誠度。",
-                C: "貓頭鷹（分析型）：精確、講求邏輯、重細節，對品質有極高標準。"
+                D: "老虎（支配型）：目標導向、具領導力，重效率。",
+                I: "孔雀（影響型）：社交性強、熱情，重視人際氛圍。",
+                S: "無尾熊（穩健型）：安定平穩、善於傾聽，重視團隊。",
+                C: "貓頭鷹（分析型）：精確、講求邏輯，對品質要求高。"
             };
 
             animal = imgMap[top1[0]];
             mainDesc = descMap[top1[0]];
-            depthDesc = depthAnalysisLib[finalType] || depthAnalysisLib["default"];
         }
 
         document.getElementById('report-user-name').innerText = userName + " 的診斷報告";
-        document.getElementById('result-type').innerText = finalType + " 型人格";
+        document.getElementById('result-type').innerText = finalType + " 型人";
         document.getElementById('animal-img').src = "images/" + animal;
         document.getElementById('main-desc').innerText = mainDesc;
-        document.getElementById('depth-desc').innerText = depthDesc;
+        document.getElementById('depth-desc').innerText = depthAnalysisLib[finalType] || depthAnalysisLib["default"];
 
         drawChart();
     }
 
     function drawChart() {
-        const ctx = document.getElementById('discChart');
-        new Chart(ctx, {
+        new Chart(document.getElementById('discChart'), {
             type: 'bar',
             data: {
                 labels: ['D 老虎', 'I 孔雀', 'S 無尾熊', 'C 貓頭鷹'],
@@ -250,6 +248,7 @@
             },
             options: { 
                 indexAxis: 'y',
+                maintainAspectRatio: false,
                 plugins: { legend: { display: false } }, 
                 scales: { x: { beginAtZero: true, max: 20 } } 
             }
@@ -257,7 +256,7 @@
     }
 
     function downloadImage() {
-        html2canvas(document.getElementById('capture-area'), { scale: 2 }).then(canvas => {
+        html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true }).then(canvas => {
             const link = document.createElement('a');
             link.download = `DISC_Report_${userName}.png`;
             link.href = canvas.toDataURL("image/png");
