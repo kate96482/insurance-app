@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>雙人合盤分析 - 小邦手</title>
+    <title>雙人合盤分析</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
             --m-blue: #4CC9F0; --m-pink: #F72585;
@@ -52,8 +53,19 @@
             margin-top: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 9, 183, 0.2);
         }
 
-        .result-card { margin-top: 20px; display: none; text-align: center; animation: fadeIn 0.5s ease; }
+        /* 结果區域設為相對定位，方便覆蓋圖片 */
+        .result-card { 
+            margin-top: 20px; display: none; text-align: center; 
+            animation: fadeIn 0.5s ease; position: relative;
+            background: white; padding-bottom: 20px;
+        }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 隱藏的 Canvas 圖片層，專門用來給用戶長按 */
+        #save-image-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; z-index: 100; pointer-events: auto;
+        }
 
         .score-circle {
             width: 70px; height: 70px; border-radius: 50%; background: var(--m-pink);
@@ -72,7 +84,6 @@
             padding: 12px; margin-top: 10px; text-align: left; line-height: 1.5; font-size: 0.85rem;
         }
 
-        /* 九宮格共用樣式 */
         .grid-container { 
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; 
             width: 100%; aspect-ratio: 1/1; 
@@ -88,7 +99,6 @@
         .circles-wrap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
         .circle { position: absolute; border: 0.8px solid; border-radius: 50%; opacity: 0.5; }
         
-        /* 三角形標示 */
         .triangle-marker { 
             position: absolute; bottom: 2px; width: 0; height: 0; 
             border-left: 5px solid transparent; border-right: 5px solid transparent; 
@@ -96,18 +106,15 @@
         }
         .active-destiny .triangle-marker { display: block; }
 
-        /* 滿版共盤樣式 */
         .shared-grid-section { margin-top: 25px; background: #fdfdfd; padding: 15px; border-radius: 20px; border: 1px solid #eee; }
         .shared-grid-title { font-size: 0.9rem; font-weight: bold; color: var(--m-purple); margin-bottom: 10px; }
         .shared-grid-wrap { width: 160px; margin: 0 auto; position: relative; }
 
-        /* 左右對照樣式 */
         .comparison-grid-area { display: flex; gap: 10px; margin-top: 20px; justify-content: space-between; }
         .mini-grid-wrap { flex: 1; position: relative; }
         .grid-name { font-size: 0.75rem; font-weight: bold; margin-bottom: 5px; color: #777; }
         canvas.line-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; }
 
-        /* 分析列表 */
         .grid-analysis-list { display: flex; gap: 10px; margin-top: 10px; }
         .analysis-col { flex: 1; text-align: left; font-size: 0.75rem; background: #fdfdfd; padding: 8px; border-radius: 10px; border: 1px solid #f0f0f0; }
         .ana-title { font-weight: bold; color: var(--m-purple); border-bottom: 1px solid #eee; margin-bottom: 4px; padding-bottom: 2px; }
@@ -244,7 +251,6 @@
             
             const wrap = item.querySelector('.circles-wrap');
             if(!isShared) {
-                // 一般個人盤：細線圈圈，無限量呈現
                 if(data.counts[i]) {
                     for(let c=0; c<data.counts[i]; c++) {
                         const circle = document.createElement('div');
@@ -256,7 +262,6 @@
                     }
                 }
             } else {
-                // 共盤：顯示兩人的數字存在情況 (只要有就圈一次)
                 if(hasP1) {
                     const c1 = document.createElement('div');
                     c1.className = `circle`;
@@ -276,6 +281,7 @@
         }
     }
 
+    // 1. 優化：連線虛線置中與顏色微調
     function drawLines(containerId, canvasId, data) {
         setTimeout(() => {
             const container = document.getElementById(containerId);
@@ -283,15 +289,29 @@
             const rect = container.getBoundingClientRect();
             canvas.width = rect.width; canvas.height = rect.height;
             const ctx = canvas.getContext('2d');
-            ctx.strokeStyle = "#F72585"; ctx.lineWidth = 1.5; ctx.setLineDash([2, 2]); ctx.globalAlpha = 0.5;
+            
+            ctx.strokeStyle = "var(--m-blue)"; // 設為藍色虛線
+            ctx.lineWidth = 1.5; 
+            ctx.setLineDash([3, 3]); 
+            ctx.globalAlpha = 0.7;
             
             lines.forEach(l => {
-                if(l.ids.every(id => data.counts[id])) {
-                    const el1 = container.children[l.ids[0]-1];
-                    const el3 = container.children[l.ids[2]-1];
+                const countPresent = l.ids.filter(id => data.counts[id]).length;
+                // 只要有 2 個數字以上有數，就畫連線
+                if(countPresent >= 2) {
+                    const activeIds = l.ids.filter(id => data.counts[id]);
+                    const startEl = container.children[activeIds[0]-1];
+                    const endEl = container.children[activeIds[activeIds.length-1]-1];
+                    
+                    // 確保獲取的是格子中心點
+                    const startX = startEl.offsetLeft + startEl.offsetWidth / 2;
+                    const startY = startEl.offsetTop + startEl.offsetHeight / 2;
+                    const endX = endEl.offsetLeft + endEl.offsetWidth / 2;
+                    const endY = endEl.offsetTop + endEl.offsetHeight / 2;
+
                     ctx.beginPath();
-                    ctx.moveTo(el1.offsetLeft + el1.offsetWidth/2, el1.offsetTop + el1.offsetHeight/2);
-                    ctx.lineTo(el3.offsetLeft + el3.offsetWidth/2, el3.offsetTop + el3.offsetHeight/2);
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
                     ctx.stroke();
                 }
             });
@@ -309,6 +329,29 @@
             <div class="ana-item"><span class="ana-sub">2.缺數分析</span>${missing.join(',') || '無'}</div>
             <div class="ana-item"><span class="ana-sub">3.連線分析</span>${activeLines.join(',') || '無'}</div>
         `;
+    }
+
+    // 2. 優化：將分析结果轉為圖片以供長按儲存
+    async function captureToImage() {
+        const resultCard = document.getElementById('resultCard');
+        // 等待繪圖完成
+        await new Promise(r => setTimeout(r, 500));
+        
+        html2canvas(resultCard, {
+            useCORS: true,
+            scale: 2, // 提高解析度
+            backgroundColor: "#FFFFFF",
+            logging: false
+        }).then(canvas => {
+            const imageData = canvas.toDataURL("image/png");
+            let imgLayer = document.getElementById('save-image-layer');
+            if(!imgLayer) {
+                imgLayer = document.createElement('img');
+                imgLayer.id = 'save-image-layer';
+                resultCard.appendChild(imgLayer);
+            }
+            imgLayer.src = imageData;
+        });
     }
 
     function analyzeCompatibility() {
@@ -332,22 +375,20 @@
             typeTag.innerText = "火花挑戰模式 (火花型)"; typeTag.style.background = "#FFB7B2";
         }
 
-        // 繪製共盤
         drawGrid('grid-shared', d1, true, d2);
-        
-        // 繪製個人盤
         drawGrid('grid-p1', d1);
         drawGrid('grid-p2', d2);
         
-        // 畫線
         drawLines('grid-p1', 'canvas-p1', d1);
         drawLines('grid-p2', 'canvas-p2', d2);
         
-        // 文字分析
         renderTextAnalysis('ana-p1', d1);
         renderTextAnalysis('ana-p2', d2);
         
         document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+
+        // 計算完畢後立即執行擷取圖片，讓用戶可以長按
+        captureToImage();
     }
 </script>
 </body>
