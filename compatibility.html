@@ -38,45 +38,81 @@
         
         h2 { color: var(--m-pink); margin: 5px 0 15px 0; font-size: 1.4rem; text-align: center; }
         
-        /* 雙人輸入框樣式 */
         .pair-input-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
         .person-box { background: #F8F9FA; padding: 12px; border-radius: 15px; border-left: 5px solid var(--m-blue); }
         .person-box.p2 { border-left-color: var(--m-pink); }
         .box-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; color: #666; }
         
         .input-row { display: flex; gap: 5px; }
-        input, select { padding: 8px; border-radius: 8px; border: 1px solid #DDD; font-size: 0.9rem; flex: 1; outline: none; }
+        input, select { padding: 8px; border-radius: 8px; border: 1px solid #DDD; font-size: 0.85rem; flex: 1; outline: none; }
 
         .calc-btn {
             width: 100%; padding: 12px; background: linear-gradient(135deg, var(--m-blue), var(--m-purple));
             color: white; border: none; border-radius: 15px; font-weight: bold; font-size: 1rem;
             margin-top: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 9, 183, 0.2);
         }
-        .calc-btn:active { transform: scale(0.98); }
 
-        /* 結果展示區域 */
-        .result-card { 
-            margin-top: 20px; display: none; text-align: center; 
-            animation: fadeIn 0.5s ease;
-        }
+        .result-card { margin-top: 20px; display: none; text-align: center; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .score-circle {
-            width: 80px; height: 80px; border-radius: 50%; background: var(--m-pink);
+            width: 70px; height: 70px; border-radius: 50%; background: var(--m-pink);
             color: white; display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; font-weight: 900; margin: 10px auto;
-            box-shadow: 0 0 20px rgba(247, 37, 133, 0.3);
+            font-size: 1.8rem; font-weight: 900; margin: 10px auto;
+            box-shadow: 0 0 15px rgba(247, 37, 133, 0.3);
         }
 
         .rel-tag {
             display: inline-block; padding: 4px 12px; border-radius: 10px;
-            background: var(--m-mint); color: #2d6a4f; font-weight: bold; font-size: 0.9rem;
+            background: var(--m-mint); color: #2d6a4f; font-weight: bold; font-size: 0.8rem;
         }
 
         .analysis-text {
             background: #fff; border: 1px dashed var(--m-blue); border-radius: 15px;
-            padding: 15px; margin-top: 15px; text-align: left; line-height: 1.6; font-size: 0.9rem;
+            padding: 12px; margin-top: 10px; text-align: left; line-height: 1.5; font-size: 0.85rem;
         }
+
+        /* 九宮格共用樣式 */
+        .grid-container { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; 
+            width: 100%; aspect-ratio: 1/1; 
+        }
+        .grid-item { 
+            background: #FFF; border: 1px solid #eee; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; 
+            position: relative; overflow: hidden;
+        }
+        .num-label { font-size: 0.85rem; font-weight: 900; color: #eee; z-index: 5; }
+        .active-num .num-label { color: #333; }
+        
+        .circles-wrap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+        .circle { position: absolute; border: 0.8px solid; border-radius: 50%; opacity: 0.5; }
+        
+        /* 三角形標示 */
+        .triangle-marker { 
+            position: absolute; bottom: 2px; width: 0; height: 0; 
+            border-left: 5px solid transparent; border-right: 5px solid transparent; 
+            border-bottom: 7px solid var(--m-blue); display: none; z-index: 6;
+        }
+        .active-destiny .triangle-marker { display: block; }
+
+        /* 滿版共盤樣式 */
+        .shared-grid-section { margin-top: 25px; background: #fdfdfd; padding: 15px; border-radius: 20px; border: 1px solid #eee; }
+        .shared-grid-title { font-size: 0.9rem; font-weight: bold; color: var(--m-purple); margin-bottom: 10px; }
+        .shared-grid-wrap { width: 160px; margin: 0 auto; position: relative; }
+
+        /* 左右對照樣式 */
+        .comparison-grid-area { display: flex; gap: 10px; margin-top: 20px; justify-content: space-between; }
+        .mini-grid-wrap { flex: 1; position: relative; }
+        .grid-name { font-size: 0.75rem; font-weight: bold; margin-bottom: 5px; color: #777; }
+        canvas.line-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; }
+
+        /* 分析列表 */
+        .grid-analysis-list { display: flex; gap: 10px; margin-top: 10px; }
+        .analysis-col { flex: 1; text-align: left; font-size: 0.75rem; background: #fdfdfd; padding: 8px; border-radius: 10px; border: 1px solid #f0f0f0; }
+        .ana-title { font-weight: bold; color: var(--m-purple); border-bottom: 1px solid #eee; margin-bottom: 4px; padding-bottom: 2px; }
+        .ana-item { margin-bottom: 8px; color: #555; }
+        .ana-sub { font-weight: bold; color: #444; display: block; }
     </style>
 </head>
 <body>
@@ -104,7 +140,6 @@
                 <select id="p2-y"></select><select id="p2-m"></select><select id="p2-d"></select>
             </div>
         </div>
-        
         <button class="calc-btn" onclick="analyzeCompatibility()">開始計算契合度</button>
     </div>
 
@@ -113,14 +148,39 @@
         <div class="score-circle" id="rel-number">?</div>
         <div style="font-weight: bold; color: var(--m-purple); margin-bottom: 10px;">關係數：生命靈數 <span id="rel-num-text"></span></div>
         
-        <div class="analysis-text" id="analysis-content">
-            這裡將顯示你們的相處建議...
+        <div class="analysis-text" id="analysis-content"></div>
+
+        <div class="shared-grid-section">
+            <div class="shared-grid-title"><i class="fa-solid fa-layer-group"></i> 能量共盤 (重疊分析)</div>
+            <div class="shared-grid-wrap">
+                <div class="grid-container" id="grid-shared"></div>
+            </div>
+            <div style="font-size: 0.7rem; color: #999; margin-top: 8px;">
+                <span style="color: var(--m-blue)">●</span> 第一位 <span style="color: var(--m-pink); margin-left: 10px;">●</span> 第二位
+            </div>
+        </div>
+
+        <div class="comparison-grid-area">
+            <div class="mini-grid-wrap">
+                <div class="grid-name">第一位命盤</div>
+                <div class="grid-container" id="grid-p1"></div>
+                <canvas class="line-overlay" id="canvas-p1"></canvas>
+            </div>
+            <div class="mini-grid-wrap">
+                <div class="grid-name">第二位命盤</div>
+                <div class="grid-container" id="grid-p2"></div>
+                <canvas class="line-overlay" id="canvas-p2"></canvas>
+            </div>
+        </div>
+
+        <div class="grid-analysis-list">
+            <div class="analysis-col" id="ana-p1"></div>
+            <div class="analysis-col" id="ana-p2"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // 初始化下拉選單 (複製原本的邏輯)
     function initSelect(prefix) {
         const sy = document.getElementById(`${prefix}-y`), 
               sm = document.getElementById(`${prefix}-m`), 
@@ -133,59 +193,162 @@
     initSelect('p1'); initSelect('p2');
 
     const relData = {
-        1: "【開創與領導】這是一段充滿動力的關係。你們會互相激發對方的野心，但要注意爭奪主導權的問題。建議多聽取對方的意見。",
-        2: "【和諧與溝通】你們非常契合！這是一段溫柔且感性的關係，擅長互相扶持。唯一的缺點是可能因為怕傷害對方而不敢說真心話。",
-        3: "【創意與歡樂】如果你們在一起，生活永遠不會無聊。這段關係充滿歡笑與創意，但要注意財務管理與長遠計畫的落實。",
-        4: "【穩定與務實】這是一段非常有安全感的關係。你們都追求穩定，適合長期發展或組建家庭，但要記得在規律生活中加入一點驚喜。",
-        5: "【自由與冒險】你們是彼此的冒險夥伴！這段關係充滿新鮮感與變化，但要小心因為兩人都太愛自由而缺乏穩定的束縛力。",
-        6: "【責任與愛護】這是一段充滿照顧與療癒的關係。你們會互相承擔責任，但也容易因為「過度期待」對方而產生壓力。",
-        7: "【靈魂與智慧】你們的連結在於心靈層面。這是一段深刻、甚至帶有神祕感的關係，適合一起探索知識或宗教，但外人可能覺得你們較疏離。",
-        8: "【成就與物質】這是一段強強聯手的關係！你們能在一起創造物質財富或事業成就，但要小心別讓金錢成為衡量感情的唯一標準。",
-        9: "【大愛與夢想】你們是彼此的精神支柱。這段關係充滿理想主義色彩，會一起為了某個夢想努力，但現實生活的細節（如家事）可能是軟肋。"
+        1: "【開創與領導】這是一段充滿動力的關係。你們會互相激發對方的野心，但要注意爭奪主導權的問題。",
+        2: "【和諧與溝通】你們非常契合！這是一段溫柔且感性的關係，擅長互相扶持。",
+        3: "【創意與歡樂】如果你們在一起，生活永遠不會無聊。這段關係充滿歡笑與創意。",
+        4: "【穩定與務實】這是一段非常有安全感的關係。你們都追求穩定，適合長期發展。",
+        5: "【自由與冒險】你們是彼此的冒險夥伴！這段關係充滿新鮮感與變化。",
+        6: "【責任與愛護】這是一段充滿照顧與療癒的關係。你們會互相承擔責任。",
+        7: "【靈魂與智慧】你們的連結在於心靈層面。這是一段深刻、甚至帶有神祕感的關係。",
+        8: "【成就與物質】這是一段強強聯手的關係！你們能在一起創造物質財富。",
+        9: "【大愛與夢想】你們是彼此的精神支柱。這段關係充滿理想主義色彩。"
     };
 
-    function getDestinyNumber(y, m, d) {
-        const str = `${y}${m.toString().padStart(2,'0')}${d.toString().padStart(2,'0')}`;
-        let sum = str.split("").map(Number).reduce((a, b) => a + b, 0);
+    const numBrief = {
+        1: "獨立開創", 2: "溝通協調", 3: "創意表達", 4: "穩固務實", 5: "自由冒險", 
+        6: "關懷責任", 7: "邏輯真理", 8: "執行成就", 9: "博愛夢想"
+    };
+
+    const lines = [
+        {ids:[1,2,3], name:"美感"}, {ids:[4,5,6], name:"組織"}, {ids:[7,8,9], name:"貴人"},
+        {ids:[1,4,7], name:"物質"}, {ids:[2,5,8], name:"情感"}, {ids:[3,6,9], name:"智慧"},
+        {ids:[1,5,9], name:"事業"}, {ids:[3,5,7], name:"爭議"}
+    ];
+
+    function getFullNumbers(y, m, d) {
+        const dateStr = `${y}${m.toString().padStart(2,'0')}${d.toString().padStart(2,'0')}`;
+        let birthNums = dateStr.split("").map(Number).filter(n => n !== 0);
+        let allNums = [...birthNums];
+        let sum = birthNums.reduce((a, b) => a + b, 0);
+        sum.toString().split("").forEach(s => allNums.push(Number(s)));
         while (sum > 9) {
             sum = sum.toString().split("").map(Number).reduce((a, b) => a + b, 0);
+            allNums.push(sum);
         }
-        return sum;
+        const counts = {};
+        allNums.forEach(n => { counts[n] = (counts[n] || 0) + 1; });
+        return { counts, destiny: sum };
+    }
+
+    function drawGrid(containerId, data, isShared = false, data2 = null) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        for(let i=1; i<=9; i++) {
+            const item = document.createElement('div');
+            const hasP1 = data.counts[i] > 0;
+            const hasP2 = isShared && data2.counts[i] > 0;
+            const isDestiny = (!isShared && data.destiny === i) || (isShared && (data.destiny === i || data2.destiny === i));
+
+            item.className = 'grid-item' + (hasP1 || hasP2 ? ' active-num' : '') + (isDestiny ? ' active-destiny' : '');
+            item.innerHTML = `<div class="triangle-marker"></div><span class="num-label">${i}</span><div class="circles-wrap"></div>`;
+            
+            const wrap = item.querySelector('.circles-wrap');
+            if(!isShared) {
+                // 一般個人盤：細線圈圈，無限量呈現
+                if(data.counts[i]) {
+                    for(let c=0; c<data.counts[i]; c++) {
+                        const circle = document.createElement('div');
+                        circle.className = `circle`;
+                        circle.style.width = (35 + c*12) + '%';
+                        circle.style.height = (35 + c*12) + '%';
+                        circle.style.borderColor = "var(--m-pink)";
+                        wrap.appendChild(circle);
+                    }
+                }
+            } else {
+                // 共盤：顯示兩人的數字存在情況 (只要有就圈一次)
+                if(hasP1) {
+                    const c1 = document.createElement('div');
+                    c1.className = `circle`;
+                    c1.style.width = '55%'; c1.style.height = '55%';
+                    c1.style.borderColor = "var(--m-blue)"; c1.style.borderWidth = "2px";
+                    wrap.appendChild(c1);
+                }
+                if(hasP2) {
+                    const c2 = document.createElement('div');
+                    c2.className = `circle`;
+                    c2.style.width = '80%'; c2.style.height = '80%';
+                    c2.style.borderColor = "var(--m-pink)"; c2.style.borderWidth = "2px";
+                    wrap.appendChild(c2);
+                }
+            }
+            container.appendChild(item);
+        }
+    }
+
+    function drawLines(containerId, canvasId, data) {
+        setTimeout(() => {
+            const container = document.getElementById(containerId);
+            const canvas = document.getElementById(canvasId);
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width; canvas.height = rect.height;
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = "#F72585"; ctx.lineWidth = 1.5; ctx.setLineDash([2, 2]); ctx.globalAlpha = 0.5;
+            
+            lines.forEach(l => {
+                if(l.ids.every(id => data.counts[id])) {
+                    const el1 = container.children[l.ids[0]-1];
+                    const el3 = container.children[l.ids[2]-1];
+                    ctx.beginPath();
+                    ctx.moveTo(el1.offsetLeft + el1.offsetWidth/2, el1.offsetTop + el1.offsetHeight/2);
+                    ctx.lineTo(el3.offsetLeft + el3.offsetWidth/2, el3.offsetTop + el3.offsetHeight/2);
+                    ctx.stroke();
+                }
+            });
+        }, 150);
+    }
+
+    function renderTextAnalysis(divId, data) {
+        const div = document.getElementById(divId);
+        let missing = [];
+        for(let i=1; i<=9; i++) if(!data.counts[i]) missing.push(i);
+        let activeLines = lines.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
+        div.innerHTML = `
+            <div class="ana-title">數據解析</div>
+            <div class="ana-item"><span class="ana-sub">1.本命數 ${data.destiny}</span>${numBrief[data.destiny]}</div>
+            <div class="ana-item"><span class="ana-sub">2.缺數分析</span>${missing.join(',') || '無'}</div>
+            <div class="ana-item"><span class="ana-sub">3.連線分析</span>${activeLines.join(',') || '無'}</div>
+        `;
     }
 
     function analyzeCompatibility() {
-        const p1Num = getDestinyNumber(document.getElementById('p1-y').value, document.getElementById('p1-m').value, document.getElementById('p1-d').value);
-        const p2Num = getDestinyNumber(document.getElementById('p2-y').value, document.getElementById('p2-m').value, document.getElementById('p2-d').value);
+        const d1 = getFullNumbers(document.getElementById('p1-y').value, document.getElementById('p1-m').value, document.getElementById('p1-d').value);
+        const d2 = getFullNumbers(document.getElementById('p2-y').value, document.getElementById('p2-m').value, document.getElementById('p2-d').value);
 
-        // 關係數計算：兩者相加
-        let relNum = p1Num + p2Num;
-        while (relNum > 9) {
-            relNum = relNum.toString().split("").map(Number).reduce((a, b) => a + b, 0);
-        }
+        let relNum = d1.destiny + d2.destiny;
+        while (relNum > 9) relNum = relNum.toString().split("").map(Number).reduce((a, b) => a + b, 0);
 
-        // 顯示結果
         document.getElementById('resultCard').style.display = 'block';
         document.getElementById('rel-number').innerText = relNum;
         document.getElementById('rel-num-text').innerText = relNum;
         document.getElementById('analysis-content').innerText = relData[relNum];
 
-        // 判斷契合模式
         const typeTag = document.getElementById('rel-type');
-        if (p1Num === p2Num) {
-            typeTag.innerText = "靈魂伴侶模式 (相似型)";
-            typeTag.style.background = "#B5EAD7";
-        } else if ((p1Num + p2Num) % 2 === 0) {
-            typeTag.innerText = "互補成長模式 (和諧型)";
-            typeTag.style.background = "#FFDAC1";
+        if (d1.destiny === d2.destiny) {
+            typeTag.innerText = "靈魂伴侶模式 (相似型)"; typeTag.style.background = "#B5EAD7";
+        } else if ((d1.destiny + d2.destiny) % 2 === 0) {
+            typeTag.innerText = "互補成長模式 (和諧型)"; typeTag.style.background = "#FFDAC1";
         } else {
-            typeTag.innerText = "火花挑戰模式 (火花型)";
-            typeTag.style.background = "#FFB7B2";
+            typeTag.innerText = "火花挑戰模式 (火花型)"; typeTag.style.background = "#FFB7B2";
         }
+
+        // 繪製共盤
+        drawGrid('grid-shared', d1, true, d2);
         
-        // 自動捲動到結果區
+        // 繪製個人盤
+        drawGrid('grid-p1', d1);
+        drawGrid('grid-p2', d2);
+        
+        // 畫線
+        drawLines('grid-p1', 'canvas-p1', d1);
+        drawLines('grid-p2', 'canvas-p2', d2);
+        
+        // 文字分析
+        renderTextAnalysis('ana-p1', d1);
+        renderTextAnalysis('ana-p2', d2);
+        
         document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
     }
 </script>
-
 </body>
 </html>
