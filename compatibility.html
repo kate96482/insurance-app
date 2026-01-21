@@ -29,13 +29,11 @@
         
         h2 { color: var(--m-pink); margin: 5px 0 15px 0; font-size: 1.4rem; text-align: center; }
 
-        /* 原始結果區：截圖完後會被隱藏 */
         #resultCard { 
             margin-top: 20px; display: none; text-align: center; 
             background: #FFFFFF; padding: 20px 10px;
         }
 
-        /* 最終圖檔顯示區：這是讓你能直接長按的地方 */
         #final-image-wrap {
             display: none;
             margin-top: 20px;
@@ -76,7 +74,8 @@
         canvas.line-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
 
         .nav-header { display: flex; justify-content: space-between; align-items: center; max-width: 450px; margin: 0 auto 10px auto; }
-        .back-btn { display: inline-flex; align-items: center; gap: 5px; color: var(--primary); font-weight: bold; font-size: 0.9rem; padding: 8px 15px; border-radius: 20px; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); cursor: pointer; }
+        .nav-btn { display: inline-flex; align-items: center; gap: 5px; color: var(--primary); font-weight: bold; font-size: 0.85rem; padding: 8px 12px; border-radius: 20px; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); cursor: pointer; text-decoration: none; border: none; }
+        
         .pair-input-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
         .person-box { background: #F8F9FA; padding: 12px; border-radius: 15px; border-left: 5px solid var(--m-blue); }
         .person-box.p2 { border-left-color: var(--m-pink); }
@@ -105,7 +104,8 @@
 <body>
 
 <div class="nav-header">
-    <div onclick="location.reload();" class="back-btn"><i class="fa-solid fa-rotate-left"></i> 重新分析</div>
+    <a href="index.html" class="nav-btn"><i class="fa-solid fa-house"></i> 返回首頁</a>
+    <button id="reset-top-btn" onclick="location.reload();" class="nav-btn" style="display: none;"><i class="fa-solid fa-rotate-left"></i> 重新分析</button>
 </div>
 
 <div class="container">
@@ -280,12 +280,13 @@
         drawGrid('grid-p1', d1);
         drawGrid('grid-p2', d2);
         
-        // 稍微延遲畫線，確保佈局完成
+        renderText('ana-p1', d1); 
+        renderText('ana-p2', d2);
+
         setTimeout(() => {
             drawLines('grid-p1', 'canvas-p1', d1);
             drawLines('grid-p2', 'canvas-p2', d2);
             
-            // 畫線完成後，執行「轉換圖片」
             setTimeout(async () => {
                 const canvas = await html2canvas(card, {
                     useCORS: true,
@@ -293,12 +294,11 @@
                     backgroundColor: "#FFFFFF"
                 });
                 
-                // 把畫出來的圖塞進 img 標籤
                 const finalImg = document.getElementById('final-image');
                 finalImg.src = canvas.toDataURL("image/png");
                 
-                // 顯示圖片區，隱藏原本的 UI 和渲染區
                 document.getElementById('final-image-wrap').style.display = 'block';
+                document.getElementById('reset-top-btn').style.display = 'inline-flex';
                 document.getElementById('input-ui').style.display = 'none';
                 card.style.display = 'none';
                 
@@ -307,7 +307,6 @@
         }, 300);
     }
 
-    // 文字解析
     const renderText = (divId, data) => {
         const div = document.getElementById(divId);
         let missing = []; for(let i=1; i<=9; i++) if(!data.counts[i]) missing.push(i);
@@ -315,16 +314,6 @@
         let active2 = lines2.filter(l => l.ids.every(id => data.counts[id])).map(l => l.name);
         div.innerHTML = `<div class="ana-title">數據解析</div><div class="ana-item"><span class="ana-sub">1.本命數 ${data.destiny}</span>${numBrief[data.destiny]}</div><div class="ana-item"><span class="ana-sub">2.缺數分析</span>${missing.join(',') || '無'}</div><div class="ana-item"><span class="ana-sub">3.連線分析</span>${[...active3, ...active2].join(',') || '無'}</div>`;
     };
-    
-    // 把文字解析掛到計算邏輯後面
-    const originalAnalyze = analyzeCompatibility;
-    analyzeCompatibility = async function() {
-        await originalAnalyze();
-        const d1 = getFullNumbers(document.getElementById('p1-y').value, document.getElementById('p1-m').value, document.getElementById('p1-d').value);
-        const d2 = getFullNumbers(document.getElementById('p2-y').value, document.getElementById('p2-m').value, document.getElementById('p2-d').value);
-        renderText('ana-p1', d1); renderText('ana-p2', d2);
-    };
 </script>
 </body>
 </html>
-
