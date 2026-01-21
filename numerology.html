@@ -28,14 +28,27 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 修正：優化返回按鈕樣式與 PWA 跳轉 */
-        .back-home {
+        /* 導覽按鈕容器 */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 450px;
+            margin: 0 auto 10px auto;
+        }
+
+        .back-home, .btn-compatibility {
             display: inline-flex; align-items: center; gap: 5px;
-            color: var(--primary); font-weight: bold; font-size: 0.9rem; margin-bottom: 10px;
+            font-weight: bold; font-size: 0.9rem;
             padding: 8px 15px; border-radius: 20px; background: white;
             box-shadow: 0 1px 4px rgba(0,0,0,0.1); cursor: pointer;
+            text-decoration: none;
         }
-        .back-home:active { transform: scale(0.95); background: #eee; }
+
+        .back-home { color: var(--primary); }
+        .btn-compatibility { color: var(--m-pink); }
+
+        .back-home:active, .btn-compatibility:active { transform: scale(0.95); background: #eee; }
 
         .container { 
             max-width: 450px; margin: auto; background: white; 
@@ -97,8 +110,13 @@
 </head>
 <body>
 
-<div onclick="window.location.assign('index.html');" class="back-home">
-    <i class="fa-solid fa-house"></i> 返回首頁
+<div class="nav-header">
+    <div onclick="window.location.assign('index.html');" class="back-home">
+        <i class="fa-solid fa-house"></i> 返回首頁
+    </div>
+    <div onclick="window.location.assign('compatibility.html');" class="btn-compatibility">
+        <i class="fa-solid fa-heart"></i> 合盤分析
+    </div>
 </div>
 
 <div class="container">
@@ -373,4 +391,3 @@
 </script>
 </body>
 </html>
-
