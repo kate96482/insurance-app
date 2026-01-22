@@ -39,6 +39,7 @@
         
         /* 顏色主題 */
         .bg-cancer { background: linear-gradient(135deg, #FF6B6B, #EE5253); }
+        .bg-retire { background: linear-gradient(135deg, #DE6262, #FFB88C); } /* 退休計算專屬橘紅 */
         .bg-numerology { background: linear-gradient(135deg, #4CC9F0, #4895EF); }
         .bg-money { background: linear-gradient(135deg, #B5EAD7, #88D8B0); } 
         .bg-mbti { background: linear-gradient(135deg, #A29BFE, #6C5CE7); }
@@ -67,6 +68,14 @@
         <div onclick="navTo('cancer_calc.html', event);" class="tool-card">
             <div class="icon-box bg-cancer"><i class="fa-solid fa-file-medical"></i></div>
             <div class="info-box"><h3>防癌無憂試算</h3><p>即時計算保費與癌症數據對比</p></div>
+        </div>
+
+        <div onclick="navTo('labor_calc.html', event);" class="tool-card">
+            <div class="icon-box bg-retire"><i class="fa-solid fa-hourglass-half"></i></div>
+            <div class="info-box">
+                <h3>退休金缺口解析</h3>
+                <p>勞保預估與退休金缺口目標達成</p>
+            </div>
         </div>
 
         <div onclick="navTo('numerology.html', event);" class="tool-card">
