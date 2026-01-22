@@ -37,11 +37,14 @@
         .info-box h3 { margin: 0; font-size: 1.15rem; color: #222; }
         .info-box p { margin: 5px 0 0 0; font-size: 0.85rem; color: #888; }
         
+        /* 顏色主題 */
         .bg-cancer { background: linear-gradient(135deg, #FF6B6B, #EE5253); }
         .bg-numerology { background: linear-gradient(135deg, #4CC9F0, #4895EF); }
         .bg-money { background: linear-gradient(135deg, #B5EAD7, #88D8B0); } 
         .bg-mbti { background: linear-gradient(135deg, #A29BFE, #6C5CE7); }
         .bg-disc { background: linear-gradient(135deg, #FF9F43, #FF6B6B); }
+        .bg-energy { background: linear-gradient(135deg, #A68A64, #5C4B3C); } /* 能量圖卡專屬咖啡色系 */
+
         .footer { margin-top: 50px; font-size: 0.75rem; color: #BBB; }
     </style>
 </head>
@@ -53,6 +56,14 @@
     </div>
 
     <div class="grid-container">
+        <div onclick="navTo('energy.html', event);" class="tool-card">
+            <div class="icon-box bg-energy"><i class="fa-solid fa-mug-hot"></i></div>
+            <div class="info-box">
+                <h3>每日能量生活圖卡</h3>
+                <p>生成專屬質感能量飲品與暖心建議</p>
+            </div>
+        </div>
+
         <div onclick="navTo('cancer_calc.html', event);" class="tool-card">
             <div class="icon-box bg-cancer"><i class="fa-solid fa-file-medical"></i></div>
             <div class="info-box"><h3>防癌無憂試算</h3><p>即時計算保費與癌症數據對比</p></div>
@@ -72,31 +83,28 @@
             <div class="icon-box bg-mbti"><i class="fa-solid fa-puzzle-piece"></i></div>
             <div class="info-box"><h3>16型人格測驗</h3><p>探索內在核心與社交特質解析</p></div>
         </div>
+
         <div onclick="navTo('disc.html', event);" class="tool-card">
-    <div class="icon-box bg-disc"><i class="fa-solid fa-bullseye"></i></div>
-    <div class="info-box">
-        <h3>DISC 人格診斷</h3>
-        <p>掌握行為風格，分析人格行為特質</p>
-    </div>
-</div>
+            <div class="icon-box bg-disc"><i class="fa-solid fa-bullseye"></i></div>
+            <div class="info-box">
+                <h3>DISC 人格診斷</h3>
+                <p>掌握行為風格，分析人格行為特質</p>
+            </div>
+        </div>
     </div>
 
     <div class="footer">&copy; 2026 數位工具箱</div>
 
     <script>
-        // 核心修正：導航函數
         function navTo(url, e) {
-            if (e) e.preventDefault(); // 阻斷原生點擊，防止 iOS 彈出網頁框
-            
+            if (e) e.preventDefault();
             if (("standalone" in window.navigator) && window.navigator.standalone) {
-                // PWA 模式：使用 replace 讓系統認為是「頁面更新」而非「開啟連結」
                 window.location.replace(url);
             } else {
                 window.location.href = url;
             }
         }
 
-        // 全域攔截器：防止頁面內任何 <a> 標籤意外觸發彈窗
         (function(document, navigator, standalone) {
             if ((standalone in navigator) && navigator[standalone]) {
                 document.addEventListener('click', function(e) {
@@ -104,7 +112,6 @@
                     while (noddy && noddy.nodeName !== "A" && noddy.nodeName !== "HTML") {
                         noddy = noddy.parentNode;
                     }
-                    // 只要點擊的是同網域連結，一律攔截並強制內部跳轉
                     if (noddy && "href" in noddy && noddy.hostname === window.location.hostname) {
                         e.preventDefault();
                         window.location.replace(noddy.href);
@@ -115,5 +122,3 @@
     </script>
 </body>
 </html>
-
-
