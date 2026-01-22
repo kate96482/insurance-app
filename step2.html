@@ -160,7 +160,7 @@ const rateDataFemale = {
     }
 };
 
-    function calculateSolutions() {
+   function calculateSolutions() {
         const age = parseInt(document.getElementById('current-age').value);
         const rAge = document.getElementById('retire-age').value;
         const dream = parseInt(document.getElementById('dream-income').value) || 0;
@@ -178,22 +178,19 @@ const rateDataFemale = {
         const themeColor = (currentGender === 'male') ? '#DE6262' : '#ed6ea0';
         
         periods.forEach(p => {
-            // 取得對應年期的費率，若無精確年齡則找最近的小於該年齡的設定值
+            // 取得對應年期的費率物件
             const ageRates = activeData[p][rAge];
-            let rate = 0;
             
-            if (ageRates[age] !== undefined) {
-                rate = ageRates[age];
-            } else {
-                // 如果沒有精確對應年齡(如10/20年期數據較跳躍)，找最近的一個較小年齡點
-                const sortedAges = Object.keys(ageRates).map(Number).sort((a,b) => b-a);
-                const closestAge = sortedAges.find(a => a <= age);
-                rate = closestAge !== undefined ? ageRates[closestAge] : 0;
-            }
+            // 【修正點】直接檢查該「目前年齡」是否存在於資料表中
+            // 不再尋找最近的年齡，若無資料則為 undefined
+            let rate = ageRates[age]; 
             
             let cardHtml = '';
-            // 邏輯檢查：如果年齡大於領息年齡，則無法進行
-            if (rate > 0 && age < parseInt(rAge)) {
+            
+            // 判斷邏輯：
+            // 1. 費率必須存在 (不為 undefined)
+            // 2. 目前年齡必須小於領息年齡
+            if (rate !== undefined && age < parseInt(rAge)) {
                 // 計算公式: 年繳 = (缺口 * 12個月) / (領息率 / 100) / 繳費年期
                 const yearly = (gap * 12) / (rate / 100) / parseInt(p);
                 const monthly = yearly / 12;
@@ -212,12 +209,13 @@ const rateDataFemale = {
                     </div>
                 `;
             } else {
+                // 不符合條件則呈現灰色
                 cardHtml = `
                     <div class="sol-card" style="opacity:0.6; background:#f9f9f9;">
                         <div class="sol-tag" style="background:#ccc">${p}年期</div>
                         <div class="sol-title">存 ${p} 年</div>
                         <div style="margin-top:20px; font-size:0.8rem; color:#999; line-height:1.4;">
-                            ${age >= parseInt(rAge) ? '目前年齡已過領息年齡' : '此年齡暫無對應數據'}
+                            ${age >= parseInt(rAge) ? '目前年齡已過領息年齡' : '此年齡暫無對應費率'}
                         </div>
                     </div>
                 `;
@@ -225,10 +223,10 @@ const rateDataFemale = {
             container.innerHTML += cardHtml;
         });
         
-        // 滾動到結果區
         document.getElementById('result-area').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 </script>
 </body>
 </html>
+
 
