@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Energy - 每日能量卡</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --cream: #FDFBF7;
+            --oat: #E8E2D9;
+            --coffee: #4A3728;
+            --accent: #A68A64;
+            --text-main: #5C4B3C;
+        }
+
+        body { 
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; 
+            background: #F0EDE9; margin: 0; padding: 15px; color: var(--text-main);
+        }
+
+        .container { max-width: 400px; margin: auto; }
+
+        /* 輸入介面 */
+        .input-card {
+            background: white; padding: 20px; border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: var(--accent); }
+        input, select { 
+            width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--oat); 
+            box-sizing: border-box; font-size: 1rem; outline: none; background: white;
+        }
+        .gen-btn { 
+            width: 100%; padding: 12px; background: var(--coffee); color: white; 
+            border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+
+        /* 渲染視覺區 */
+        #energyCard {
+            background: var(--cream); border-radius: 25px; overflow: hidden;
+            display: none; position: relative; border: none; width: 400px; /* 固定寬度確保渲染一致 */
+        }
+        .card-header { padding: 35px 30px 10px; text-align: left; }
+        .date-label { font-size: 0.9rem; letter-spacing: 2px; color: var(--accent); font-weight: 300; }
+        
+        .energy-section { padding: 0 30px; margin-top: 10px; }
+        .energy-val { font-size: 3.5rem; font-weight: 200; font-family: "Times New Roman", serif; display: flex; align-items: baseline; gap: 5px; }
+        .energy-val span { font-size: 1rem; font-weight: bold; letter-spacing: 1px; color: var(--accent); }
+
+        .visual-area { text-align: center; padding: 15px 30px; }
+        .main-img { width: 100%; height: 220px; object-fit: cover; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+
+        .content-section { padding: 0 30px 40px; text-align: center; }
+        .item-name { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; color: var(--coffee); border-bottom: 1px solid var(--oat); display: inline-block; padding-bottom: 5px; }
+        .advice-text { font-size: 0.95rem; line-height: 1.8; color: var(--text-main); font-weight: 400; text-align: justify; }
+
+        .card-footer { 
+            background: #F4F1ED; padding: 20px 30px; display: flex; 
+            justify-content: space-between; align-items: center; border-top: 1px dashed var(--oat);
+        }
+        .agent-info { font-size: 0.75rem; color: var(--accent); letter-spacing: 1px; }
+
+        /* 結果圖顯示 */
+        #final-wrap { display: none; text-align: center; }
+        #final-image { width: 100%; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: block; margin: auto; }
+        .save-tip { background: var(--coffee); color: white; padding: 10px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 15px; }
+
+        .nav-top { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .back-home { text-decoration: none; color: var(--coffee); font-size: 0.85rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-top">
+        <a href="index.html" class="back-home"><i class="fa-solid fa-chevron-left"></i> 返回首頁</a>
+    </div>
+
+    <div id="input-ui" class="input-card">
+        <h3 style="margin-top:0; color:var(--coffee)">✨ 每日能量生活圖卡</h3>
+        
+        <div class="input-group">
+            <label>選擇發送情境</label>
+            <select id="mode-select">
+                <option value="coffee">☕ 午後咖啡系列</option>
+                <option value="breakfast">☀️ 晨間飲品系列</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>客戶生日</label>
+            <div style="display: flex; gap: 5px;">
+                <select id="birth-m"></select>
+                <select id="birth-d"></select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>您的署名</label>
+            <input type="text" id="agent-name" value="您的生活顧問">
+        </div>
+        <button class="gen-btn" onclick="generateCard()">生成質感能量卡</button>
+    </div>
+
+    <div id="final-wrap">
+        <div class="save-tip">✨ 生成成功！請長按圖片儲存</div>
+        <div id="canvas-container"></div>
+        <img id="final-image" src="">
+        <button class="gen-btn" style="margin-top:20px; background:white; color:var(--coffee); border:1.1px solid var(--coffee);" onclick="location.reload()">重新製作</button>
+    </div>
+
+    <div id="energyCard">
+        <div class="card-header">
+            <div class="date-label" id="card-date"></div>
+        </div>
+        <div class="energy-section">
+            <div class="energy-val" id="card-energy"></div>
+        </div>
+        <div class="visual-area">
+            <img id="card-img" src="" class="main-img">
+        </div>
+        <div class="content-section">
+            <div class="item-name" id="card-item-name"></div>
+            <div class="advice-text" id="card-advice"></div>
+        </div>
+        <div class="card-footer">
+            <div class="agent-info">SENT WITH WARMTH BY</div>
+            <div class="agent-info" id="card-agent" style="font-weight: bold;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 初始化日期
+    const sm = document.getElementById('birth-m'), sd = document.getElementById('birth-d');
+    for(let i=1; i<=12; i++) sm.options.add(new Option(i+'月', i));
+    for(let i=1; i<=31; i++) sd.options.add(new Option(i+'日', i));
+
+    // 資料庫
+    const coffeeLibrary = {
+        1: { name: "濃縮咖啡 Espresso", energy: "92% Drive", advice: "能量極強的一天，適合迅速做出重要決定。第一直覺通常是最正確的。" },
+        2: { name: "燕麥拿鐵 Oat Latte", energy: "75% Harmony", advice: "情緒細膩的一天，適合與人交流。聽聽周遭聲音，會發現溫暖的細節。" },
+        3: { name: "氣泡美式 Sparkling", energy: "88% Creative", advice: "靈感隨時會像氣泡湧現。記下奇思妙想，今天適合處理創意任務。" },
+        4: { name: "經典熱拿鐵 Latte", energy: "65% Stable", advice: "步調穩定就是最好的節奏。按部就班處理事務，踏實感會帶給你平靜。" },
+        5: { name: "維也納咖啡 Vienna", energy: "82% Freedom", advice: "嘗試一條沒走過的小徑吧！驚喜往往隱藏在未知的轉角。" },
+        6: { name: "卡布奇諾 Cappuccino", energy: "70% Warmth", advice: "主動問候一位好久不見的朋友。你的小小溫暖，是他人最大的動力。" },
+        7: { name: "手沖單品豆 Pour-over", energy: "55% Insight", advice: "給自己十分鐘的靜謐。在繁瑣中抽離，深呼吸，找回內心的秩序感。" },
+        8: { name: "焦糖瑪奇朵 Macchiato", energy: "95% Power", advice: "今天的你很有影響力。勇敢表達想法，大家會不自覺地跟隨你的腳步。" },
+        9: { name: "抹茶拿鐵 Matcha", energy: "60% Mindful", advice: "分享與付出的日子。幫助身邊的人，善意最終會回到你身邊。" }
+    };
+
+    const breakfastLibrary = {
+        1: { name: "活力熱美式", energy: "90% Awake", advice: "清晨的陽光與咖啡是絕配。今天適合設定新目標，精神百倍地出發！" },
+        2: { name: "暖心熱豆漿", energy: "72% Nurture", advice: "溫潤的口感開啟溫暖的一天。適合處理家庭或內部協調，細心會帶來好運。" },
+        3: { name: "鮮榨柳橙汁", energy: "85% Vitality", advice: "滿滿的維他命 C！今天適合接觸新朋友，你的活力會感染周遭所有人。" },
+        4: { name: "經典奶茶", energy: "68% Comfort", advice: "熟悉的味道最安心。今天適合處理例行公事，平穩中能看見進度。" },
+        5: { name: "美祿可可", energy: "80% Energy", advice: "童心未泯的一天。嘗試用不同視角看工作，煩人的問題會有新解法。" },
+        6: { name: "香醇熱牛奶", energy: "60% Pure", advice: "單純就是力量。減少複雜的思考，回歸初心，事情會變得簡單許多。" },
+        7: { name: "英式早安茶", energy: "50% Focus", advice: "清淡優雅的開場。適合安靜閱讀或規劃一週進度，清晰的頭腦是你的武器。" },
+        8: { name: "蔬果精力湯", energy: "95% Health", advice: "身心狀態處於高峰！適合挑戰高強度的任務，你的爆發力會讓大家驚艷。" },
+        9: { name: "低脂優酪乳", energy: "65% Light", advice: "輕盈的一天，適合斷捨離。清理桌面或電子郵件，空間清爽，心情也會亮起來。" }
+    };
+
+    async function generateCard() {
+        const modeSelect = document.getElementById('mode-select').value;
+        const m = parseInt(sm.value), d = parseInt(sd.value);
+        const agentName = document.getElementById('agent-name').value;
+        const today = new Date();
+        
+        // 能量運算
+        let dateStr = `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}${m}${d}`;
+        let num = dateStr.split("").map(Number).reduce((a, b) => a + b, 0);
+        while (num > 9) num = num.toString().split("").map(Number).reduce((a, b) => a + b, 0);
+        if(num === 0) num = 5;
+
+        // 提取資料
+        const db = (modeSelect === 'coffee') ? coffeeLibrary : breakfastLibrary;
+        const data = db[num];
+        const prefix = (modeSelect === 'coffee') ? 'c' : 'b';
+
+        // 填充 HTML
+        document.getElementById('card-date').innerText = `${today.getFullYear()} / ${(today.getMonth()+1).toString().padStart(2,'0')} / ${today.getDate().toString().padStart(2,'0')}`;
+        document.getElementById('card-energy').innerHTML = `${data.energy.split(' ')[0]}<span>% ${data.energy.split(' ')[1]}</span>`;
+        
+        // 連結圖片：例如 c1.png 或 b5.png
+        const imgElement = document.getElementById('card-img');
+        imgElement.src = `${prefix}${num}.png`;
+
+        document.getElementById('card-item-name').innerText = `[ ${data.name} ]`;
+        document.getElementById('card-advice').innerText = data.advice;
+        document.getElementById('card-agent').innerText = agentName;
+
+        // 確保圖片載入後再進行渲染
+        imgElement.onload = async function() {
+            const cardUI = document.getElementById('energyCard');
+            cardUI.style.display = 'block';
+            
+            try {
+                const canvas = await html2canvas(cardUI, {
+                    scale: 2,
+                    backgroundColor: null,
+                    useCORS: true,
+                    logging: false
+                });
+
+                const finalImg = document.getElementById('final-image');
+                finalImg.src = canvas.toDataURL("image/png");
+                
+                document.getElementById('input-ui').style.display = 'none';
+                document.getElementById('final-wrap').style.display = 'block';
+                cardUI.style.display = 'none';
+            } catch (error) {
+                console.error("渲染失敗:", error);
+                alert("圖片渲染失敗，請確認圖片路徑是否正確。");
+            }
+        };
+
+        // 處理圖片載入失敗的情況
+        imgElement.onerror = function() {
+            alert(`找不到圖片路徑: ${prefix}${num}.png，請確認檔案已上傳。`);
+        };
+    }
+</script>
+
+</body>
+</html>
