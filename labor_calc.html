@@ -248,12 +248,22 @@
         img.scrollIntoView({ behavior: 'smooth' });
     }
 
+    // --- 修改後的跳轉函式 ---
     function goToStep2() {
         const birthYear = document.getElementById('birth-year').value;
-        const age = 115 - parseInt(birthYear);
+        const currentAge = 115 - parseInt(birthYear);
         const dream = document.getElementById('dream-income').value;
-        const labor = calculatedLabor;
-        window.location.href = `step2.html?age=${age}&labor=${labor}&dream=${dream}`;
+        const labor = calculatedLabor; // 使用全域變數
+        const retireAge = document.getElementById('retire-age').value;
+
+        // 儲存到 localStorage 供第二層使用
+        localStorage.setItem('retired_currentAge', currentAge);
+        localStorage.setItem('retired_dreamIncome', dream);
+        localStorage.setItem('retired_laborIncome', labor);
+        localStorage.setItem('retired_retireAge', retireAge);
+
+        // 跳轉
+        window.location.href = `step2.html`;
     }
 
     window.onload = () => document.getElementById('birth-year').dispatchEvent(new Event('input'));
