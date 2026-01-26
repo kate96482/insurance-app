@@ -39,8 +39,10 @@
         .sol-tag { position: absolute; top: 0; right: 0; background: var(--primary); color: white; font-size: 0.7rem; padding: 2px 8px; border-bottom-left-radius: 10px; }
         .sol-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; color: #333; }
         .sol-rate { font-size: 0.8rem; color: var(--success); font-weight: bold; }
-        .sol-monthly { font-size: 1.2rem; font-weight: bold; color: var(--text); margin: 8px 0; }
-        .sol-yearly { font-size: 0.75rem; color: #888; }
+        
+        /* 修改：縮小字體並強制不換行，確保一列呈現 */
+        .sol-monthly { font-size: 1.1rem; font-weight: bold; color: var(--text); margin: 8px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sol-yearly { font-size: 0.75rem; color: #888; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -87,13 +89,24 @@
             <input type="number" id="labor-income" value="22000" step="1000">
         </div>
 
-        <button class="btn" onclick="calculateSolutions()">分析四種存錢方案</button>
+        <div style="display: flex; gap: 10px;">
+            <div class="input-group" style="flex: 1.5;">
+                <label>已累計本金 (元)</label>
+                <input type="number" id="saved-capital" value="0" step="10000">
+            </div>
+            <div class="input-group" style="flex: 1;">
+                <label>預計提領 (年)</label>
+                <input type="number" id="payout-years" value="25" min="1" max="50">
+            </div>
+        </div>
+
+        <button class="btn" onclick="calculateSolutions()">分析四種理財方案</button>
 
         <div id="result-area">
             <div class="gap-box">
                 您的每月退休金缺口
                 <div class="gap-val" id="res-gap">$ 0</div>
-                <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">建議透過以下商品領息率補足</div>
+                <div id="gap-subtext" style="font-size: 0.8rem; color: #888; margin-top: 5px;">以下方案僅供參考</div>
             </div>
 
             <div class="solution-grid" id="solution-container"></div>
@@ -166,34 +179,48 @@ const rateDataFemale = {
         const dream = parseInt(document.getElementById('dream-income').value) || 0;
         const labor = parseInt(document.getElementById('labor-income').value) || 0;
         
-        const gap = Math.max(0, dream - labor);
-        document.getElementById('res-gap').innerText = `$ ${gap.toLocaleString()}`;
+        // 處理已備本金
+        const savedCapital = parseInt(document.getElementById('saved-capital').value) || 0;
+        const payoutYears = parseInt(document.getElementById('payout-years').value) || 25;
+        
+        // 將本金平攤為每月領取金額
+        const monthlyFromCapital = savedCapital / (payoutYears * 12);
+        
+        // 最終缺口計算
+        const gap = Math.max(0, dream - labor - monthlyFromCapital);
+        
+        document.getElementById('res-gap').innerText = `$ ${Math.round(gap).toLocaleString()}`;
         document.getElementById('result-area').style.display = 'block';
 
         const container = document.getElementById('solution-container');
+        const gapSubtext = document.getElementById('gap-subtext');
         container.innerHTML = '';
+
+        // 如果缺口已補足
+        if (gap <= 0) {
+            gapSubtext.innerText = "恭喜！您的已備資產與勞保已足以支應理想退休生活。";
+            gapSubtext.style.color = "var(--success)";
+            return;
+        } else {
+            gapSubtext.innerText = "以下方案僅供參考";
+            gapSubtext.style.color = "#888";
+        }
 
         const periods = ["3", "6", "10", "20"];
         const activeData = (currentGender === 'male') ? rateDataMale : rateDataFemale;
         const themeColor = (currentGender === 'male') ? '#DE6262' : '#ed6ea0';
         
         periods.forEach(p => {
-            // 取得對應年期的費率物件
             const ageRates = activeData[p][rAge];
-            
-            // 【修正點】直接檢查該「目前年齡」是否存在於資料表中
-            // 不再尋找最近的年齡，若無資料則為 undefined
             let rate = ageRates[age]; 
             
             let cardHtml = '';
             
-            // 判斷邏輯：
-            // 1. 費率必須存在 (不為 undefined)
-            // 2. 目前年齡必須小於領息年齡
             if (rate !== undefined && age < parseInt(rAge)) {
-                // 計算公式: 年繳 = (缺口 * 12個月) / (領息率 / 100) / 繳費年期
                 const yearly = (gap * 12) / (rate / 100) / parseInt(p);
                 const monthly = yearly / 12;
+                // 新增：計算總存
+                const totalInvest = yearly * parseInt(p);
 
                 cardHtml = `
                     <div class="sol-card">
@@ -204,12 +231,12 @@ const rateDataFemale = {
                         </div>
                         <div>
                             <div class="sol-monthly">$ ${Math.round(monthly).toLocaleString()} <small>/月</small></div>
-                            <div class="sol-yearly">年繳約 $${Math.round(yearly).toLocaleString()}</div>
+                            <div class="sol-yearly">年存約 $${Math.round(yearly).toLocaleString()}</div>
+                            <div class="sol-yearly">總累積估計 $${Math.round(totalInvest).toLocaleString()}</div>
                         </div>
                     </div>
                 `;
             } else {
-                // 不符合條件則呈現灰色
                 cardHtml = `
                     <div class="sol-card" style="opacity:0.6; background:#f9f9f9;">
                         <div class="sol-tag" style="background:#ccc">${p}年期</div>
@@ -228,5 +255,3 @@ const rateDataFemale = {
 </script>
 </body>
 </html>
-
-
