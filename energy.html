@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Energy - 每日能量卡</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="images.js"></script>
+
     <style>
         :root {
             --cream: #FDFBF7;
@@ -22,7 +25,6 @@
 
         .container { max-width: 400px; margin: auto; }
 
-        /* 輸入介面 */
         .input-card {
             background: white; padding: 20px; border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
@@ -38,10 +40,9 @@
             border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
 
-        /* 渲染視覺區 */
         #energyCard {
             background: var(--cream); border-radius: 25px; overflow: hidden;
-            display: none; position: relative; border: none; width: 400px; /* 固定寬度確保渲染一致 */
+            display: none; position: relative; border: none; width: 400px; 
         }
         .card-header { padding: 35px 30px 10px; text-align: left; }
         .date-label { font-size: 0.9rem; letter-spacing: 2px; color: var(--accent); font-weight: 300; }
@@ -63,7 +64,6 @@
         }
         .agent-info { font-size: 0.75rem; color: var(--accent); letter-spacing: 1px; }
 
-        /* 結果圖顯示 */
         #final-wrap { display: none; text-align: center; }
         #final-image { width: 100%; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: block; margin: auto; }
         .save-tip { background: var(--coffee); color: white; padding: 10px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 15px; }
@@ -139,7 +139,7 @@
     for(let i=1; i<=12; i++) sm.options.add(new Option(i+'月', i));
     for(let i=1; i<=31; i++) sd.options.add(new Option(i+'日', i));
 
-    // 資料庫
+    // 文字資料庫
     const coffeeLibrary = {
         1: { name: "濃縮咖啡 Espresso", energy: "92% Drive", advice: "能量極強的一天，適合迅速做出重要決定。第一直覺通常是最正確的。" },
         2: { name: "燕麥拿鐵 Oat Latte", energy: "75% Harmony", advice: "情緒細膩的一天，適合與人交流。聽聽周遭聲音，會發現溫暖的細節。" },
@@ -170,30 +170,33 @@
         const agentName = document.getElementById('agent-name').value;
         const today = new Date();
         
-        // 能量運算
         let dateStr = `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}${m}${d}`;
         let num = dateStr.split("").map(Number).reduce((a, b) => a + b, 0);
         while (num > 9) num = num.toString().split("").map(Number).reduce((a, b) => a + b, 0);
         if(num === 0) num = 5;
 
-        // 提取資料
         const db = (modeSelect === 'coffee') ? coffeeLibrary : breakfastLibrary;
         const data = db[num];
         const prefix = (modeSelect === 'coffee') ? 'c' : 'b';
 
-        // 填充 HTML
+        // 填充 HTML 內容
         document.getElementById('card-date').innerText = `${today.getFullYear()} / ${(today.getMonth()+1).toString().padStart(2,'0')} / ${today.getDate().toString().padStart(2,'0')}`;
         document.getElementById('card-energy').innerHTML = `${data.energy.split(' ')[0]}<span>% ${data.energy.split(' ')[1]}</span>`;
-        
-        // 連結圖片：例如 c1.png 或 b5.png
-        const imgElement = document.getElementById('card-img');
-        imgElement.src = `${prefix}${num}.png`;
-
         document.getElementById('card-item-name').innerText = `[ ${data.name} ]`;
         document.getElementById('card-advice').innerText = data.advice;
         document.getElementById('card-agent').innerText = agentName;
 
-        // 確保圖片載入後再進行渲染
+        const imgElement = document.getElementById('card-img');
+        
+        // --- 核心改動：直接對接 images.js 中的數據 ---
+        // 確保 imgAssets 是在 images.js 裡定義的
+        if (typeof imgAssets !== 'undefined' && imgAssets[prefix + num]) {
+            imgElement.src = imgAssets[prefix + num];
+        } else {
+            alert(`載入錯誤：找不到 ${prefix}${num} 的圖片數據，請檢查 images.js 是否正確載入。`);
+            return;
+        }
+
         imgElement.onload = async function() {
             const cardUI = document.getElementById('energyCard');
             cardUI.style.display = 'block';
@@ -214,17 +217,15 @@
                 cardUI.style.display = 'none';
             } catch (error) {
                 console.error("渲染失敗:", error);
-                alert("圖片渲染失敗，請確認圖片路徑是否正確。");
+                alert("圖卡製作失敗，請重試。");
             }
         };
 
-        // 處理圖片載入失敗的情況
         imgElement.onerror = function() {
-            alert(`找不到圖片路徑: ${prefix}${num}.png，請確認檔案已上傳。`);
+            alert("圖片數據解析失敗，請確認 Base64 字串是否完整。");
         };
     }
 </script>
 
 </body>
-
 </html>
