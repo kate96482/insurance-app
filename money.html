@@ -113,13 +113,26 @@
         .side-drawer.is-open { right: 0; }
 
         .drawer-trigger {
-            position: absolute; left: -45px; top: 50%;
-            transform: translateY(-50%); width: 45px; height: 80px;
-            background: var(--bright-blue); cursor: pointer;
-            clip-path: polygon(100% 0, 0 50%, 100% 100%);
-            display: none; align-items: center; justify-content: center; color: white;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-        }
+    position: absolute;
+    left: -35px; /* 標籤寬度 */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 35px;
+    height: 100px; /* 增加高度，更好點擊 */
+    background: var(--m-purple); /* 改用紫色更有層次感 */
+    color: white;
+    cursor: pointer;
+    display: none; /* JS 會控制顯示 */
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl; /* 文字直打 */
+    text-orientation: upright;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    border-radius: 12px 0 0 12px; /* 左側圓角 */
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+}
 
         .rate-table-drawer {
             width: 100%; border-collapse: collapse; margin-top: 5px; 
@@ -451,3 +464,4 @@
 </script>
 </body>
 </html>
+
