@@ -18,9 +18,59 @@
     <style>
         :root { --primary-color: #4CC9F0; --secondary-color: #7209B7; --bg-color: #F8F9FA; --text-color: #333; }
         body { font-family: "Microsoft JhengHei", sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .header { text-align: center; margin-bottom: 30px; margin-top: 20px; }
+        
+        /* Header 區域樣式優化 */
+        .header { text-align: center; margin-bottom: 30px; margin-top: 20px; position: relative; }
+        .title-wrapper { display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; }
         .header h1 { color: var(--secondary-color); margin: 0; font-size: 1.8rem; }
         .header p { color: #666; margin-top: 8px; font-size: 0.9rem; }
+
+        /* 鈴鐺與公告彈窗樣式 */
+        .notice-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.4rem;
+            color: #FF9F43; /* 溫暖的橘色 */
+            transition: transform 0.2s;
+            padding: 5px;
+        }
+        .notice-bell:active { transform: scale(0.9); }
+        .notice-bell .dot {
+            position: absolute;
+            top: 5px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: #FF6B6B;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .notice-popover {
+            position: absolute;
+            top: 45px;
+            right: -20px;
+            width: 260px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 15px;
+            text-align: left;
+            z-index: 1000;
+            display: none; /* 初始隱藏 */
+            border: 1px solid rgba(0,0,0,0.05);
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notice-popover h4 { margin: 0 0 10px 0; font-size: 1rem; color: var(--secondary-color); display: flex; align-items: center; gap: 5px; }
+        .notice-content { font-size: 0.85rem; color: #555; line-height: 1.6; }
+        .notice-content ul { margin: 0; padding-left: 18px; }
+        .notice-content li { margin-bottom: 5px; }
+
         .grid-container { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; max-width: 450px; }
         @media (min-width: 600px) { .grid-container { max-width: 800px; grid-template-columns: 1fr 1fr; } }
 
@@ -39,12 +89,12 @@
         
         /* 顏色主題 */
         .bg-cancer { background: linear-gradient(135deg, #FF6B6B, #EE5253); }
-        .bg-retire { background: linear-gradient(135deg, #DE6262, #FFB88C); } /* 退休計算專屬橘紅 */
+        .bg-retire { background: linear-gradient(135deg, #DE6262, #FFB88C); }
         .bg-numerology { background: linear-gradient(135deg, #4CC9F0, #4895EF); }
         .bg-money { background: linear-gradient(135deg, #B5EAD7, #88D8B0); } 
         .bg-mbti { background: linear-gradient(135deg, #A29BFE, #6C5CE7); }
         .bg-disc { background: linear-gradient(135deg, #FF9F43, #FF6B6B); }
-        .bg-energy { background: linear-gradient(135deg, #A68A64, #5C4B3C); } /* 能量圖卡專屬咖啡色系 */
+        .bg-energy { background: linear-gradient(135deg, #A68A64, #5C4B3C); }
 
         .footer { margin-top: 50px; font-size: 0.75rem; color: #BBB; }
     </style>
@@ -52,7 +102,23 @@
 <body>
 
     <div class="header">
-        <h1>數位工具箱</h1>
+        <div class="title-wrapper">
+            <h1>數位工具箱</h1>
+            <div class="notice-bell" id="bellBtn">
+                <i class="fa-solid fa-bell"></i>
+                <div class="dot"></div>
+                <div class="notice-popover" id="noticeBox">
+                    <h4><i class="fa-solid fa-bullhorn"></i> 更新公告</h4>
+                    <div class="notice-content">
+                        <ul>
+                            <li><b>[新增]</b> 貸款試算新增利率參考側邊欄，點擊右方藍色按鈕即可查看。</li>
+                            <li><b>[優化]</b> 調整整體介面配色，提供更舒適的瀏覽體驗。</li>
+                            <li><b>[預告]</b> 功能開發中，敬請期待！</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
         <p>提供您專業且便捷的試算服務</p>
     </div>
 
@@ -105,6 +171,21 @@
     <div class="footer">&copy; 2026 數位工具箱</div>
 
     <script>
+        // 公告欄顯示切換
+        const bellBtn = document.getElementById('bellBtn');
+        const noticeBox = document.getElementById('noticeBox');
+
+        bellBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止觸發導航
+            const isVisible = noticeBox.style.display === 'block';
+            noticeBox.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // 點擊畫面其他地方關閉公告
+        document.addEventListener('click', () => {
+            noticeBox.style.display = 'none';
+        });
+
         function navTo(url, e) {
             if (e) e.preventDefault();
             if (("standalone" in window.navigator) && window.navigator.standalone) {
