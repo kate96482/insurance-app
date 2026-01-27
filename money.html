@@ -31,7 +31,7 @@
             background: var(--bg); 
             color: var(--text-dark); 
             margin: 0; padding: 10px;
-            overflow-x: hidden; /* 防止滑動時出現水平捲軸 */
+            overflow-x: hidden;
         }
 
         .back-home {
@@ -104,8 +104,8 @@
 
         /* --- 利率側邊欄優化樣式 --- */
         .side-drawer {
-            position: fixed; top: 0; right: -280px; 
-            width: 280px; height: 100vh; background: #fff;
+            position: fixed; top: 0; right: -325px; 
+            width: 320px; height: 100vh; background: #fff;
             box-shadow: -5px 0 15px rgba(0,0,0,0.1);
             transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             z-index: 2000;
@@ -113,7 +113,7 @@
         .side-drawer.is-open { right: 0; }
 
         .drawer-trigger {
-            position: absolute; left: -45px; top: 50%; /* 寬度增加 */
+            position: absolute; left: -45px; top: 50%;
             transform: translateY(-50%); width: 45px; height: 80px;
             background: var(--bright-blue); cursor: pointer;
             clip-path: polygon(100% 0, 0 50%, 100% 100%);
@@ -125,11 +125,11 @@
             width: 100%; border-collapse: collapse; margin-top: 5px; 
             font-size: 0.85rem;
         }
-        .rate-table-drawer th { background: #F8F5F2; padding: 8px 5px; text-align: left; color: #666; border-bottom: 1px solid var(--oat); }
+        .rate-table-drawer th { background: #F8F5F2; padding: 8px 10px; text-align: left; color: #666; border-bottom: 1px solid var(--oat); }
         .rate-table-drawer td { 
-            padding: 10px 5px; 
+            padding: 8px 10px; 
             border-bottom: 1px solid #F1F1F1; 
-            white-space: nowrap; /* 禁止換行，達成一列式 */
+            white-space: nowrap; 
             vertical-align: middle; 
         }
         
@@ -156,31 +156,40 @@
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
-    <div style="padding:10px; overflow-x:auto; height:calc(100% - 60px);">
+    <div style="padding:5px; overflow-y:auto; height:calc(100% - 60px);">
         <table class="rate-table-drawer">
             <thead><tr><th>銀行機構</th><th>利率參考</th></tr></thead>
             <tbody>
-                <tr class="cat-row"><td colspan="2">🟢 正常收件</td></tr>
-                <tr><td>公股行庫</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
+                <tr class="cat-row"><td colspan="2">🟢 正常收件 (公股行庫)</td></tr>
+                <tr><td>臺灣銀行</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
+                <tr><td>土地銀行</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
+                <tr><td>合作金庫</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
+                <tr><td>第一銀行</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
+                <tr><td>華南銀行</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
+                <tr><td>彰化銀行</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
+                <tr><td>兆豐銀行</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
+                <tr><td>臺灣企銀</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
+                
+                <tr class="cat-row"><td colspan="2">🔵 正常收件 (民營/網銀)</td></tr>
                 <tr><td>凱基銀行</td><td>2.40% 起</td></tr>
                 <tr><td>玉山銀行</td><td>2.50% 起</td></tr>
-                <tr><td>將來 (網銀)</td><td>2.50% 起</td></tr>
+                <tr><td>將來銀行</td><td>2.50% 起</td></tr>
                 <tr><td>台新銀行</td><td>2.55% 起</td></tr>
                 <tr><td>王道銀行</td><td>2.68% 起</td></tr>
-                <tr><td>匯豐 / 元大</td><td>2.7% ~ 2.73%</td></tr>
+                <tr><td>匯豐 / 元大</td><td>2.70% ~ 2.73%</td></tr>
                 <tr><td>星展 / 台中</td><td>2.80% 起</td></tr>
                 
                 <tr class="cat-row"><td colspan="2">🟠 特定條件</td></tr>
-                <tr><td>國泰 / 富邦人壽</td><td>2.5% (限薪轉)</td></tr>
+                <tr><td>國泰/富邦人壽</td><td>2.50% (限薪轉)</td></tr>
                 <tr><td>農會 / 信合社</td><td>2.60% 起</td></tr>
                 <tr><td>國泰世華</td><td>限 VIP 客戶</td></tr>
-                <tr><td>安泰銀行</td><td>3.5% (小額)</td></tr>
+                <tr><td>安泰銀行</td><td>3.50% (小額)</td></tr>
                 
                 <tr class="cat-row"><td colspan="2">🔴 暫停收件</td></tr>
                 <tr><td>永豐銀行</td><td><span class="tag-stop">暫停受理</span></td></tr>
             </tbody>
         </table>
-        <p style="font-size: 0.7rem; color: #999; margin-top: 15px;">* 以上為 2026 Q1 調查，實際利率以各行審核為準。</p>
+        <p style="font-size: 0.7rem; color: #999; margin: 15px 10px;">* 以上為 2026 Q1 調查，實際利率以各行審核為準。</p>
     </div>
 </div>
 
@@ -294,47 +303,25 @@
         const trigger = document.getElementById('drawerTrigger');
         const closeBtn = document.getElementById('closeDrawer');
 
-        // 點擊事件
+        // 點擊展開
         trigger.addEventListener('click', (e) => {
             e.stopPropagation();
             drawer.classList.toggle('is-open');
         });
 
+        // 點擊右上角 X 關閉
         closeBtn.addEventListener('click', () => {
             drawer.classList.remove('is-open');
         });
 
+        // 點擊側邊欄以外範圍關閉
         document.addEventListener('click', (event) => {
             if (!drawer.contains(event.target) && drawer.classList.contains('is-open')) {
                 drawer.classList.remove('is-open');
             }
         });
 
-        // --- 左滑展開功能 ---
-        let touchstartX = 0;
-        let touchendX = 0;
-
-        document.addEventListener('touchstart', e => {
-            touchstartX = e.changedTouches[0].screenX;
-        }, false);
-
-        document.addEventListener('touchend', e => {
-            touchendX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, false);
-
-        function handleSwipe() {
-            // 從螢幕右側向左滑動超過 50px
-            if (touchstartX > window.innerWidth * 0.7 && touchstartX - touchendX > 50) {
-                if (currentMode === 'mortgage') {
-                    drawer.classList.add('is-open');
-                }
-            }
-            // 從左向右滑動關閉
-            if (drawer.classList.contains('is-open') && touchendX - touchstartX > 50) {
-                drawer.classList.remove('is-open');
-            }
-        }
+        // 移除所有滑動(Swipe)關閉的邏輯
     });
 
     let currentMode = 'mortgage';
