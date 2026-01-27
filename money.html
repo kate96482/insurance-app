@@ -102,7 +102,7 @@
         .form-section.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- 利率側邊欄優化樣式 --- */
+        /* --- 利率側邊欄優化樣式 (關鍵修正點) --- */
         .side-drawer {
             position: fixed; top: 0; right: -325px; 
             width: 320px; height: 100vh; background: #fff;
@@ -123,19 +123,31 @@
 
         .rate-table-drawer {
             width: 100%; border-collapse: collapse; margin-top: 5px; 
-            font-size: 0.85rem;
+            font-size: 0.82rem; /* 稍微調小字體以增加空間 */
+            table-layout: fixed; /* 固定佈局，確保欄位不跑版 */
         }
-        .rate-table-drawer th { background: #F8F5F2; padding: 8px 10px; text-align: left; color: #666; border-bottom: 1px solid var(--oat); }
+        .rate-table-drawer th { 
+            background: #F8F5F2; padding: 6px 10px; text-align: left; 
+            color: #666; border-bottom: 1px solid var(--oat); 
+        }
         .rate-table-drawer td { 
-            padding: 8px 4px; 
+            padding: 5px 8px; /* 縮減上下間距 */
             border-bottom: 1px solid #F1F1F1; 
             white-space: nowrap; 
             vertical-align: middle; 
+            text-align: left; /* 全部改為靠左，解決中間空白問題 */
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
-        .cat-row { background: #FAF9F7; font-weight: bold; color: var(--m-purple); }
+        /* 嚴格定義欄位寬度 */
+        .rate-table-drawer th:nth-child(1), .rate-table-drawer td:nth-child(1) { width: 42%; }
+        .rate-table-drawer th:nth-child(2), .rate-table-drawer td:nth-child(2) { width: 58%; }
 
-        .tag { padding: 2px 5px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .cat-row { background: #FAF9F7; font-weight: bold; color: var(--m-purple); }
+        .cat-row td { padding: 6px 10px; }
+
+        .tag { padding: 2px 5px; border-radius: 4px; font-size: 0.72rem; font-weight: bold; display: inline-block; }
         .tag-ok { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; }
         .tag-stop { color: #D32F2F; font-weight: bold; }
     </style>
@@ -190,7 +202,7 @@
                 <tr><td>永豐銀行</td><td><span class="tag-stop">暫停受理</span></td></tr>
             </tbody>
         </table>
-        <p style="font-size: 0.7rem; color: #999; margin: 15px 10px;">* 以上為 2026 Q1 調查，實際利率以各行審核為準。</p>
+        <p style="font-size: 0.65rem; color: #999; margin: 15px 10px;">* 以上為 2026 Q1 調查，實際利率以各行審核為準。</p>
     </div>
 </div>
 
@@ -304,25 +316,20 @@
         const trigger = document.getElementById('drawerTrigger');
         const closeBtn = document.getElementById('closeDrawer');
 
-        // 點擊展開
         trigger.addEventListener('click', (e) => {
             e.stopPropagation();
             drawer.classList.toggle('is-open');
         });
 
-        // 點擊右上角 X 關閉
         closeBtn.addEventListener('click', () => {
             drawer.classList.remove('is-open');
         });
 
-        // 點擊側邊欄以外範圍關閉
         document.addEventListener('click', (event) => {
             if (!drawer.contains(event.target) && drawer.classList.contains('is-open')) {
                 drawer.classList.remove('is-open');
             }
         });
-
-        // 移除所有滑動(Swipe)關閉的邏輯
     });
 
     let currentMode = 'mortgage';
@@ -444,5 +451,3 @@
 </script>
 </body>
 </html>
-
-
