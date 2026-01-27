@@ -22,7 +22,7 @@
             --soft-yellow: #FCF6BD;
             --text-dark: #2B2D42;
             --bg: #F8F9FA;
-            --coffee: #4A3728; /* 新增咖啡色系供利率表使用 */
+            --coffee: #4A3728;
             --oat: #E8E2D9;
         }
 
@@ -31,6 +31,7 @@
             background: var(--bg); 
             color: var(--text-dark); 
             margin: 0; padding: 10px;
+            overflow-x: hidden; /* 防止滑動時出現水平捲軸 */
         }
 
         .back-home {
@@ -101,10 +102,10 @@
         .form-section.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- 新增功能：利率側邊欄樣式 --- */
+        /* --- 利率側邊欄優化樣式 --- */
         .side-drawer {
-            position: fixed; top: 0; right: -350px; 
-            width: 320px; height: 100vh; background: #fff;
+            position: fixed; top: 0; right: -280px; 
+            width: 280px; height: 100vh; background: #fff;
             box-shadow: -5px 0 15px rgba(0,0,0,0.1);
             transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             z-index: 2000;
@@ -112,22 +113,31 @@
         .side-drawer.is-open { right: 0; }
 
         .drawer-trigger {
-            position: absolute; left: -40px; top: 50%;
-            transform: translateY(-50%); width: 40px; height: 80px;
+            position: absolute; left: -45px; top: 50%; /* 寬度增加 */
+            transform: translateY(-50%); width: 45px; height: 80px;
             background: var(--bright-blue); cursor: pointer;
             clip-path: polygon(100% 0, 0 50%, 100% 100%);
-            display: none; /* 初始隱藏，僅房貸模式顯示 */
-            align-items: center; justify-content: center; color: white;
+            display: none; align-items: center; justify-content: center; color: white;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
         }
 
         .rate-table-drawer {
-            width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.82rem;
+            width: 100%; border-collapse: collapse; margin-top: 5px; 
+            font-size: 0.85rem;
         }
-        .rate-table-drawer th { background: #F8F5F2; padding: 8px 5px; text-align: left; border-bottom: 2px solid var(--oat); }
-        .rate-table-drawer td { padding: 8px 5px; border-bottom: 1px solid #EEE; }
+        .rate-table-drawer th { background: #F8F5F2; padding: 8px 5px; text-align: left; color: #666; border-bottom: 1px solid var(--oat); }
+        .rate-table-drawer td { 
+            padding: 10px 5px; 
+            border-bottom: 1px solid #F1F1F1; 
+            white-space: nowrap; /* 禁止換行，達成一列式 */
+            vertical-align: middle; 
+        }
+        
         .cat-row { background: #FAF9F7; font-weight: bold; color: var(--m-purple); }
-        .tag { padding: 2px 5px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
-        .tag-ok { background: #E8F5E9; color: #2E7D32; }
+
+        .tag { padding: 2px 5px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .tag-ok { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; }
+        .tag-stop { color: #D32F2F; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -138,33 +148,39 @@
 
 <div class="side-drawer" id="sideDrawer">
     <div class="drawer-trigger" id="drawerTrigger">
-        <i class="fa-solid fa-percent" style="margin-left:15px"></i>
+        <i class="fa-solid fa-percent" style="margin-left:15px; font-size: 1rem;"></i>
     </div>
-    <div style="padding:15px; border-bottom:1px solid #EEE; display:flex; justify-content:flex-start;">
-        <button id="closeDrawer" style="background:none; border:none; font-size:1.1rem; cursor:pointer; color:var(--text-dark);">
-            <i class="fa-solid fa-xmark"></i> 關閉
+    <div style="padding:15px; border-bottom:1px solid #EEE; display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-weight:bold; font-size:1rem; color:var(--m-purple)">🏛️ 房貸利率參考表</span>
+        <button id="closeDrawer" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--text-dark);">
+            <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
-    <div style="padding:15px; overflow-y:auto; height:calc(100% - 60px);">
-        <h3 style="color:var(--bright-blue); margin:0 0 10px 0; font-size:1.1rem;">🏛️ 2026 Q1 房貸利率表</h3>
+    <div style="padding:10px; overflow-x:auto; height:calc(100% - 60px);">
         <table class="rate-table-drawer">
-            <thead><tr><th>銀行 / 機構</th><th>利率參考</th></tr></thead>
+            <thead><tr><th>銀行機構</th><th>利率參考</th></tr></thead>
             <tbody>
-                <tr class="cat-row"><td colspan="2">🟢 正常收件（首選）</td></tr>
-                <tr><td>公股行庫</td><td><span class="tag tag-ok">新青安利率</span></td></tr>
+                <tr class="cat-row"><td colspan="2">🟢 正常收件</td></tr>
+                <tr><td>公股行庫</td><td><span class="tag tag-ok">新青安政策</span></td></tr>
                 <tr><td>凱基銀行</td><td>2.40% 起</td></tr>
                 <tr><td>玉山銀行</td><td>2.50% 起</td></tr>
-                <tr><td>將來銀行</td><td>2.50% 起</td></tr>
+                <tr><td>將來 (網銀)</td><td>2.50% 起</td></tr>
                 <tr><td>台新銀行</td><td>2.55% 起</td></tr>
-                <tr><td>匯豐 / 元大</td><td>2.70% 起</td></tr>
-                <tr class="cat-row"><td colspan="2">🟠 特定條件收件</td></tr>
-                <tr><td>國泰/富邦人壽</td><td>2.50% (限薪轉)</td></tr>
-                <tr><td>農會/信合社</td><td>2.60% 起</td></tr>
+                <tr><td>王道銀行</td><td>2.68% 起</td></tr>
+                <tr><td>匯豐 / 元大</td><td>2.7% ~ 2.73%</td></tr>
+                <tr><td>星展 / 台中</td><td>2.80% 起</td></tr>
+                
+                <tr class="cat-row"><td colspan="2">🟠 特定條件</td></tr>
+                <tr><td>國泰 / 富邦人壽</td><td>2.5% (限薪轉)</td></tr>
+                <tr><td>農會 / 信合社</td><td>2.60% 起</td></tr>
                 <tr><td>國泰世華</td><td>限 VIP 客戶</td></tr>
+                <tr><td>安泰銀行</td><td>3.5% (小額)</td></tr>
+                
                 <tr class="cat-row"><td colspan="2">🔴 暫停收件</td></tr>
-                <tr><td>永豐銀行</td><td><span style="color:red">暫停受理</span></td></tr>
+                <tr><td>永豐銀行</td><td><span class="tag-stop">暫停受理</span></td></tr>
             </tbody>
         </table>
+        <p style="font-size: 0.7rem; color: #999; margin-top: 15px;">* 以上為 2026 Q1 調查，實際利率以各行審核為準。</p>
     </div>
 </div>
 
@@ -258,7 +274,6 @@
 </div>
 
 <script>
-    // PWA 防跳轉腳本 (維持原樣)
     (function(doc, nav, standalone) {
         if ((standalone in nav) && nav[standalone]) {
             doc.addEventListener('click', function(event) {
@@ -274,12 +289,12 @@
         }
     })(document, window.navigator, 'standalone');
 
-    // --- 新增功能：利率抽屜控制腳本 ---
     document.addEventListener('DOMContentLoaded', function() {
         const drawer = document.getElementById('sideDrawer');
         const trigger = document.getElementById('drawerTrigger');
         const closeBtn = document.getElementById('closeDrawer');
 
+        // 點擊事件
         trigger.addEventListener('click', (e) => {
             e.stopPropagation();
             drawer.classList.toggle('is-open');
@@ -294,6 +309,32 @@
                 drawer.classList.remove('is-open');
             }
         });
+
+        // --- 左滑展開功能 ---
+        let touchstartX = 0;
+        let touchendX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+        }, false);
+
+        document.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            // 從螢幕右側向左滑動超過 50px
+            if (touchstartX > window.innerWidth * 0.7 && touchstartX - touchendX > 50) {
+                if (currentMode === 'mortgage') {
+                    drawer.classList.add('is-open');
+                }
+            }
+            // 從左向右滑動關閉
+            if (drawer.classList.contains('is-open') && touchendX - touchstartX > 50) {
+                drawer.classList.remove('is-open');
+            }
+        }
     });
 
     let currentMode = 'mortgage';
@@ -305,7 +346,6 @@
         document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
         document.getElementById(mode + '-options').classList.add('active');
         
-        // 控制利率三角形顯示：僅房貸顯示
         const trigger = document.getElementById('drawerTrigger');
         trigger.style.display = (mode === 'mortgage') ? 'flex' : 'none';
         
@@ -339,7 +379,6 @@
         if(currentMode === 'mortgage') {
             document.getElementById('mYearTxt').innerText = document.getElementById('mYearSld').value + " 年";
             document.getElementById('graceTxt').innerText = document.getElementById('graceSld').value + " 年";
-            // 房貸頁面確保三角形顯示 (初始載入用)
             document.getElementById('drawerTrigger').style.display = 'flex';
         } else if(currentMode === 'personal') {
             document.getElementById('pYearTxt').innerText = document.getElementById('pYearSld').value + " 年";
