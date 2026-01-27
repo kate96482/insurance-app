@@ -102,7 +102,7 @@
         .form-section.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- 利率側邊欄優化樣式 (關鍵修正點) --- */
+        /* --- 利率側邊欄優化樣式 --- */
         .side-drawer {
             position: fixed; top: 0; right: -325px; 
             width: 320px; height: 100vh; background: #fff;
@@ -123,31 +123,31 @@
 
         .rate-table-drawer {
             width: 100%; border-collapse: collapse; margin-top: 5px; 
-            font-size: 0.82rem; /* 稍微調小字體以增加空間 */
-            table-layout: fixed; /* 固定佈局，確保欄位不跑版 */
+            font-size: 0.85rem;
+            table-layout: fixed; /* 固定佈局 */
         }
         .rate-table-drawer th { 
-            background: #F8F5F2; padding: 6px 10px; text-align: left; 
+            background: #F8F5F2; padding: 10px; text-align: left; 
             color: #666; border-bottom: 1px solid var(--oat); 
         }
         .rate-table-drawer td { 
-            padding: 5px 8px; /* 縮減上下間距 */
+            padding: 8px 10px; 
             border-bottom: 1px solid #F1F1F1; 
             white-space: nowrap; 
             vertical-align: middle; 
-            text-align: left; /* 全部改為靠左，解決中間空白問題 */
+            text-align: left;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         
-        /* 嚴格定義欄位寬度 */
-        .rate-table-drawer th:nth-child(1), .rate-table-drawer td:nth-child(1) { width: 42%; }
-        .rate-table-drawer th:nth-child(2), .rate-table-drawer td:nth-child(2) { width: 58%; }
+        /* 嚴格定義寬度，縮減間距 */
+        .rate-table-drawer th:nth-child(1), .rate-table-drawer td:nth-child(1) { width: 130px; }
+        .rate-table-drawer th:nth-child(2), .rate-table-drawer td:nth-child(2) { width: auto; }
 
         .cat-row { background: #FAF9F7; font-weight: bold; color: var(--m-purple); }
-        .cat-row td { padding: 6px 10px; }
+        .cat-row td { padding: 10px; width: 100% !important; }
 
-        .tag { padding: 2px 5px; border-radius: 4px; font-size: 0.72rem; font-weight: bold; display: inline-block; }
+        .tag { padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
         .tag-ok { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; }
         .tag-stop { color: #D32F2F; font-weight: bold; }
     </style>
@@ -168,7 +168,7 @@
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
-    <div style="padding:5px; overflow-y:auto; height:calc(100% - 60px);">
+    <div style="padding:0; overflow-y:auto; height:calc(100% - 60px); overflow-x: hidden;">
         <table class="rate-table-drawer">
             <thead><tr><th>銀行機構</th><th>利率參考</th></tr></thead>
             <tbody>
