@@ -9,33 +9,33 @@
         :root { --primary: #DE6262; --secondary: #FFB88C; --text: #4A3728; --bg: #F0EDE9; --success: #2F855A; }
         body { font-family: "PingFang TC", sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); }
         .container { max-width: 450px; margin: auto; padding-top: 40px; }
-        
-        /* 左上角返回 */
-        .header-nav { position: absolute; top: 15px; left: 15px; }
+        .header-nav { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; }
         .back-home { text-decoration: none; color: var(--primary); font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
-
+        .fast-link { text-decoration: none; color: white; background: var(--primary); font-size: 0.8rem; padding: 6px 12px; border-radius: 20px; font-weight: bold; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         h2 { color: var(--primary); margin-top: 0; font-size: 1.4rem; text-align: center; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: var(--primary); }
+        .input-group { margin-bottom: 18px; }
+        label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; color: var(--primary); }
         input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #E8E2D9; box-sizing: border-box; font-size: 1rem; outline: none; }
-        .hint { font-size: 0.75rem; color: #888; margin-top: 3px; }
+        .range-container { display: flex; align-items: center; gap: 15px; }
+        input[type=range] { flex: 1; accent-color: var(--primary); }
+        .range-val { font-size: 1.2rem; font-weight: bold; color: var(--primary); min-width: 50px; }
+        .hint { font-size: 0.75rem; color: #888; margin-top: 5px; }
+        .policy-tag { font-size: 0.75rem; color: #DE6262; font-weight: bold; margin-top: 3px; display: block; }
         .btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
-        
-        .text-results { display: none; }
-
         #result { display: none; margin-top: 25px; }
         .canvas-container { margin-bottom: 20px; text-align: center; }
         #output-image { width: 100%; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .save-tip { font-size: 0.8rem; color: #888; margin-top: 8px; }
-
         .btn-advanced { background: linear-gradient(135deg, #2F855A, #48BB78); margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; color: white; padding: 15px; border-radius: 12px; font-weight: bold; }
+        #old-years-status { font-size: 0.75rem; margin-top: 6px; font-weight: 500; display: block; line-height: 1.4; }
     </style>
 </head>
 <body>
 
 <div class="header-nav">
     <a href="index.html" class="back-home"><i class="fa-solid fa-house"></i> 返回首頁</a>
+    <a href="step2.html" class="fast-link"><i class="fa-solid fa-bolt"></i> 直接試算</a>
 </div>
 
 <div class="container">
@@ -50,9 +50,20 @@
         <div class="input-group">
             <label>民國 97 年前是否有勞保年資？</label>
             <select id="has-old-years">
-                <option value="yes">是 (具備一次領資格)</option>
+                <option value="yes">是 (具備一次請領資格)</option>
                 <option value="no">否 (僅能選擇月領年金)</option>
             </select>
+            <div id="old-years-status"></div>
+        </div>
+
+        <div class="input-group">
+            <label>預計退休年齡</label>
+            <div class="range-container">
+                <input type="range" id="retire-age-slider" min="50" max="70" value="65">
+                <span class="range-val" id="age-val">65歲</span>
+            </div>
+            <span class="policy-tag" id="policy-desc">法定退休年齡 (100%領取)</span>
+            <div class="hint" id="legal-age-hint">您的法定退休年齡為：-- 歲</div>
         </div>
 
         <div class="input-group">
@@ -61,44 +72,25 @@
         </div>
 
         <div class="input-group">
-            <label>預計退休年齡</label>
-            <select id="retire-age">
-                <option value="55">55 歲</option>
-                <option value="60">60 歲</option>
-                <option value="65" selected>65 歲</option>
-                <option value="70">70 歲</option>
-            </select>
-            <div class="hint" id="legal-age-hint">您的法定退休年齡為：-- 歲</div>
-        </div>
-
-        <div class="input-group">
             <label>最高 60 個月平均投保薪資</label>
             <input type="number" id="avg-salary" value="45800">
-            <div class="hint">目前勞保最高上限為 45,800 元</div>
+            <div class="hint">勞保月領看「最高60個月」，一次請領看「最後3年」</div>
         </div>
 
         <div class="input-group">
             <label>退休時勞保總年資</label>
-            <input type="number" id="years" value="35">
+            <input type="number" id="years" step="0.1" value="35">
         </div>
 
         <button class="btn" onclick="calculateGap()">分析缺口與目標</button>
 
         <div id="result">
             <div class="canvas-container">
-                <canvas id="resultCanvas" width="800" height="1450" style="display:none;"></canvas>
-                <img id="output-image" alt="退休缺口分析圖">
+                <canvas id="resultCanvas" width="800" height="1750" style="display:none;"></canvas>
+                <img id="output-image" alt="退休缺口 analysis圖">
                 <div class="save-tip" id="save-tip"><i class="fa-regular fa-image"></i> 長按上方圖片可儲存結果</div>
+                <div id="debug-info"></div>
             </div>
-
-            <div class="text-results">
-                <span id="res-labor"></span>
-                <span id="res-gap"></span>
-                <span id="res-total-gap"></span>
-                <span id="res-prepare-years"></span>
-                <span id="res-yearly-target"></span>
-            </div>
-
             <a href="javascript:void(0)" id="advanced-btn" class="btn-advanced" onclick="goToStep2()">
                 進入進階方案對照 <i class="fa-solid fa-chevron-right"></i>
             </a>
@@ -108,6 +100,8 @@
 
 <script>
     let calculatedLabor = 0;
+    // 自動抓取目前民國年份
+    const currentSystemYear = new Date().getFullYear() - 1911; 
 
     function getLegalRetireAge(birthYear) {
         if (birthYear <= 46) return 60;
@@ -118,63 +112,117 @@
         return 65;
     }
 
-    document.getElementById('birth-year').addEventListener('input', function() {
-        const by = parseInt(this.value);
-        if(by) document.getElementById('legal-age-hint').innerText = `您的法定退休年齡為：${getLegalRetireAge(by)} 歲`;
-    });
+    const slider = document.getElementById('retire-age-slider');
+    const ageVal = document.getElementById('age-val');
+    const policyDesc = document.getElementById('policy-desc');
+    const birthInput = document.getElementById('birth-year');
+    const hasOldSelect = document.getElementById('has-old-years');
+    const statusBox = document.getElementById('old-years-status');
 
-    function calculateGap() {
-        const birthYear = parseInt(document.getElementById('birth-year').value);
-        const hasOld = document.getElementById('has-old-years').value;
-        const dreamIncome = parseFloat(document.getElementById('dream-income').value);
-        const retireAge = parseInt(document.getElementById('retire-age').value);
-        const avgSalary = parseFloat(document.getElementById('avg-salary').value);
-        const years = parseInt(document.getElementById('years').value);
-        const thisYear = 115; 
-        const maxAge = 95;
-
-        if(!birthYear) return alert("請輸入出生年份");
-
-        const currentAge = thisYear - birthYear;
-        const legalAge = getLegalRetireAge(birthYear);
-
-        let laborA = (avgSalary * years * 0.00775) + 3000;
-        let laborB = avgSalary * years * 0.0155;
-        let bestBase = Math.max(laborA, laborB);
+    function updateSliderLogic() {
+        const birthYear = parseInt(birthInput.value) || 75;
+        const currentAge = currentSystemYear - birthYear;
+        const legal = getLegalRetireAge(birthYear);
+        const earliestAge = legal - 5; 
         
-        let diff = retireAge - legalAge;
-        if (diff > 5) diff = 5;
-        if (diff < -5) diff = -5;
-        const ratio = 1 + (diff * 0.04);
-        calculatedLabor = Math.round(bestBase * ratio);
-
-        let onceAmount = 0;
-        if (hasOld === 'yes') {
-            let baseCount = years <= 15 ? years : 15 + (years - 15) * 2;
-            if (baseCount > 45) baseCount = 45;
-            onceAmount = baseCount * avgSalary;
+        if (birthYear >= 82) {
+            hasOldSelect.value = "no";
+            statusBox.innerHTML = '<span style="color:#DE6262">💡 民國 97 年時您未滿 15 歲，實務上極少具備此資格。</span>';
+        } else if (birthYear <= 75) {
+            hasOldSelect.value = "yes";
+            statusBox.innerHTML = '<span style="color:#2F855A">✅ 符合大環境年資背景。</span>';
+        } else {
+            statusBox.innerHTML = '<span style="color:#DD6B20">⚠️ 當時您約 16-21 歲，請確認大學或高中打工是否有投保紀錄。</span>';
         }
 
-        const monthlyGap = Math.max(0, dreamIncome - calculatedLabor);
-        const retirePeriod = maxAge - retireAge;
-        const totalGap = monthlyGap * 12 * retirePeriod;
+        const minPossible = Math.max(50, currentAge);
+        slider.min = minPossible;
+        if (parseInt(slider.value) < minPossible) slider.value = minPossible;
+
+        const val = parseInt(slider.value);
+        ageVal.innerText = val + '歲';
+        
+        let diff = val - legal;
+        if (diff < 0) {
+            let reducePercent = Math.min(20, Math.abs(diff) * 4);
+            if (val < earliestAge) {
+                policyDesc.innerText = `提早退休 (月領需待 ${earliestAge} 歲開領，減額 20%)`;
+            } else {
+                policyDesc.innerText = `提早領取 (減額年金 -${reducePercent}%)`;
+            }
+            policyDesc.style.color = "#DE6262";
+        } else if (diff > 0) {
+            const bonus = Math.min(20, diff * 4);
+            policyDesc.innerText = `延後領取 (增額年金 +${bonus}%)`;
+            policyDesc.style.color = "#2F855A";
+        } else {
+            policyDesc.innerText = "法定退休年齡 (100%領取)";
+            policyDesc.style.color = "#DE6262";
+        }
+        document.getElementById('legal-age-hint').innerText = `您的法定退休年齡為：${legal} 歲 (目前 ${currentAge} 歲 / 基準年：${currentSystemYear}年)`;
+    }
+
+    slider.addEventListener('input', updateSliderLogic);
+    birthInput.addEventListener('input', updateSliderLogic);
+
+    function calculateGap() {
+        const birthYear = parseInt(birthInput.value);
+        const hasOld = document.getElementById('has-old-years').value;
+        const dreamIncome = parseFloat(document.getElementById('dream-income').value);
+        const retireAge = parseInt(slider.value);
+        const avgSalary = parseFloat(document.getElementById('avg-salary').value);
+        const yearsRaw = parseFloat(document.getElementById('years').value);
+        const maxAge = 95;
+
+        const legalAge = getLegalRetireAge(birthYear);
+        const currentAge = currentSystemYear - birthYear;
+        const earliestAge = legalAge - 5;
+
+        let laborA_Base = (avgSalary * yearsRaw * 0.00775) + 3000;
+        let laborB_Base = (avgSalary * yearsRaw * 0.0155);
+        let effectiveRetireAge = Math.max(retireAge, earliestAge);
+        let diff = effectiveRetireAge - legalAge;
+        let ratio = 1 + (Math.max(-5, Math.min(5, diff)) * 0.04);
+        
+        let finalA = Math.round(laborA_Base * ratio);
+        let finalB = Math.round(laborB_Base * ratio);
+        
+        const canMonthly = (yearsRaw >= 15);
+        calculatedLabor = (canMonthly && retireAge >= earliestAge) ? Math.max(finalA, finalB) : 0;
+        const monthlyAmountWhenStart = canMonthly ? Math.max(finalA, finalB) : 0;
+
+        let baseDetail = "";
+        let onceAmount = 0;
+        if (hasOld === 'yes') {
+            let decimalPart = yearsRaw % 1;
+            let calcYears = Math.floor(yearsRaw);
+            if (decimalPart > 0.5) calcYears += 1;
+            else if (decimalPart > 0) calcYears += 0.5;
+
+            let base15 = Math.min(calcYears, 15);
+            let baseAbove = Math.max(0, calcYears - 15) * 2;
+            let totalBase = base15 + baseAbove;
+            let limit = retireAge >= 60 ? 50 : 45;
+            let finalBase = Math.min(limit, totalBase);
+            onceAmount = finalBase * avgSalary;
+            baseDetail = `${base15}×1 + ${(baseAbove/2)}×2 = ${totalBase}基數 (限${limit})`;
+        }
+
+        const vacuumYears = Math.max(0, earliestAge - retireAge);
+        const vacuumCost = dreamIncome * 12 * vacuumYears;
+        const postRetireYears = maxAge - Math.max(retireAge, earliestAge);
+        const monthlyGap = Math.max(0, dreamIncome - monthlyAmountWhenStart);
+        const totalGap = vacuumCost + (monthlyGap * 12 * postRetireYears);
         const prepareYears = Math.max(1, retireAge - currentAge);
-        const yearlyTarget = Math.round(totalGap / prepareYears);
 
         document.getElementById('result').style.display = 'block';
 
         drawResultImage({
-            birthYear, years, avgSalary, retireAge, legalAge, ratio,
-            laborA: Math.round(laborA * ratio),
-            laborB: Math.round(laborB * ratio),
-            finalLabor: calculatedLabor,
-            onceAmount: onceAmount,
-            gap: monthlyGap,
-            total: totalGap,
-            prepare: prepareYears,
-            yearly: yearlyTarget,
-            monthly: Math.round(yearlyTarget / 12),
-            hasOld: hasOld
+            avgSalary, years: yearsRaw, retireAge, ratio, legalAge, canMonthly, earliestAge,
+            finalLabor: calculatedLabor, monthlyAmountWhenStart, vacuumYears, vacuumCost,
+            onceAmount, baseDetail, total: totalGap, 
+            prepare: prepareYears, yearly: Math.round(totalGap / prepareYears), hasOld,
+            dreamIncome
         });
     }
 
@@ -184,120 +232,117 @@
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = '#DE6262';
-        ctx.fillRect(0, 0, canvas.width, 140);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 44px "PingFang TC"';
-        ctx.textAlign = 'center';
+        ctx.fillStyle = '#DE6262'; ctx.fillRect(0, 0, canvas.width, 140);
+        ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 44px "PingFang TC"'; ctx.textAlign = 'center';
         ctx.fillText('退休金缺口解析報告', canvas.width / 2, 85);
 
         ctx.textAlign = 'left';
-        ctx.font = '28px "PingFang TC"';
-
         let y = 200;
-        ctx.fillStyle = '#DE6262';
-        ctx.fillText('一、勞保年金估算 (系統自動擇優)', 60, y);
         
+        ctx.fillStyle = d.canMonthly ? '#DE6262' : '#AAAAAA'; 
+        ctx.font = 'bold 30px "PingFang TC"';
+        ctx.fillText('一、勞保月領年金', 60, y);
         y += 50;
-        ctx.fillStyle = '#4A3728';
-        ctx.font = '24px "PingFang TC"';
-        ctx.fillText(`A式：(${d.avgSalary} × ${d.years}年 × 0.775%) + 3000 = $${d.laborA.toLocaleString()}`, 80, y);
-        y += 40;
-        ctx.fillText(`B式：${d.avgSalary} × ${d.years}年 × 1.55% = $${d.laborB.toLocaleString()}`, 80, y);
-        y += 45;
-        ctx.fillStyle = d.ratio >= 1 ? '#2F855A' : '#DE6262';
-        ctx.fillText(`請領調整：${d.retireAge}歲領取 (加減額比例: ${(d.ratio*100).toFixed(0)}%)`, 80, y);
-        
-        y += 60;
-        ctx.fillStyle = '#FFF5F5';
-        ctx.fillRect(60, y, 680, 80);
-        ctx.fillStyle = '#DE6262';
-        ctx.font = 'bold 32px "PingFang TC"';
-        ctx.fillText(`預估每月領取：$ ${d.finalLabor.toLocaleString()}`, 100, y + 50);
 
-        y += 150;
-        if (d.hasOld === 'yes') {
-            ctx.fillStyle = '#DE6262';
-            ctx.font = 'bold 28px "PingFang TC"';
-            ctx.fillText('二、一次請領試算與決策', 60, y);
-            y += 50;
-            ctx.fillStyle = '#4A3728';
-            ctx.font = '24px "PingFang TC"';
-            ctx.fillText(`一次領總額：$${d.onceAmount.toLocaleString()}`, 80, y);
-            
-            y += 45;
-            ctx.fillStyle = '#2F855A';
-            let breakEven = (d.onceAmount / (d.finalLabor * 12)).toFixed(1);
-            ctx.font = 'bold 26px "PingFang TC"';
-            ctx.fillText(`💡 決策分析：月領滿 ${breakEven} 年即回本`, 80, y);
-            
-            y += 35;
-            ctx.font = 'italic 20px "PingFang TC"';
-            ctx.fillStyle = '#888';
-            ctx.fillText(`計算式：一次領 ${d.onceAmount.toLocaleString()} ÷ (月領 ${d.finalLabor.toLocaleString()} × 12月) = ${breakEven}年`, 100, y);
+        if (!d.canMonthly) {
+            ctx.fillStyle = '#AAAAAA'; ctx.font = '22px "PingFang TC"';
+            ctx.fillText('⚠️ 年資未滿 15 年，不具備月領資格。', 80, y);
+        } else if (d.retireAge < d.earliestAge) {
+            ctx.fillStyle = '#E53E3E'; ctx.font = 'bold 24px "PingFang TC"';
+            ctx.fillText(`⚠️ 尚未達請領年齡 (需待 ${d.earliestAge} 歲)`, 80, y);
+            y += 40;
+            ctx.fillStyle = '#4A3728'; ctx.font = '20px "PingFang TC"';
+            ctx.fillText(`屆時預估領取：$ ${d.monthlyAmountWhenStart.toLocaleString()} /月`, 80, y);
         } else {
-            ctx.fillStyle = '#888';
-            ctx.fillText('二、一次請領試算 (不具備資格)', 60, y);
+            ctx.fillStyle = '#4A3728'; ctx.font = 'bold 32px "PingFang TC"';
+            ctx.fillText(`預估每月領取：$ ${d.finalLabor.toLocaleString()}`, 80, y);
+        }
+        
+        y += 120;
+        ctx.fillStyle = d.hasOld === 'yes' ? '#DE6262' : '#AAAAAA';
+        ctx.font = 'bold 30px "PingFang TC"';
+        ctx.fillText('二、一次請領與回本分析', 60, y);
+        y += 50;
+        if (d.hasOld === 'yes') {
+            ctx.fillStyle = '#4A3728'; ctx.font = '22px "PingFang TC"';
+            ctx.fillText(`一次領總額：$${d.onceAmount.toLocaleString()} (${d.baseDetail})`, 80, y);
+            y += 55;
+            
+            let onceBreakEven = (d.onceAmount / (d.monthlyAmountWhenStart * 12));
+            let totalWaitAndRun = (onceBreakEven + d.vacuumYears).toFixed(1);
+            
+            ctx.fillStyle = '#2F855A'; ctx.font = 'bold 24px "PingFang TC"';
+            ctx.fillText(`💡 決策：自退休起算需 ${totalWaitAndRun} 年回本`, 80, y);
+            y += 35;
+            ctx.fillStyle = '#718096'; ctx.font = '16px "PingFang TC"';
+            let formulaStr = `計算式：${d.vacuumYears}(空窗期) + (${d.onceAmount.toLocaleString()} ÷ (${d.monthlyAmountWhenStart.toLocaleString()}×12))`;
+            ctx.fillText(formulaStr, 80, y);
+            
+            y += 30;
+            ctx.fillStyle = '#4A3728'; ctx.font = '18px "PingFang TC"';
+            ctx.fillText(`(即領超過 ${ (parseFloat(d.retireAge) + parseFloat(totalWaitAndRun)).toFixed(1) } 歲，月領總額才超越一次領)`, 80, y);
+        } else {
+            ctx.fillStyle = '#AAAAAA'; ctx.font = '22px "PingFang TC"';
+            ctx.fillText('⚠️ 您不具備一次領資格 (民國97年前無年資)。', 80, y);
         }
 
-        y += 140;
-        ctx.fillStyle = '#DE6262';
-        ctx.font = 'bold 28px "PingFang TC"';
-        ctx.fillText('三、退休缺口目標 (至95歲)', 60, y);
-        
+        y += 150;
+        ctx.fillStyle = '#DE6262'; ctx.font = 'bold 30px "PingFang TC"';
+        ctx.fillText('三、退休資金缺口 (含空窗期時間成本)', 60, y);
         y += 50;
-        ctx.fillStyle = '#FFF5F5';
-        ctx.fillRect(60, y, 680, 160);
-        ctx.fillStyle = '#DE6262';
-        ctx.font = 'bold 36px "PingFang TC"';
-        ctx.textAlign = 'center';
-        ctx.fillText('總資金缺口', canvas.width / 2, y + 60);
-        ctx.font = 'bold 60px "PingFang TC"';
-        ctx.fillText(`$ ${d.total.toLocaleString()}`, canvas.width / 2, y + 130);
-
-        y += 230;
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#4A3728';
-        ctx.font = '28px "PingFang TC"';
-        ctx.fillText(`距離退休剩餘：${d.prepare} 年`, canvas.width / 2, y);
-
-        y += 60;
-        ctx.fillStyle = '#F0FFF4';
-        ctx.fillRect(60, y, 680, 180);
-        ctx.fillStyle = '#2F855A';
-        ctx.font = 'bold 32px "PingFang TC"';
-        ctx.fillText('每年需額外準備', canvas.width / 2, y + 60);
-        ctx.font = 'bold 55px "PingFang TC"';
-        ctx.fillText(`$ ${d.yearly.toLocaleString()}`, canvas.width / 2, y + 135);
         
+        if (d.vacuumYears > 0) {
+            ctx.fillStyle = '#FFF5F5'; ctx.fillRect(60, y, 680, 100);
+            ctx.fillStyle = '#E53E3E'; ctx.font = 'bold 22px "PingFang TC"';
+            ctx.fillText(`● 空窗期 (${d.retireAge}~${d.earliestAge}歲)：`, 80, y + 40);
+            ctx.fillText(`  需自備生活費共 $ ${d.vacuumCost.toLocaleString()}`, 80, y + 75);
+            y += 130;
+        }
+
+        ctx.fillStyle = '#FFF5F5'; ctx.fillRect(60, y, 680, 160);
+        ctx.fillStyle = '#DE6262'; ctx.textAlign = 'center'; ctx.font = 'bold 36px "PingFang TC"';
+        ctx.fillText('最終退休缺口', canvas.width / 2, y + 60);
+        ctx.font = 'bold 60px "PingFang TC"'; ctx.fillText(`$ ${d.total.toLocaleString()}`, canvas.width / 2, y + 130);
+
         y += 240;
-        ctx.fillStyle = '#888';
-        ctx.font = '20px "PingFang TC"';
+        ctx.fillStyle = '#F0FFF4'; ctx.fillRect(60, y, 680, 180);
+        ctx.fillStyle = '#2F855A'; ctx.font = 'bold 32px "PingFang TC"';
+        ctx.fillText(`距離退休剩 ${d.prepare} 年，每年需存：`, canvas.width / 2, y + 60);
+        ctx.font = 'bold 55px "PingFang TC"'; ctx.fillText(`$ ${d.yearly.toLocaleString()}`, canvas.width / 2, y + 135);
+
+        // --- 底部品牌與資訊區域 ---
+        y += 240; 
+        ctx.fillStyle = '#888'; 
+        ctx.font = 'bold 22px "PingFang TC"'; 
+        ctx.textAlign = 'center';
         ctx.fillText('由「小邦手」財務分析工具產出', canvas.width / 2, y);
+        
+        y += 35; 
+        ctx.font = '18px "PingFang TC"';
+        ctx.fillText(`本報告係以民國 ${currentSystemYear} 年之法律與年齡為基準進行試算`, canvas.width / 2, y);
+        // -------------------------
+
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = canvas.width;
+        finalCanvas.height = y + 80; // 稍微增加底部留白
+        const fctx = finalCanvas.getContext('2d');
+        fctx.drawImage(canvas, 0, 0);
 
         const img = document.getElementById('output-image');
-        img.src = canvas.toDataURL('image/png');
+        img.src = finalCanvas.toDataURL('image/png');
         img.style.display = 'block';
-        document.getElementById('save-tip').style.display = 'block';
         img.scrollIntoView({ behavior: 'smooth' });
     }
 
     function goToStep2() {
-        const birthYear = document.getElementById('birth-year').value;
-        const currentAge = 115 - parseInt(birthYear);
-        const dream = document.getElementById('dream-income').value;
-        const retireAge = document.getElementById('retire-age').value;
-
-        localStorage.setItem('retired_currentAge', currentAge);
-        localStorage.setItem('retired_dreamIncome', dream);
+        localStorage.setItem('retired_currentAge', currentSystemYear - parseInt(birthInput.value));
+        localStorage.setItem('retired_dreamIncome', document.getElementById('dream-income').value);
         localStorage.setItem('retired_laborIncome', calculatedLabor);
-        localStorage.setItem('retired_retireAge', retireAge);
-
+        localStorage.setItem('retired_retireAge', slider.value);
         window.location.href = `step2.html`;
     }
 
-    window.onload = () => document.getElementById('birth-year').dispatchEvent(new Event('input'));
+    window.onload = updateSliderLogic;
 </script>
-
 </body>
 </html>
