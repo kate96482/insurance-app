@@ -57,46 +57,51 @@
 
         .save-hint { text-align: center; color: #888; font-size: 0.85rem; margin: 15px 0; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-    #capture-area {
-    /* 1. 鎖定寬度與置中 */
+  #capture-area {
+    /* 1. 設定畫布比例，寬度維持 100% 才能自適應，但內部會留白 */
     width: 100vw;
-    max-width: 450px;           /* 電腦看時維持精美比例 */
+    max-width: 450px;
     min-height: 100vh;
-    margin: 0 auto !important;  /* 關鍵：強制整體水平置中 */
+    margin: 0 auto !important;
     
-    /* 2. 背景與對齊 */
-    background: #fff;
-    padding: 30px 0;            /* 左右不留白，讓格子去撐開 */
+    /* 2. 背景色：建議設為淺灰色或與你的主題搭配，這樣上傳 LINE 才有邊框感 */
+    background: #f4f4f9; 
+    padding: 30px 0;    /* 上下留白 */
     box-sizing: border-box;
-    text-align: center;         /* 讓內部的 inline-block 元素居中 */
-    display: block;             /* 換回最穩定的 block 模式 */
+    display: block;
+    text-align: center;
 }
 
-/* 紫色標題區塊與下方解析格子共通設定 */
+/* 標題與格子的共通設定：縮窄寬度來產生留白 */
 .result-header, .analysis-section {
-    /* 3. 格子寬度：拉到 92%，不再感到窄小 */
-    width: 92% !important;      
+    /* 3. 寬度降到 88%，這樣左右各會有 6% 的空白空間 */
+    width: 88% !important; 
     
-    /* 4. 強制水平居中：平分左右剩餘空間 */
+    /* 4. 絕對置中 */
     margin-left: auto !important;
     margin-right: auto !important;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     
-    display: block;             /* 確保每個格子佔據獨立一行 */
+    display: block;
     box-sizing: border-box;
-    text-align: center;         /* 文字內容置中 */
+    /* 增加陰影讓格子更有立體感，上傳後不會死板 */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
 }
 
 .result-header {
     padding: 30px 20px;
-    border-radius: 25px;
+    border-radius: 20px;
+    /* 確保標題文字在紫格內也是置中的 */
+    text-align: center;
 }
 
 .analysis-section {
     padding: 25px 20px;
-    background: #fdfbf7;        /* 解析格子的底色 */
-    border-radius: 20px;
+    background: #ffffff;  /* 內容格子改為純白，與外層背景區隔 */
+    border-radius: 18px;
+    text-align: center;
 }
+
         /* 如果你想要圖片看起來更高級，可以加一點圓角 */
         #capture-area .result-header {
             border-radius: 20px 20px 0 0;
@@ -918,17 +923,18 @@ function showFinalResult(type) {
     setTimeout(() => {
     const target = document.getElementById('capture-area');
     
-    // ✨ 自動抓取 CSS 渲染後的真實尺寸，不再寫死 window 大小
+    // 取得包含 padding 的完整寬高
     const finalWidth = target.offsetWidth;
     const finalHeight = target.offsetHeight;
 
     html2canvas(target, { 
-        scale: 3,               // 提高解析度讓文字不模糊
+        scale: 3,               // 畫質設為 3 倍，在 LINE 裡縮圖才不會糊
         useCORS: true,
-        width: finalWidth,      // 鎖定截圖寬度
-        height: finalHeight,    // 鎖定截圖高度
+        width: finalWidth,
+        height: finalHeight,
         windowWidth: finalWidth,
         windowHeight: finalHeight,
+        backgroundColor: "#f4f4f9", // ✨ 確保背景色也被拍進去
         x: 0,
         y: 0,
         scrollX: 0,
@@ -940,29 +946,30 @@ function showFinalResult(type) {
         const img = new Image();
         img.src = canvas.toDataURL("image/png");
         
-        // 顯示圖片的寬度限制，與 CSS 保持一致
+        // 預覽圖寬度調整
         img.style.width = "100%";
         img.style.maxWidth = "450px"; 
         img.style.margin = "0 auto";
         img.style.display = "block";
-        img.style.borderRadius = "20px";
+        img.style.borderRadius = "12px";
         
         wrapper.appendChild(img);
 
         const hint = document.createElement('div');
         hint.className = 'save-hint';
-        hint.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> 💡 長按上方圖片即可儲存全螢幕報告';
+        hint.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> 💡 長按上方圖片即可儲存報告';
         wrapper.appendChild(hint);
 
-        // 拍照完畢後隱藏原始區域
         target.style.display = "none";
     });
 }, 800);
+
 
 }
 </script>
 </body>
 </html>
+
 
 
 
