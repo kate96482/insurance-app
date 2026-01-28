@@ -76,8 +76,17 @@
 }
 
 #analysis-body {
-    flex-grow: 1;
+    width: 100%;            /* 確保寬度撐滿，text-align 才會生效 */
     margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* 讓內部的解析小節也置中 */
+}
+
+.analysis-section {
+    width: 100%;            /* 讓每一段解析佔滿寬度 */
+    text-align: center;     /* 內容文字置中 */
+    margin-bottom: 15px;
 }
         /* 如果你想要圖片看起來更高級，可以加一點圓角 */
         #capture-area .result-header {
@@ -942,6 +951,7 @@ function showFinalResult(type) {
 </script>
 </body>
 </html>
+
 
 
 
