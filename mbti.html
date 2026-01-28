@@ -58,12 +58,17 @@
         .save-hint { text-align: center; color: #888; font-size: 0.85rem; margin: 15px 0; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
         #capture-area {
-            width: 380px;      /* 強制設定輸出的寬度，這樣轉圖時比例才會一致 */
-            margin: 0 auto;    /* 畫面居中 */
-            padding: 30px;     /* 讓文字跟圖片邊緣有呼吸空間，成品會更有質感 */
-            background: #fff;  /* 務必設定底色，否則透明背景存圖後可能會變黑 */
-            box-sizing: border-box; /* 確保 padding 不會撐破寬度 */
-        }
+    width: 400px;         /* 你想加寬，這裡可以改 400px 或 450px */
+    height: 711px;        /* 這裡強制設定 9:16 的高度 (400 / 9 * 16) */
+    margin: 0 auto;
+    padding: 40px 30px;   /* 上下留白多一點，更有海報感 */
+    background: #fff;
+    display: flex;        /* 使用 flex 讓內容可以均勻分佈 */
+    flex-direction: column;
+    justify-content: space-between; /* 讓頭部跟底部撐開，中間內容居中 */
+    box-sizing: border-box;
+    position: relative;
+}
 
         /* 如果你想要圖片看起來更高級，可以加一點圓角 */
         #capture-area .result-header {
@@ -905,6 +910,7 @@ function showFinalResult(type) {
 </script>
 </body>
 </html>
+
 
 
 
