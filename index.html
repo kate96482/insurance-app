@@ -88,14 +88,20 @@
         .info-box p { margin: 5px 0 0 0; font-size: 0.85rem; color: #888; }
         
         /* 顏色主題 */
-        .bg-cancer { background: linear-gradient(135deg, #FF6B6B, #EE5253); }
-        .bg-retire { background: linear-gradient(135deg, #DE6262, #FFB88C); }
-        .bg-numerology { background: linear-gradient(135deg, #4CC9F0, #4895EF); }
-        .bg-money { background: linear-gradient(135deg, #B5EAD7, #88D8B0); } 
-        .bg-mbti { background: linear-gradient(135deg, #A29BFE, #6C5CE7); }
-        .bg-disc { background: linear-gradient(135deg, #FF9F43, #FF6B6B); }
-        .bg-energy { background: linear-gradient(135deg, #A68A64, #5C4B3C); }
-
+        /* 1. 癌症：改用更有質感的胭脂紅，保留警示但降低刺眼度 */
+.bg-cancer { background: linear-gradient(135deg, #e63946, #b1a7a6); }
+/* 2. 退休：改用夕陽溫潤色調，象徵晚年的安穩與優雅 */
+.bg-retire { background: linear-gradient(135deg, #f4a261, #e76f51); }
+/* 3. 生命靈數：改用深邃的星空藍，增加神祕感與數字的智慧感 */
+.bg-numerology { background: linear-gradient(135deg, #457b9d, #1d3557); }
+/* 4. 貸款試算：改用較穩重的薄荷墨綠，象徵金錢的成長與流動 */
+.bg-money { background: linear-gradient(135deg, #80ed99, #57cc99); } 
+/* 5. MBTI：保留紫色調但增加層次，呈現人格的多元與深層 */
+.bg-mbti { background: linear-gradient(135deg, #a29bfe, #6c5ce7); }
+/* 6. DISC：改用活力的珊瑚橙，呼應行為特質的動態感 */
+.bg-disc { background: linear-gradient(135deg, #ffb347, #ffcc33); }
+/* 7. 能量圖：維持大地色系但改用「古銅金漸層」，提升能量的質感 */
+.bg-energy { background: linear-gradient(135deg, #c0c0aa, #1cece2); }
         .footer { margin-top: 50px; font-size: 0.75rem; color: #BBB; }
     </style>
 </head>
@@ -113,7 +119,7 @@
                         <ul>
                             <li><b>[新增]</b> 貸款試算新增利率參考側邊欄，點擊右方藍色按鈕即可查看。</li>
                             <li><b>[優化]</b> 調整整體介面配色，提供更舒適的瀏覽體驗。</li>
-                            <li><b>[預告]</b> 功能開發中，敬請期待！</li>
+                            <li><b>[新增]</b> MBTI新增64型人格分析</li>
                         </ul>
                     </div>
                 </div>
@@ -125,10 +131,7 @@
     <div class="grid-container">
         <div onclick="navTo('energy.html', event);" class="tool-card">
             <div class="icon-box bg-energy"><i class="fa-solid fa-mug-hot"></i></div>
-            <div class="info-box">
-                <h3>每日能量生活圖卡</h3>
-                <p>生成專屬質感能量飲品與暖心建議</p>
-            </div>
+            <div class="info-box"><h3>每日能量生活圖卡</h3><p>生成專屬質感能量飲品與暖心建議</p></div>
         </div>
 
         <div onclick="navTo('cancer_calc.html', event);" class="tool-card">
@@ -138,15 +141,12 @@
 
         <div onclick="navTo('labor_calc.html', event);" class="tool-card">
             <div class="icon-box bg-retire"><i class="fa-solid fa-hourglass-half"></i></div>
-            <div class="info-box">
-                <h3>退休金缺口解析</h3>
-                <p>勞保預估與退休金缺口目標達成</p>
-            </div>
+            <div class="info-box"><h3>勞保與退休財務解析</h3><p>勞保現況/缺口診斷/退休佈局</p></div>
         </div>
 
         <div onclick="navTo('numerology.html', event);" class="tool-card">
             <div class="icon-box bg-numerology"><i class="fa-solid fa-star"></i></div>
-            <div class="info-box"><h3>生命靈數全解析</h3><p>九宮格連線與流年週期運勢</p></div>
+            <div class="info-box"><h3>生命靈數全解析</h3><p>九宮連線/流年運勢/合盤分析</p></div>
         </div>
         
         <div onclick="navTo('money.html', event);" class="tool-card">
@@ -156,15 +156,12 @@
 
         <div onclick="navTo('mbti.html', event);" class="tool-card">
             <div class="icon-box bg-mbti"><i class="fa-solid fa-puzzle-piece"></i></div>
-            <div class="info-box"><h3>16型人格測驗</h3><p>探索內在核心與社交特質解析</p></div>
+            <div class="info-box"><h3>MBTI人格測驗</h3><p>內在核心/社交特質/深度解析</p></div>
         </div>
 
         <div onclick="navTo('disc.html', event);" class="tool-card">
             <div class="icon-box bg-disc"><i class="fa-solid fa-bullseye"></i></div>
-            <div class="info-box">
-                <h3>DISC 人格診斷</h3>
-                <p>掌握行為風格，分析人格行為特質</p>
-            </div>
+            <div class="info-box"><h3>DISC 人格診斷</h3><p>行為風格/特質分析/精準診斷</p></div>
         </div>
     </div>
 
@@ -212,3 +209,4 @@
     </script>
 </body>
 </html>
+
