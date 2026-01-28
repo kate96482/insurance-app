@@ -86,10 +86,9 @@
 
         <div id="result">
             <div class="canvas-container">
-                <canvas id="resultCanvas" width="800" height="1750" style="display:none;"></canvas>
+                <canvas id="resultCanvas" width="800" height="1850" style="display:none;"></canvas>
                 <img id="output-image" alt="退休缺口 analysis圖">
                 <div class="save-tip" id="save-tip"><i class="fa-regular fa-image"></i> 長按上方圖片可儲存結果</div>
-                <div id="debug-info"></div>
             </div>
             <a href="javascript:void(0)" id="advanced-btn" class="btn-advanced" onclick="goToStep2()">
                 進入進階方案對照 <i class="fa-solid fa-chevron-right"></i>
@@ -100,7 +99,6 @@
 
 <script>
     let calculatedLabor = 0;
-    // 自動抓取目前民國年份
     const currentSystemYear = new Date().getFullYear() - 1911; 
 
     function getLegalRetireAge(birthYear) {
@@ -193,6 +191,9 @@
 
         let baseDetail = "";
         let onceAmount = 0;
+        let finalBase = 0;
+        let limit = 45;
+
         if (hasOld === 'yes') {
             let decimalPart = yearsRaw % 1;
             let calcYears = Math.floor(yearsRaw);
@@ -202,8 +203,13 @@
             let base15 = Math.min(calcYears, 15);
             let baseAbove = Math.max(0, calcYears - 15) * 2;
             let totalBase = base15 + baseAbove;
-            let limit = retireAge >= 60 ? 50 : 45;
-            let finalBase = Math.min(limit, totalBase);
+            
+            if (retireAge > 60) {
+                let extraYears = retireAge - 60;
+                limit = Math.min(50, 45 + Math.floor(extraYears * 2));
+            }
+            
+            finalBase = Math.min(limit, totalBase);
             onceAmount = finalBase * avgSalary;
             baseDetail = `${base15}×1 + ${(baseAbove/2)}×2 = ${totalBase}基數 (限${limit})`;
         }
@@ -222,7 +228,7 @@
             finalLabor: calculatedLabor, monthlyAmountWhenStart, vacuumYears, vacuumCost,
             onceAmount, baseDetail, total: totalGap, 
             prepare: prepareYears, yearly: Math.round(totalGap / prepareYears), hasOld,
-            dreamIncome
+            dreamIncome, finalA, finalB, laborA_Base, laborB_Base
         });
     }
 
@@ -241,21 +247,25 @@
         
         ctx.fillStyle = d.canMonthly ? '#DE6262' : '#AAAAAA'; 
         ctx.font = 'bold 30px "PingFang TC"';
-        ctx.fillText('一、勞保月領年金', 60, y);
+        ctx.fillText('一、勞保月領年金 (擇優選取)', 60, y);
         y += 50;
 
         if (!d.canMonthly) {
             ctx.fillStyle = '#AAAAAA'; ctx.font = '22px "PingFang TC"';
             ctx.fillText('⚠️ 年資未滿 15 年，不具備月領資格。', 80, y);
-        } else if (d.retireAge < d.earliestAge) {
-            ctx.fillStyle = '#E53E3E'; ctx.font = 'bold 24px "PingFang TC"';
-            ctx.fillText(`⚠️ 尚未達請領年齡 (需待 ${d.earliestAge} 歲)`, 80, y);
-            y += 40;
-            ctx.fillStyle = '#4A3728'; ctx.font = '20px "PingFang TC"';
-            ctx.fillText(`屆時預估領取：$ ${d.monthlyAmountWhenStart.toLocaleString()} /月`, 80, y);
         } else {
+            ctx.fillStyle = '#4A3728'; ctx.font = '20px "PingFang TC"';
+            ctx.fillText(`A式：(${d.avgSalary.toLocaleString()} × ${d.years} × 0.775% + 3000) × ${d.ratio.toFixed(2)} = $ ${d.finalA.toLocaleString()}`, 80, y);
+            y += 35;
+            ctx.fillText(`B式：(${d.avgSalary.toLocaleString()} × ${d.years} × 1.55%) × ${d.ratio.toFixed(2)} = $ ${d.finalB.toLocaleString()}`, 80, y);
+            y += 50;
+            
             ctx.fillStyle = '#4A3728'; ctx.font = 'bold 32px "PingFang TC"';
-            ctx.fillText(`預估每月領取：$ ${d.finalLabor.toLocaleString()}`, 80, y);
+            if (d.retireAge < d.earliestAge) {
+                ctx.fillStyle = '#E53E3E'; ctx.fillText(`⚠️ 需待 ${d.earliestAge} 歲開領 (預估 $ ${d.monthlyAmountWhenStart.toLocaleString()}/月)`, 80, y);
+            } else {
+                ctx.fillText(`預估每月領取：$ ${d.finalLabor.toLocaleString()}`, 80, y);
+            }
         }
         
         y += 120;
@@ -263,24 +273,21 @@
         ctx.font = 'bold 30px "PingFang TC"';
         ctx.fillText('二、一次請領與回本分析', 60, y);
         y += 50;
+
         if (d.hasOld === 'yes') {
-            ctx.fillStyle = '#4A3728'; ctx.font = '22px "PingFang TC"';
-            ctx.fillText(`一次領總額：$${d.onceAmount.toLocaleString()} (${d.baseDetail})`, 80, y);
-            y += 55;
+            ctx.fillStyle = '#4A3728'; ctx.font = 'bold 32px "PingFang TC"';
+            ctx.fillText(`一次領總額：$ ${d.onceAmount.toLocaleString()}`, 80, y);
+            y += 45;
+            ctx.font = '22px "PingFang TC"';
+            ctx.fillText(`(${d.baseDetail})`, 80, y);
             
-            let onceBreakEven = (d.onceAmount / (d.monthlyAmountWhenStart * 12));
-            let totalWaitAndRun = (onceBreakEven + d.vacuumYears).toFixed(1);
-            
+            y += 70;
+            let totalWaitAndRun = ( (d.onceAmount / (d.monthlyAmountWhenStart * 12)) + d.vacuumYears ).toFixed(1);
             ctx.fillStyle = '#2F855A'; ctx.font = 'bold 24px "PingFang TC"';
             ctx.fillText(`💡 決策：自退休起算需 ${totalWaitAndRun} 年回本`, 80, y);
             y += 35;
             ctx.fillStyle = '#718096'; ctx.font = '16px "PingFang TC"';
-            let formulaStr = `計算式：${d.vacuumYears}(空窗期) + (${d.onceAmount.toLocaleString()} ÷ (${d.monthlyAmountWhenStart.toLocaleString()}×12))`;
-            ctx.fillText(formulaStr, 80, y);
-            
-            y += 30;
-            ctx.fillStyle = '#4A3728'; ctx.font = '18px "PingFang TC"';
-            ctx.fillText(`(即領超過 ${ (parseFloat(d.retireAge) + parseFloat(totalWaitAndRun)).toFixed(1) } 歲，月領總額才超越一次領)`, 80, y);
+            ctx.fillText(`計算式：${d.vacuumYears}(空窗期) + (${d.onceAmount.toLocaleString()} ÷ (${d.monthlyAmountWhenStart.toLocaleString()}×12))`, 80, y);
         } else {
             ctx.fillStyle = '#AAAAAA'; ctx.font = '22px "PingFang TC"';
             ctx.fillText('⚠️ 您不具備一次領資格 (民國97年前無年資)。', 80, y);
@@ -294,8 +301,7 @@
         if (d.vacuumYears > 0) {
             ctx.fillStyle = '#FFF5F5'; ctx.fillRect(60, y, 680, 100);
             ctx.fillStyle = '#E53E3E'; ctx.font = 'bold 22px "PingFang TC"';
-            ctx.fillText(`● 空窗期 (${d.retireAge}~${d.earliestAge}歲)：`, 80, y + 40);
-            ctx.fillText(`  需自備生活費共 $ ${d.vacuumCost.toLocaleString()}`, 80, y + 75);
+            ctx.fillText(`● 空窗期 (${d.retireAge}~${d.earliestAge}歲)：需自備 $ ${d.vacuumCost.toLocaleString()}`, 80, y + 55);
             y += 130;
         }
 
@@ -310,26 +316,21 @@
         ctx.fillText(`距離退休剩 ${d.prepare} 年，每年需存：`, canvas.width / 2, y + 60);
         ctx.font = 'bold 55px "PingFang TC"'; ctx.fillText(`$ ${d.yearly.toLocaleString()}`, canvas.width / 2, y + 135);
 
-        // --- 底部品牌與資訊區域 ---
         y += 240; 
-        ctx.fillStyle = '#888'; 
-        ctx.font = 'bold 22px "PingFang TC"'; 
-        ctx.textAlign = 'center';
+        ctx.fillStyle = '#888'; ctx.font = 'bold 22px "PingFang TC"'; ctx.textAlign = 'center';
         ctx.fillText('由「小邦手」財務分析工具產出', canvas.width / 2, y);
-        
-        y += 35; 
-        ctx.font = '18px "PingFang TC"';
-        ctx.fillText(`本報告係以民國 ${currentSystemYear} 年之法律與年齡為基準進行試算`, canvas.width / 2, y);
-        // -------------------------
 
+        // --- 下面這段是關鍵：根據 y (最後一行字的位置) 重新裁切高度 ---
         const finalCanvas = document.createElement('canvas');
         finalCanvas.width = canvas.width;
-        finalCanvas.height = y + 80; // 稍微增加底部留白
+        finalCanvas.height = y + 80; // y 是最後一行字的高度，+80 是留一點點底邊比較好看
         const fctx = finalCanvas.getContext('2d');
-        fctx.drawImage(canvas, 0, 0);
+        fctx.drawImage(canvas, 0, 0); // 把長畫布的內容「貼」到這個剛好高度的新畫布上
 
         const img = document.getElementById('output-image');
-        img.src = finalCanvas.toDataURL('image/png');
+        img.src = finalCanvas.toDataURL('image/png'); // 改用新畫布產出圖片
+        // -------------------------------------------------------
+
         img.style.display = 'block';
         img.scrollIntoView({ behavior: 'smooth' });
     }
@@ -341,7 +342,6 @@
         localStorage.setItem('retired_retireAge', slider.value);
         window.location.href = `step2.html`;
     }
-
     window.onload = updateSliderLogic;
 </script>
 </body>
