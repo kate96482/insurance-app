@@ -58,51 +58,45 @@
         .save-hint { text-align: center; color: #888; font-size: 0.85rem; margin: 15px 0; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     #capture-area {
-    /* 1. 確保外殼是滿寬且置中的 */
-    width: 100%;
-    max-width: 450px;
-    margin: 0 auto;
+    /* 1. 鎖定寬度與置中 */
+    width: 100vw;
+    max-width: 450px;           /* 電腦看時維持精美比例 */
+    min-height: 100vh;
+    margin: 0 auto !important;  /* 關鍵：強制整體水平置中 */
     
-    /* 2. 強制裡面的東西「水平置中」 */
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    
+    /* 2. 背景與對齊 */
     background: #fff;
-    padding: 30px 15px; /* 縮小左右內距，給格子更多空間 */
+    padding: 30px 0;            /* 左右不留白，讓格子去撐開 */
     box-sizing: border-box;
+    text-align: center;         /* 讓內部的 inline-block 元素居中 */
+    display: block;             /* 換回最穩定的 block 模式 */
 }
 
-/* 標題塊 (紫色那一區) */
-.result-header {
-    /* 3. 強制撐開寬度，不要讓它縮在一起 */
-    width: 90% !important; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+/* 紫色標題區塊與下方解析格子共通設定 */
+.result-header, .analysis-section {
+    /* 3. 格子寬度：拉到 92%，不再感到窄小 */
+    width: 92% !important;      
     
-    padding: 30px 20px;
+    /* 4. 強制水平居中：平分左右剩餘空間 */
+    margin-left: auto !important;
+    margin-right: auto !important;
     margin-bottom: 25px;
-    border-radius: 25px;
-    text-align: center;
-}
-
-/* 下方文字解析格子 */
-.analysis-section {
-    /* 4. 強制格子撐開到 90% 寬度 */
-    width: 90% !important; 
-    margin-bottom: 20px;
-    text-align: center;
-    box-sizing: border-box;
     
-    /* 如果你有加白色底色或邊框，在這裡統一設定 */
-    background: #fdfbf7; 
-    padding: 20px;
-    border-radius: 15px;
+    display: block;             /* 確保每個格子佔據獨立一行 */
+    box-sizing: border-box;
+    text-align: center;         /* 文字內容置中 */
 }
 
+.result-header {
+    padding: 30px 20px;
+    border-radius: 25px;
+}
 
+.analysis-section {
+    padding: 25px 20px;
+    background: #fdfbf7;        /* 解析格子的底色 */
+    border-radius: 20px;
+}
         /* 如果你想要圖片看起來更高級，可以加一點圓角 */
         #capture-area .result-header {
             border-radius: 20px 20px 0 0;
@@ -924,30 +918,31 @@ function showFinalResult(type) {
     setTimeout(() => {
     const target = document.getElementById('capture-area');
     
-    // 改用 offsetWidth 和 offsetHeight，這會抓取元素「當前被擠壓/撐開後」的實際尺寸
-    const actualWidth = target.offsetWidth;
-    const actualHeight = target.offsetHeight;
+    // ✨ 自動抓取 CSS 渲染後的真實尺寸，不再寫死 window 大小
+    const finalWidth = target.offsetWidth;
+    const finalHeight = target.offsetHeight;
 
     html2canvas(target, { 
-        scale: 3,           
+        scale: 3,               // 提高解析度讓文字不模糊
         useCORS: true,
-        width: actualWidth,
-        height: actualHeight,
-        windowWidth: actualWidth,  // 鎖定寬度防止 RWD 在截圖時跑掉
-        windowHeight: actualHeight,
-        scrollX: 0,
-        scrollY: 0,
+        width: finalWidth,      // 鎖定截圖寬度
+        height: finalHeight,    // 鎖定截圖高度
+        windowWidth: finalWidth,
+        windowHeight: finalHeight,
         x: 0,
-        y: 0
+        y: 0,
+        scrollX: 0,
+        scrollY: 0
     }).then(canvas => {
         const wrapper = document.getElementById('final-image-wrapper');
         wrapper.innerHTML = "";
+        
         const img = new Image();
         img.src = canvas.toDataURL("image/png");
         
-        // 顯示在網頁上的圖也跟著自適應
+        // 顯示圖片的寬度限制，與 CSS 保持一致
         img.style.width = "100%";
-        img.style.maxWidth = "450px"; // 這裡要跟 CSS 的 max-width 一致
+        img.style.maxWidth = "450px"; 
         img.style.margin = "0 auto";
         img.style.display = "block";
         img.style.borderRadius = "20px";
@@ -956,16 +951,19 @@ function showFinalResult(type) {
 
         const hint = document.createElement('div');
         hint.className = 'save-hint';
-        hint.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> 💡 長按上方圖片即可儲存報告';
+        hint.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> 💡 長按上方圖片即可儲存全螢幕報告';
         wrapper.appendChild(hint);
 
+        // 拍照完畢後隱藏原始區域
         target.style.display = "none";
     });
 }, 800);
+
 }
 </script>
 </body>
 </html>
+
 
 
 
