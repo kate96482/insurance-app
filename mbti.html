@@ -58,36 +58,43 @@
         .save-hint { text-align: center; color: #888; font-size: 0.85rem; margin: 15px 0; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
        #capture-area {
-    /* 自適應核心：電腦寬度固定，手機寬度撐滿 */
-    width: 100%;           /* 預設寬度 100% */
-    max-width: 450px;      /* 在電腦上看，最大就這麼寬，才像手機截圖 */
-    
-    /* 比例控制：設定最少要跟手機螢幕一樣高 */
-    min-height: 100vh;     
-    
-    margin: 0 auto;        /* 電腦上看會置中 */
-    padding: 40px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* ✨ 讓所有內容水平置中 */
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 450px;       /* 保持你想要的完美自適應寬度 */
+    margin: 0 auto;         /* 確保在電腦上也是置中的 */
     background: #fff;
-    display: flex;
-    flex-direction: column;
     box-sizing: border-box;
-    position: relative;
-    overflow: hidden;      /* 防止內容溢出 */
+    padding: 30px 20px;
 }
 
+/* 標題區域 (紫色的那一塊) */
+.result-header {
+    width: 90%;             /* ✨ 不要 100% 比較美，左右留一點呼吸空間 */
+    max-width: 350px;       /* 設定最大寬度防止太胖 */
+    text-align: center;
+    border-radius: 20px;    /* 圓角維持 */
+    padding: 30px 20px;
+    margin-bottom: 30px;    /* 跟下方解析保持距離 */
+}
+
+/* 下方解析內容區域 */
 #analysis-body {
-    width: 100%;            /* 確保寬度撐滿，text-align 才會生效 */
-    margin-top: 20px;
+    width: 100%;            /* ✨ 確保這個容器撐滿 */
     display: flex;
     flex-direction: column;
-    align-items: center;    /* 讓內部的解析小節也置中 */
+    align-items: center;    /* ✨ 讓內部的 section 也能置中 */
 }
 
+/* 每一格解析 (核心性格、決策風格等) */
 .analysis-section {
-    width: 100%;            /* 讓每一段解析佔滿寬度 */
-    text-align: center;     /* 內容文字置中 */
-    margin-bottom: 15px;
+    width: 85%;             /* ✨ 讓格子寬度固定在 85%-90%，看起來才像卡片 */
+    margin-bottom: 20px;
+    text-align: center;     /* 文字置中 */
 }
+
         /* 如果你想要圖片看起來更高級，可以加一點圓角 */
         #capture-area .result-header {
             border-radius: 20px 20px 0 0;
@@ -951,6 +958,7 @@ function showFinalResult(type) {
 </script>
 </body>
 </html>
+
 
 
 
