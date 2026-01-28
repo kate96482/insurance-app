@@ -40,6 +40,22 @@
             border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
 
+        /* 載入動畫樣式 */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(240, 237, 233, 0.9);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999;
+        }
+        .loader {
+            width: 48px; height: 48px;
+            border: 5px solid var(--oat); border-bottom-color: var(--coffee);
+            border-radius: 50%; display: inline-block; box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { margin-top: 15px; font-weight: bold; color: var(--coffee); letter-spacing: 1px; }
+
         #energyCard {
             background: var(--cream); border-radius: 25px; overflow: hidden;
             display: none; position: relative; border: none; width: 400px; 
@@ -73,6 +89,11 @@
     </style>
 </head>
 <body>
+
+<div id="loading-overlay">
+    <span class="loader"></span>
+    <div class="loading-text">正在調製您的能量圖卡...</div>
+</div>
 
 <div class="container">
     <div class="nav-top">
@@ -139,16 +160,15 @@
     for(let i=1; i<=12; i++) sm.options.add(new Option(i+'月', i));
     for(let i=1; i<=31; i++) sd.options.add(new Option(i+'日', i));
 
-    // 文字資料庫
     const coffeeLibrary = {
         1: { name: "濃縮咖啡 Espresso", energy: "92% Drive", advice: "能量極強的一天，適合迅速做出重要決定。第一直覺通常是最正確的。" },
-        2: { name: "燕麥拿鐵 Oat Latte", energy: "75% Harmony", advice: "情緒細膩的一天，適合與人交流。聽聽周遭聲音，會發現溫暖的細節。" },
+        2: { name: "燕麥拿鐵 Oat Latte", energy: "75% Harmony", advice: "情緒細膩的一天，適合與人交流。聽聽周遭聲音，會發現溫塊的細節。" },
         3: { name: "氣泡美式 Sparkling", energy: "88% Creative", advice: "靈感隨時會像氣泡湧現。記下奇思妙想，今天適合處理創意任務。" },
         4: { name: "經典熱拿鐵 Latte", energy: "65% Stable", advice: "步調穩定就是最好的節奏。按部就班處理事務，踏實感會帶給你平靜。" },
         5: { name: "維也納咖啡 Vienna", energy: "82% Freedom", advice: "嘗試一條沒走過的小徑吧！驚喜往往隱藏在未知的轉角。" },
         6: { name: "卡布奇諾 Cappuccino", energy: "70% Warmth", advice: "主動問候一位好久不見的朋友。你的小小溫暖，是他人最大的動力。" },
         7: { name: "手沖單品豆 Pour-over", energy: "55% Insight", advice: "給自己十分鐘的靜謐。在繁瑣中抽離，深呼吸，找回內心的秩序感。" },
-        8: { name: "焦 caramel 瑪奇朵 Macchiato", energy: "95% Power", advice: "今天的你很有影響力。勇敢表達想法，大家會不自覺地跟隨你的腳步。" },
+        8: { name: "焦糖瑪奇朵 Macchiato", energy: "95% Power", advice: "今天的你很有影響力。勇敢表達想法，大家會不自覺地跟隨你的腳步。" },
         9: { name: "抹茶拿鐵 Matcha", energy: "60% Mindful", advice: "分享與付出的日子。幫助身邊的人，善意最終會回到你身邊。" }
     };
 
@@ -165,6 +185,9 @@
     };
 
     async function generateCard() {
+        const loading = document.getElementById('loading-overlay');
+        loading.style.display = 'flex'; // 顯示載入動畫
+
         const modeSelect = document.getElementById('mode-select').value;
         const m = parseInt(sm.value), d = parseInt(sd.value);
         const agentName = document.getElementById('agent-name').value;
@@ -179,7 +202,6 @@
         const data = db[num];
         const prefix = (modeSelect === 'coffee') ? 'c' : 'b';
 
-        // 填充 HTML 內容
         document.getElementById('card-date').innerText = `${today.getFullYear()} / ${(today.getMonth()+1).toString().padStart(2,'0')} / ${today.getDate().toString().padStart(2,'0')}`;
         document.getElementById('card-energy').innerHTML = `${data.energy.split(' ')[0]}<span>% ${data.energy.split(' ')[1]}</span>`;
         document.getElementById('card-item-name').innerText = `[ ${data.name} ]`;
@@ -187,14 +209,13 @@
         document.getElementById('card-agent').innerText = agentName;
 
         const imgElement = document.getElementById('card-img');
-        
-        // --- 核心修正：加入跨域允許，支持外部網址圖床 ---
         imgElement.crossOrigin = "anonymous"; 
 
         if (typeof imgAssets !== 'undefined' && imgAssets[prefix + num]) {
             imgElement.src = imgAssets[prefix + num];
         } else {
-            alert(`載入錯誤：找不到 ${prefix}${num} 的圖片網址，請檢查 images.js 是否正確設定。`);
+            loading.style.display = 'none';
+            alert(`載入錯誤：找不到 ${prefix}${num} 的圖片數據`);
             return;
         }
 
@@ -206,7 +227,7 @@
                 const canvas = await html2canvas(cardUI, {
                     scale: 2,
                     backgroundColor: null,
-                    useCORS: true, // 這裡配合 img.crossOrigin 達成跨域拍照
+                    useCORS: true,
                     logging: false
                 });
 
@@ -216,14 +237,17 @@
                 document.getElementById('input-ui').style.display = 'none';
                 document.getElementById('final-wrap').style.display = 'block';
                 cardUI.style.display = 'none';
+                loading.style.display = 'none'; // 隱藏載入動畫
             } catch (error) {
                 console.error("渲染失敗:", error);
+                loading.style.display = 'none';
                 alert("圖卡製作失敗，請重試。");
             }
         };
 
         imgElement.onerror = function() {
-            alert("圖片網址載入失敗，請確認 Postimages 的連結是否為「直接連結 (Direct Link)」。");
+            loading.style.display = 'none';
+            alert("圖片載入失敗，請確認圖床連結是否正確。");
         };
     }
 </script>
