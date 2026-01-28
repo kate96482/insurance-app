@@ -889,7 +889,14 @@ function showFinalResult(type) {
     document.getElementById('analysis-body').innerHTML = html;
 
     setTimeout(() => {
-        html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true }).then(canvas => {
+        html2canvas(document.getElementById('capture-area'), { 
+    scale: 2, 
+    useCORS: true,
+    width: 400,        // 跟 CSS 的寬度一致
+    height: 711,       // 跟 CSS 的高度一致
+    windowWidth: 400,
+    windowHeight: 711
+}).then(canvas => {
             const wrapper = document.getElementById('final-image-wrapper');
             wrapper.innerHTML = "";
             const img = new Image();
@@ -910,6 +917,7 @@ function showFinalResult(type) {
 </script>
 </body>
 </html>
+
 
 
 
