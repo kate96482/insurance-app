@@ -57,6 +57,17 @@
 
         .save-hint { text-align: center; color: #888; font-size: 0.85rem; margin: 15px 0; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        #capture-area {
+            width: 380px;      /* 強制設定輸出的寬度，這樣轉圖時比例才會一致 */
+            margin: 0 auto;    /* 畫面居中 */
+            padding: 30px;     /* 讓文字跟圖片邊緣有呼吸空間，成品會更有質感 */
+            background: #fff;  /* 務必設定底色，否則透明背景存圖後可能會變黑 */
+            box-sizing: border-box; /* 確保 padding 不會撐破寬度 */
+        }
+
+        /* 如果你想要圖片看起來更高級，可以加一點圓角 */
+        #capture-area .result-header {
+            border-radius: 20px 20px 0 0;
     </style>
 </head>
 <body>
@@ -878,7 +889,7 @@ function showFinalResult(type) {
             wrapper.innerHTML = "";
             const img = new Image();
             img.src = canvas.toDataURL("image/png");
-            img.style.width = "350px";
+            img.style.width = "90%";
             img.style.borderRadius = "20px";
             wrapper.appendChild(img);
 
@@ -894,6 +905,7 @@ function showFinalResult(type) {
 </script>
 </body>
 </html>
+
 
 
 
