@@ -148,7 +148,7 @@
         5: { name: "維也納咖啡 Vienna", energy: "82% Freedom", advice: "嘗試一條沒走過的小徑吧！驚喜往往隱藏在未知的轉角。" },
         6: { name: "卡布奇諾 Cappuccino", energy: "70% Warmth", advice: "主動問候一位好久不見的朋友。你的小小溫暖，是他人最大的動力。" },
         7: { name: "手沖單品豆 Pour-over", energy: "55% Insight", advice: "給自己十分鐘的靜謐。在繁瑣中抽離，深呼吸，找回內心的秩序感。" },
-        8: { name: "焦糖瑪奇朵 Macchiato", energy: "95% Power", advice: "今天的你很有影響力。勇敢表達想法，大家會不自覺地跟隨你的腳步。" },
+        8: { name: "焦 caramel 瑪奇朵 Macchiato", energy: "95% Power", advice: "今天的你很有影響力。勇敢表達想法，大家會不自覺地跟隨你的腳步。" },
         9: { name: "抹茶拿鐵 Matcha", energy: "60% Mindful", advice: "分享與付出的日子。幫助身邊的人，善意最終會回到你身邊。" }
     };
 
@@ -188,12 +188,13 @@
 
         const imgElement = document.getElementById('card-img');
         
-        // --- 核心改動：直接對接 images.js 中的數據 ---
-        // 確保 imgAssets 是在 images.js 裡定義的
+        // --- 核心修正：加入跨域允許，支持外部網址圖床 ---
+        imgElement.crossOrigin = "anonymous"; 
+
         if (typeof imgAssets !== 'undefined' && imgAssets[prefix + num]) {
             imgElement.src = imgAssets[prefix + num];
         } else {
-            alert(`載入錯誤：找不到 ${prefix}${num} 的圖片數據，請檢查 images.js 是否正確載入。`);
+            alert(`載入錯誤：找不到 ${prefix}${num} 的圖片網址，請檢查 images.js 是否正確設定。`);
             return;
         }
 
@@ -205,7 +206,7 @@
                 const canvas = await html2canvas(cardUI, {
                     scale: 2,
                     backgroundColor: null,
-                    useCORS: true,
+                    useCORS: true, // 這裡配合 img.crossOrigin 達成跨域拍照
                     logging: false
                 });
 
@@ -222,7 +223,7 @@
         };
 
         imgElement.onerror = function() {
-            alert("圖片數據解析失敗，請確認 Base64 字串是否完整。");
+            alert("圖片網址載入失敗，請確認 Postimages 的連結是否為「直接連結 (Direct Link)」。");
         };
     }
 </script>
