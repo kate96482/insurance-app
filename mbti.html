@@ -11,33 +11,19 @@
         :root { --primary: #A29BFE; --secondary: #6C5CE7; --bg: #F8F9FA; --accent: #FF9F43; }
         body { font-family: "Microsoft JhengHei", sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; -webkit-tap-highlight-color: transparent; }
         .mbti-container { width: 100%; max-width: 500px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); box-sizing: border-box; position: relative; }
-/* 返回首頁按鈕 */
-        .top-nav {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-        }
-        .back-home-link {
-            text-decoration: none;
-            color: #888;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.3s;
-            font-weight: bold;
-        }
-        .back-home-link:hover {
-            color: var(--secondary);
-        }
+        
+        /* 返回首頁按鈕 */
+        .top-nav { position: absolute; top: 20px; left: 20px; z-index: 100; }
+        .back-home-link { text-decoration: none; color: #888; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; transition: 0.3s; font-weight: bold; }
+        .back-home-link:hover { color: var(--secondary); }
         
         /* 導航與進度 */
         .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; height: 30px; }
         .nav-btn { background: none; border: none; color: #aaa; cursor: pointer; font-size: 0.9rem; padding: 5px; transition: 0.2s; }
-        .progress-box { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        .progress-box { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: 0.4s; }
-        
+        #progress-text { font-size: 0.75rem; color: #bbb; text-align: right; margin-bottom: 15px; }
+
         /* 選項 */
         .options-container { display: flex; flex-direction: column; gap: 12px; margin-top: 25px; }
         .opt-btn { border: none; padding: 16px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; }
@@ -47,9 +33,11 @@
 
         /* 輸入框與按鈕 */
         .input-group { margin: 20px 0; text-align: left; }
-        .name-input { width: 100%; padding: 14px; border-radius: 15px; border: 2px solid #eee; box-sizing: border-box; font-size: 1rem; }
+        .name-input { width: 100%; padding: 14px; border-radius: 15px; border: 2px solid #eee; box-sizing: border-box; font-size: 1rem; transition: 0.3s; }
+        .name-input.error { border-color: #ff7675; background: #fff5f5; }
         .type-selector { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 20px; }
-        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
         .btn-primary { background: var(--secondary); color: white; }
         .btn-outline { background: white; color: var(--secondary); border: 2px solid var(--secondary); }
 
@@ -60,29 +48,19 @@
         /* 彈窗 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-content { background: white; padding: 25px; border-radius: 25px; width: 100%; max-width: 320px; text-align: center; }
-/* 人格大類配色 */
-.theme-nt { background: linear-gradient(135deg, #6c5ce7, #a29bfe) !important; } /* 分析師-紫 */
-.theme-nf { background: linear-gradient(135deg, #00b894, #55efc4) !important; } /* 外交官-綠 */
-.theme-sj { background: linear-gradient(135deg, #0984e3, #74b9ff) !important; } /* 守護者-藍 */
-.theme-sp { background: linear-gradient(135deg, #e17055, #fab1a0) !important; } /* 探險家-橘 */
 
-/* 提示文字樣式 */
-.save-hint { 
-    text-align: center; 
-    color: #888; 
-    font-size: 0.85rem; 
-    margin: 15px 0; 
-    animation: pulse 2s infinite; 
-}
+        /* 人格大類配色 */
+        .theme-nt { background: linear-gradient(135deg, #6c5ce7, #a29bfe) !important; }
+        .theme-nf { background: linear-gradient(135deg, #00b894, #55efc4) !important; }
+        .theme-sj { background: linear-gradient(135deg, #0984e3, #74b9ff) !important; }
+        .theme-sp { background: linear-gradient(135deg, #e17055, #fab1a0) !important; }
 
-@keyframes pulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
-}
+        .save-hint { text-align: center; color: #888; font-size: 0.85rem; margin: 15px 0; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
+
 <div class="top-nav" id="top-nav">
     <a href="index.html" class="back-home-link">
         <i class="fa-solid fa-house"></i> 返回首頁
@@ -90,23 +68,21 @@
 </div>
 
 <div id="mbti-app" class="mbti-container">
-   <div id="quiz-intro" class="quiz-step">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <i class="fa-solid fa-dna" style="font-size: 3.5rem; color: var(--primary); margin-bottom: 10px;"></i>
-        <h2 style="color:var(--secondary); margin-bottom: 5px;">MBTI 性格傾向測驗</h2>
-        
-        <p style="color: #666; font-size: 0.95rem; margin: 10px 0 5px 0;">探索你的內在核心，發現你的靈魂色彩。</p>
-        <p style="color: #999; font-size: 0.85rem; margin-bottom: 15px;">請根據第一直覺作答。</p>
-        
-        <div style="display: inline-block; background: #f0f0ff; padding: 5px 15px; border-radius: 10px; color: var(--secondary); font-size: 0.85rem; font-weight: bold;">
-            基本分析 📝 60 題 | ⏱ 預計 5-8 分鐘
-        </div>
+    <div id="quiz-intro" class="quiz-step">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fa-solid fa-dna" style="font-size: 3.5rem; color: var(--primary); margin-bottom: 10px;"></i>
+            <h2 style="color:var(--secondary); margin-bottom: 5px;">MBTI 性格傾向測驗</h2>
+            <p style="color: #666; font-size: 0.95rem; margin: 10px 0 5px 0;">探索你的內在核心，發現你的靈魂色彩。</p>
+            <p style="color: #999; font-size: 0.85rem; margin-bottom: 15px;">請根據第一直覺作答。</p>
+            <div style="display: inline-block; background: #f0f0ff; padding: 5px 15px; border-radius: 10px; color: var(--secondary); font-size: 0.85rem; font-weight: bold;">
+                基本分析 📝 60 題 | ⏱ 預計 5-8 分鐘
+            </div>
         </div>
     
-    <div class="input-group">
-        <label style="font-size: 0.8rem; color: #888;">請輸入測驗者姓名：</label>
-        <input type="text" id="user-name-input" class="name-input" placeholder="您的暱稱">
-    </div>
+        <div class="input-group">
+            <label style="font-size: 0.8rem; color: #888;">請輸入測驗者姓名：</label>
+            <input type="text" id="user-name-input" class="name-input" placeholder="您的暱稱 (必填)">
+        </div>
         <button class="btn btn-primary" onclick="startFlow('new')">尚未測驗，開始 60 題</button>
         <div style="margin: 20px 0; text-align: center; color: #bbb; font-size: 0.8rem;">—— 或者 ——</div>
         <select id="known-type" class="type-selector">
@@ -124,15 +100,15 @@
 
     <div id="quiz-content" class="quiz-step" style="display:none;">
         <div class="quiz-nav">
-    <button class="nav-btn" id="prev-btn" onclick="goBack()">
-        <i class="fa-solid fa-chevron-left"></i> 上一題
-    </button>
-    <button class="nav-btn" onclick="toggleReturnModal(true)">
-        返回 <i class="fa-solid fa-arrow-rotate-left"></i>
-    </button>
-</div>
+            <button class="nav-btn" id="prev-btn" onclick="goBack()">
+                <i class="fa-solid fa-chevron-left"></i> 上一題
+            </button>
+            <button class="nav-btn" onclick="toggleReturnModal(true)">
+                返回 <i class="fa-solid fa-arrow-rotate-left"></i>
+            </button>
+        </div>
         <div class="progress-box"><div id="progress-bar"></div></div>
-        <div style="text-align: center; min-height: 80px; display: flex; align-items: center; justify-content: center;">
+        <div id="progress-text"></div> <div style="text-align: center; min-height: 80px; display: flex; align-items: center; justify-content: center;">
             <h3 id="q-text" style="margin: 0; color: #333;"></h3>
         </div>
         <div class="options-container">
@@ -149,8 +125,7 @@
                 <h1 id="res-full-code" style="margin:10px 0 0 0;"></h1>
                 <h2 id="res-title" style="margin:5px 0;"></h2>
             </div>
-            <div id="analysis-body">
-                </div>
+            <div id="analysis-body"></div>
         </div>
         <div id="final-image-wrapper"></div>
         <div id="result-actions">
@@ -168,6 +143,7 @@
         <button class="btn btn-outline" onclick="closeModalAndShowBase()">不用了，看基礎報告</button>
     </div>
 </div>
+
 <div id="return-modal" class="modal-overlay">
     <div class="modal-content">
         <i class="fa-solid fa-circle-exclamation" style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;"></i>
@@ -179,7 +155,6 @@
 </div>
 
 <script>
-// 題目數據 (簡化示意)
 const mbtiBaseQuestions = [
     { text: "1.在社交聚會中，你通常是主動找人交談的那一位。", dim: "EI", dir: 1 },
     { text: "2.你傾向於根據事實和證據做決定，而非憑感覺。", dim: "TF", dir: 1 },
@@ -232,7 +207,7 @@ const mbtiBaseQuestions = [
     { text: "49.你對雜亂的環境耐受度很高。", dim: "JP", dir: -1 },
     { text: "50.你會為了不傷害別人的感情而說善意的謊言。", dim: "TF", dir: -1 },
     { text: "51.你是社交場合中的氣氛帶動者。", dim: "EI", dir: 1 },
-    { text: "52.你對新奇的產品和科技充滿強烈好奇心。", dim: "SN", dir: -1 },
+    { text: "52.你對新奇的產品 and 科技充滿強烈好奇心。", dim: "SN", dir: -1 },
     { text: "53.你喜歡事情有明確的開始與結束日期。", dim: "JP", dir: 1 },
     { text: "54.你決策時偏向客觀分析，而非個人主觀喜好。", dim: "TF", dir: 1 },
     { text: "55.你在陌生人面前會表現得比較拘謹。", dim: "EI", dir: -1 },
@@ -242,6 +217,7 @@ const mbtiBaseQuestions = [
     { text: "59.即使在熱鬧的地方，你也可能感到孤獨。", dim: "EI", dir: -1 },
     { text: "60.你喜歡追求具有象徵意義的東西。", dim: "SN", dir: -1 }
 ];
+
 const advanceQuestions = [
     { text: "1.在餐廳點餐時，你通常能在 1 分鐘內決定好要吃什麼。", dim: "AO", dir: 1 },
     { text: "2.網購看到心儀商品時，你傾向迅速下單而非反覆對比評論。", dim: "AO", dir: 1 },
@@ -264,27 +240,28 @@ const advanceQuestions = [
     { text: "19.看到路邊弱小的生命需要幫助，你會有強烈的共感與憐憫。", dim: "HC", dir: 1 },
     { text: "20.面對別人的讚美，你會感到由衷開心並給予熱情回饋。", dim: "HC", dir: 1 }
 ];
-// 分析資料庫
+
 const analysisDB = {
     "BASE": {
-        "INTJ": { title: "建築師", core: "你擁有強大的意志與獨立思考能力，追求效率，是天生的戰略家。<br>【代表人物】：埃隆·馬斯克、尼采" },
-        "INTP": { title: "邏輯學家", core: "你對理論有著不懈熱情，比起現實，你更活在概念世界中。<br>【代表人物】：比爾·蓋茲、愛因斯坦" },
-        "ENTJ": { title: "指揮官", core: "具備強大領導力與遠見，能迅速果斷地帶領團隊達成目標。<br>【代表人物】：賈伯斯、撒切爾夫人" },
-        "ENTP": { title: "辯論家", core: "腦中充滿新穎點子，喜歡挑戰現狀，在碰撞中尋求創新。<br>【代表人物】：艾迪生、鋼鐵人" },
-        "INFJ": { title: "提倡者", core: "安靜而深沉的理想主義者，擁有敏閱洞察力，渴望改變世界。<br>【代表人物】：馬丁路德金、柏拉圖" },
-        "INFP": { title: "調解者", core: "溫柔富有同理心的夢想家，堅守內在價值，尋找生活意義。<br>【代表人物】：莎士比亞、JK羅琳" },
-        "ENFJ": { title: "主人公", core: "充滿感染力的領袖，善於鼓舞人心，帶領大眾走向和諧。<br>【代表人物】：歐普拉、歐巴馬" },
-        "ENFP": { title: "競選者", core: "自由奔放的靈魂，對生活充滿好奇，擅長激發他人潛能。<br>【代表人物】：迪士尼、小勞勃道尼" },
-        "ISTJ": { title: "物流師", core: "務實可靠，責任感強。重視秩序與傳統，是社會的中流砥柱。<br>【代表人物】：傑夫貝佐斯、華盛頓" },
-        "ISFJ": { title: "守護者", core: "溫和堅毅，總是默默關懷他人，細心維護周圍人的福祉。<br>【代表人物】：德蕾莎修女、凱特王妃" },
-        "ESTJ": { title: "總管", core: "傑出的組織者，注重事實與規則，執行力極高且井然有序。<br>【代表人物】：洛克菲勒、希拉蕊" },
-        "ESFJ": { title: "執政官", core: "熱情友好的社交專家，重視和諧，是建立社區聯結的關鍵。<br>【代表人物】：泰勒絲、休傑克曼" },
-        "ISTP": { title: "鑑賞家", core: "冷靜且充滿好奇心，喜歡動手解決問題，適應能力極強。<br>【代表人物】：麥可喬丹、印第安納瓊斯" },
-        "ISFP": { title: "藝術家", core: "低調且富有美感，熱愛感官體驗，用獨特方式表達感受。<br>【代表人物】：萊昂納多、艾薇兒" },
-        "ESTP": { title: "企業家", core: "充滿活力的冒險家，活在當下，對機會敏銳，在行動中學習。<br>【代表人物】：川普、瑪丹娜" },
-        "ESFP": { title: "表演者", core: "天生表演者，充滿樂趣，能點燃氣氛，讓當下變得精彩。<br>【代表人物】：艾爾頓強、瑪麗蓮夢露" }
+        "INTJ": { title: "建築師", core: "你擁有強大的意志與獨立思考能力，追求效率，是天生的戰略家。<br>【代表人物】：埃隆·馬斯克" },
+        "INTP": { title: "邏輯學家", core: "你對理論有著不懈熱情，比起現實，你更活在概念世界中。<br>【代表人物】：愛因斯坦" },
+        "ENTJ": { title: "指揮官", core: "具備強大領導力與遠見，能迅速果斷地帶領團隊達成目標。<br>【代表人物】：賈伯斯" },
+        "ENTP": { title: "辯論家", core: "腦中充滿新穎點子，喜歡挑戰現狀，在碰撞中尋求創新。<br>【代表人物】：鋼鐵人" },
+        "INFJ": { title: "提倡者", core: "安靜而深沉的理想主義者，擁有敏閱洞察力，渴望改變世界。<br>【代表人物】：柏拉圖" },
+        "INFP": { title: "調解者", core: "溫柔富有同理心的夢想家，堅守內在價值，尋找生活意義。<br>【代表人物】：JK羅琳" },
+        "ENFJ": { title: "主人公", core: "充滿感染力的領袖，善於鼓舞人心，帶領大眾走向和諧。<br>【代表人物】：歐巴馬" },
+        "ENFP": { title: "競選者", core: "自由奔放的靈魂，對生活充滿好奇，擅長激發他人潛能。<br>【代表人物】：迪士尼" },
+        "ISTJ": { title: "物流師", core: "務實可靠，責任感強。重視秩序與傳統，是社會的中流砥柱。<br>【代表人物】：華盛頓" },
+        "ISFJ": { title: "守護者", core: "溫和堅毅，總是默默關懷他人，細心維護周圍人的福祉。<br>【代表人物】：德蕾莎修女" },
+        "ESTJ": { title: "總管", core: "傑出的組織者，注重事實與規則，執行力極高且井然有序。<br>【代表人物】：洛克菲勒" },
+        "ESFJ": { title: "執政官", core: "熱情友好的社交專家，重視和諧，是建立社區聯結的關鍵。<br>【代表人物】：泰勒絲" },
+        "ISTP": { title: "鑑賞家", core: "冷靜且充滿好奇心，喜歡動手解決問題，適應能力極強。<br>【代表人物】：麥可喬丹" },
+        "ISFP": { title: "藝術家", core: "低調且富有美感，熱愛感官體驗，用獨特方式表達感受。<br>【代表人物】：萊昂納多" },
+        "ESTP": { title: "企業家", core: "充滿活力的冒險家，活在當下，對機會敏銳，在行動中學習。<br>【代表人物】：川普" },
+        "ESFP": { title: "表演者", core: "天生表演者，充滿樂趣，能點燃氣氛，讓當下變得精彩。<br>【代表人物】：瑪麗蓮夢露" }
     },
     "ADVANCE": {
+        // 這裡應放置你之前那 64 組詳細資料，以下僅為結構示範
         // --- 分析師系列 (NT) 深度文案 ---
 "INTJ-AH": { 
     title: "開拓型戰略家", 
@@ -760,11 +737,24 @@ let currentQuestions = [];
 let currentIndex = 0;
 let userScores = { EI: 0, SN: 0, TF: 0, JP: 0, AO: 0, HC: 0 };
 let scoreHistory = [];
-let mode = ""; // 'base' or 'advance'
+let mode = ""; 
 let tempBaseType = "";
 
 function startFlow(flowType) {
-    userName = document.getElementById('user-name-input').value.trim() || "神秘嘉賓";
+    const nameInput = document.getElementById('user-name-input');
+    userName = nameInput.value.trim();
+    
+    // 姓名鎖：如果沒填名字，不給進入
+    if (!userName) {
+        alert("請先輸入您的暱稱，讓我們知道測驗者是誰唷！");
+        nameInput.classList.add('error');
+        nameInput.focus();
+        return;
+    }
+    
+    nameInput.classList.remove('error');
+    document.getElementById('top-nav').style.display = 'none';
+
     if (flowType === 'new') {
         mode = "base";
         currentQuestions = mbtiBaseQuestions;
@@ -779,6 +769,7 @@ function startFlow(flowType) {
 function initQuiz() {
     currentIndex = 0;
     scoreHistory = [];
+    userScores = { EI: 0, SN: 0, TF: 0, JP: 0, AO: 0, HC: 0 }; // 重置分數
     document.getElementById('quiz-intro').style.display = 'none';
     document.getElementById('quiz-content').style.display = 'block';
     renderQuestion();
@@ -817,13 +808,13 @@ function goBack() {
         renderQuestion();
     }
 }
+
 function toggleReturnModal(show) {
     document.getElementById('return-modal').style.display = show ? 'flex' : 'none';
 }
 
 function finishCurrentStep() {
     if (mode === "base") {
-        // 算出主人格
         tempBaseType = (userScores.EI >= 0 ? "E" : "I") + (userScores.SN >= 0 ? "S" : "N") + 
                        (userScores.TF >= 0 ? "T" : "F") + (userScores.JP >= 0 ? "J" : "P");
         document.getElementById('advance-confirm-modal').style.display = 'flex';
@@ -842,8 +833,7 @@ function continueToAdvance() {
     mode = "advance";
     currentQuestions = advanceQuestions;
     currentIndex = 0;
-    scoreHistory = []; // 清空進階題的歷史
-    // 重置 AO, HC 分數
+    scoreHistory = []; 
     userScores.AO = 0; userScores.HC = 0;
     renderQuestion();
 }
@@ -854,28 +844,15 @@ function showFinalResult(type) {
     document.getElementById('res-user-name').innerText = `受檢者：${userName}`;
 
     let code, data, html = "";
-    
-    // --- 【新增】自動判定顏色邏輯 ---
-    const base4 = tempBaseType; // 取得四碼，例如 ENFP
-    const middleTwo = base4.substring(1, 3); // 取得 NF, NT 等
+    const base4 = tempBaseType; 
+    const middleTwo = base4.substring(1, 3); 
     const headerEl = document.querySelector('.result-header');
     
-    // 先移除所有可能的顏色類別
     headerEl.classList.remove('theme-nt', 'theme-nf', 'theme-sj', 'theme-sp');
-    
-    // 根據 MBTI 大類決定顏色
-    if (middleTwo === "NT") {
-        headerEl.classList.add('theme-nt');
-    } else if (middleTwo === "NF") {
-        headerEl.classList.add('theme-nf');
-    } else if (base4.endsWith('J')) { 
-        // 只要是 SJ 結尾都歸類為守護者藍
-        headerEl.classList.add('theme-sj');
-    } else {
-        // 剩下的 SP 結尾歸類為探險家橘
-        headerEl.classList.add('theme-sp');
-    }
-    // --------------------------------
+    if (middleTwo === "NT") headerEl.classList.add('theme-nt');
+    else if (middleTwo === "NF") headerEl.classList.add('theme-nf');
+    else if (base4.endsWith('J')) headerEl.classList.add('theme-sj');
+    else headerEl.classList.add('theme-sp');
 
     if (type === "BASE") {
         code = tempBaseType;
@@ -897,9 +874,8 @@ function showFinalResult(type) {
     document.getElementById('res-title').innerText = data.title;
     document.getElementById('analysis-body').innerHTML = html;
 
-    // 生成圖卡
     setTimeout(() => {
-        html2canvas(document.getElementById('capture-area'), { scale: 2 }).then(canvas => {
+        html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true }).then(canvas => {
             const wrapper = document.getElementById('final-image-wrapper');
             wrapper.innerHTML = "";
             const img = new Image();
@@ -908,16 +884,15 @@ function showFinalResult(type) {
             img.style.borderRadius = "20px";
             wrapper.appendChild(img);
 
-            // --- 【新增】動態插入提示文字 ---
             const hint = document.createElement('div');
             hint.className = 'save-hint';
             hint.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> 💡 長按上方圖片即可儲存或分享報告';
             wrapper.appendChild(hint);
-            // --------------------------------
 
             document.getElementById('capture-area').style.display = "none";
         });
     }, 800);
-}</script>
+}
+</script>
 </body>
 </html>
