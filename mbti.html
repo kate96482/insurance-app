@@ -57,25 +57,28 @@
 
         .save-hint { text-align: center; color: #888; font-size: 0.85rem; margin: 15px 0; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-        #capture-area {
-    width: 100vw;         /* 寬度等於視窗寬 */
-    min-height: 100vh;    /* 最少要跟螢幕一樣高 */
-    margin: 0;
-    padding: 40px 25px;   /* 內距，讓內容不要太貼邊 */
-    background: #fff;     /* 背景色 */
+       #capture-area {
+    /* 自適應核心：電腦寬度固定，手機寬度撐滿 */
+    width: 100%;           /* 預設寬度 100% */
+    max-width: 450px;      /* 在電腦上看，最大就這麼寬，才像手機截圖 */
+    
+    /* 比例控制：設定最少要跟手機螢幕一樣高 */
+    min-height: 100vh;     
+    
+    margin: 0 auto;        /* 電腦上看會置中 */
+    padding: 40px 25px;
+    background: #fff;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    /* 確保在拍照前，它是可見的但不在畫面上亂跑 */
-    position: relative; 
+    position: relative;
+    overflow: hidden;      /* 防止內容溢出 */
 }
 
-/* 為了讓它看起來更像專業報告，可以讓內容在螢幕中均勻分布 */
 #analysis-body {
-    flex-grow: 1;         /* 讓中間文字區域自動撐開 */
+    flex-grow: 1;
     margin-top: 20px;
 }
-
         /* 如果你想要圖片看起來更高級，可以加一點圓角 */
         #capture-area .result-header {
             border-radius: 20px 20px 0 0;
@@ -897,30 +900,39 @@ function showFinalResult(type) {
     setTimeout(() => {
     const target = document.getElementById('capture-area');
     
-    // 取得目前手機螢幕的實際寬高
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    // 改用 offsetWidth 和 offsetHeight，這會抓取元素「當前被擠壓/撐開後」的實際尺寸
+    const actualWidth = target.offsetWidth;
+    const actualHeight = target.offsetHeight;
 
     html2canvas(target, { 
-        scale: 3,           // 為了讓全螢幕圖存下來不模糊，建議設為 3
+        scale: 3,           
         useCORS: true,
-        width: w,           // 抓取螢幕寬度
-        height: h,          // 抓取螢幕高度
-        windowWidth: w,
-        windowHeight: h
+        width: actualWidth,
+        height: actualHeight,
+        windowWidth: actualWidth,  // 鎖定寬度防止 RWD 在截圖時跑掉
+        windowHeight: actualHeight,
+        scrollX: 0,
+        scrollY: 0,
+        x: 0,
+        y: 0
     }).then(canvas => {
         const wrapper = document.getElementById('final-image-wrapper');
         wrapper.innerHTML = "";
         const img = new Image();
         img.src = canvas.toDataURL("image/png");
         
-        // 顯示在網頁上時，讓它看起來跟手機螢幕一樣大
-        img.style.width = "100%"; 
+        // 顯示在網頁上的圖也跟著自適應
+        img.style.width = "100%";
+        img.style.maxWidth = "450px"; // 這裡要跟 CSS 的 max-width 一致
+        img.style.margin = "0 auto";
+        img.style.display = "block";
+        img.style.borderRadius = "20px";
+        
         wrapper.appendChild(img);
 
         const hint = document.createElement('div');
         hint.className = 'save-hint';
-        hint.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> 💡 長按上方圖片即可儲存全螢幕報告';
+        hint.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> 💡 長按上方圖片即可儲存報告';
         wrapper.appendChild(hint);
 
         target.style.display = "none";
@@ -930,6 +942,7 @@ function showFinalResult(type) {
 </script>
 </body>
 </html>
+
 
 
 
