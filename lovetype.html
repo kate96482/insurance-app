@@ -35,7 +35,7 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* 左上角導航 - 提升 z-index 確保點擊 */
+        /* 左上角導航 - 確保 z-index 高於截圖 */
         .nav-header { position: fixed; top: 15px; left: 15px; z-index: 1000; }
         .btn-nav {
             background: rgba(255, 255, 255, 0.9); border: 1px solid #ddd;
@@ -88,7 +88,7 @@
         .option-btn:hover { border-color: var(--secondary-color); background: #e0f7f6; }
         .back-btn { margin-top: 10px; background: none; border: none; color: #95a5a6; cursor: pointer; text-decoration: underline; font-size: 14px; }
 
-        /* 結果頁 & 圖片優化邏輯 */
+        /* 結果頁樣式 */
         .result-view { display: none; text-align: center; padding-bottom: 50px; }
         #result-capture {
             width: 100%; background: white; border-radius: 20px; box-shadow: var(--card-shadow);
@@ -206,8 +206,8 @@
     <div class="modal-content">
         <h3>確定要離開測驗嗎？</h3>
         <button class="modal-btn" style="background: #eee;" onclick="closeModal()">取消</button>
-        <button class="modal-btn" style="background: var(--primary-color); color: white;" onclick="resetQuiz()">重新測驗</button>
-        <button class="modal-btn" style="background: var(--secondary-color); color: white;" onclick="location.reload()">返回首頁</button>
+        <button class="modal-btn" style="background: var(--primary-color); color: white;" onclick="resetToQuizHome()">重新測驗</button>
+        <button class="modal-btn" style="background: var(--secondary-color); color: white;" onclick="goToIndex()">返回首頁</button>
     </div>
 </div>
 
@@ -249,6 +249,7 @@
         { q: "對於這段關係的穩定感：", options: [{ t: "即使分開也能過得很好，心態豁達。", s: "O" }, { t: "投入極深，非常害怕失去對方。", s: "E" }] }
     ];
 
+    // 結果數據與其餘功能保持完整 (略...)
     const resultsData = {
         "LCRO": { name: "老闆貓 (Boss Cat)", img: "https://i.postimg.cc/xCxkDjhX/LAPE.jpg", tags: ["#主導權", "#反差萌", "#務實派"], analysis: "你在外面可能是獨當一面的領導者，但在伴侶面前，你會立刻切換成「討摸模式」。你對感情的需求很直接：你要聽我的，但你要寵我。你不喜歡無謂的感性內耗，認為愛就是一起吃好吃的、過好日子。", warning: "當你的指令被無視或對方表現得比你更強勢時，你會鬧彆扭或變得冷漠。", match: "FARE 能幹經理" },
         "LCRE": { name: "隱藏寶貝 (Hidden Treasure)", img: "https://i.postimg.cc/nzRsbVg7/LCRE.jpg", tags: ["#悶騷", "#計畫通", "#深情"], analysis: "你的愛是帶有「權限」的，只有進入核心圈的人才能看到你的軟弱。你極度追求穩定，會為了給對方更好的生活而瘋狂努力。你把對方的未來視為自己的責任，甚至會幫對方規劃職涯或財務。", warning: "最討厭「不確定性」。如果對方臨時改行程或對未來沒計畫，會讓你大發雷霆。", match: "FCPE 忠犬八公" },
@@ -256,7 +257,7 @@
         "LCPE": { name: "傲嬌不良 (Tsundere Delinquent)", img: "https://i.postimg.cc/rmndXy3r/LCPE.jpg", tags: ["#口嫌體正直", "#保護欲", "#純愛"], analysis: "你習慣用凶巴巴或嫌棄的口吻來掩飾害羞。你會一邊唸對方「笨手笨腳」，一邊把對方的家務全部做完。你的主導是為了保護，你認為這個世界上只有你才有資格欺負對方。", warning: "對方如果真的被你氣走，或是對方太脆弱聽不懂你的反話，關係會崩潰。", match: "FAPE 最後的戀人" },
         "LARO": { name: "憧憬的前輩 (Admired Senior)", img: "https://i.postimg.cc/qRbtVBSC/LARO.jpg", tags: ["#成熟魅力", "#解決問題", "#穩定感"], analysis: "你在感情中像是一個精神支柱。你很少情緒崩潰，總能冷靜地幫對方分析利弊。你追求的是一種「有品質的樂觀」，不喜歡小情小愛的糾纏，更看重雙方是否能一起變優秀。", warning: "容易顯得太像「說教」，讓伴侶覺得你是在教訓學生而不是在談戀愛。", match: "FCRE 精明兔子" },
         "LARE": { name: "魅力平衡者 (Charming Balancer)", img: "https://i.postimg.cc/26cqRjML/LARE.jpg", tags: ["#理性感性並行", "#高標準", "#精確"], analysis: "你對伴侶的挑選非常嚴苛。你認為感情需要經營，像是一台精密儀器。你會主動引導對方修正缺點，追求一種「對等」且「進步」的關係。你出門絕對體面，是伴侶帶得出場的驕傲。", warning: "過度追求完美，會讓對方在你面前不敢出錯，感到精疲力竭。", match: "FARO 不可思議生命體" },
-        "LAPO": { name: "完美變色龍 (Perfect Chameleon)", img: "https://i.postimg.cc/cH9Ky12K/LAPO.jpg", tags: ["#高情商", "#適應力", "#活潑"], analysis: "你能根據對方的性格切換自己的面貌。對方喜歡安靜你就陪著看書，對方喜歡夜店你就陪著跳舞。你習慣主導局勢讓大家開心，但這種熱情有時會讓你感到內心空虛。", warning: "為了和諧而隱瞞真實感受，累積到最後會突然爆發式消失。", match: "FCRO 戀愛魔法師" },
+        "LAPO": { name: "完美變色龍 (Perfect Chameleon)", img: "https://i.postimg.cc/cH9Ky12K/LAPO.jpg", tags: ["#高情商", "#適應力", "#活潑"], analysis: "你能根據對方的性格切換自己的面貌。對方喜歡安靜傾聽你就陪著看書，對方喜歡夜店你就陪著跳舞。你習慣主導局勢讓大家開心，但這種熱情有時會讓你感到內心空虛。", warning: "為了和諧而隱瞞真實感受，累積到最後會突然爆發式消失。", match: "FCRO 戀愛魔法師" },
         "LAPE": { name: "隊長獅子 (Captain Lion)", img: "https://i.postimg.cc/xCxkDjhX/LAPE.jpg", tags: ["#領地意識", "#英雄主義", "#絕對正義"], analysis: "你對愛情的定義是「守護」。你非常有責任感，會為了對方跟全世界對抗。你的熱情是明火，不隱藏、不退縮。你會要求對方報備行程，因為你必須確定對方在你的保護範圍內。", warning: "嫉妒心重。對方只要跟異性多說兩句話，你的小宇宙就會爆發。", match: "FAPO 惡魔天使" },
         "FCRO": { name: "戀愛魔法師 (Love Magician)", img: "https://i.postimg.cc/SsTXFQ3J/FCRO.jpg", tags: ["#小聰明", "#氣氛營造", "#輕鬆感"], analysis: "你知道什麼時候該撒嬌、什麼時候該閉嘴。你配合度高是因為你懶得吵架。你總能用幽默感化解尷尬，讓另一半覺得跟你在一起非常放鬆。", warning: "當遇到需要負責任的大事時，你傾向於躲在對方身後，讓對方覺得你沒擔當。", match: "LARO 憧憬的前輩" },
         "FCRE": { name: "精明兔子 (Smart Rabbit)", img: "https://i.postimg.cc/3RSy5rVW/FCRE.jpg", tags: ["#觀察者", "#精明內在", "#可愛外殼"], analysis: "你看起來柔弱好說話，但其實心裡有一台計算機。你會觀察對方的價值、性格缺陷和對你的好，再決定要投入多少。你的撒嬌通常是有目的的「戰略性示弱」。", warning: "如果對方讓你覺得無利可圖或看不到未來，你會冷酷地迅速撤離。", match: "LARE 魅力平衡者" },
@@ -372,41 +373,45 @@
     function captureResult() {
         const target = document.getElementById('result-capture');
         const navHeader = document.getElementById('nav-header');
-
-        navHeader.style.visibility = 'hidden'; // 截圖時隱藏導航按鈕
-
-        html2canvas(target, { 
-            useCORS: true, 
-            scale: 2, 
-            backgroundColor: "#ffffff"
-        }).then(canvas => {
+        navHeader.style.visibility = 'hidden'; 
+        html2canvas(target, { useCORS: true, scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
             const imgData = canvas.toDataURL("image/png");
             const overlay = document.createElement('img');
             overlay.src = imgData;
             overlay.className = "screenshot-overlay";
-            
             const container = document.getElementById('image-overlay-container');
             container.innerHTML = "";
             container.appendChild(overlay);
-
             document.getElementById('html-content-to-hide').style.visibility = 'hidden';
             container.style.display = 'block';
-
-            navHeader.style.visibility = 'visible'; // 截圖完成後恢復導航按鈕
+            navHeader.style.visibility = 'visible'; 
             document.getElementById('loading-overlay').style.display = 'none';
         });
     }
 
-    // 修正點：點擊返回首頁直接強制跳轉刷新
+    // --- 導航與視窗邏輯校正 ---
+
     function handleNavHome() {
+        // 如果正在測驗中，彈出確認視窗
         if(document.getElementById('quiz-view').style.display === 'block') {
             document.getElementById('nav-modal').style.display = 'flex';
         } else {
-            window.location.href = window.location.pathname + window.location.search; 
+            // 在其他頁面點擊左上角，直接去 index.html
+            goToIndex();
         }
     }
+
+    // 返回 index.html
+    function goToIndex() {
+        window.location.href = "index.html";
+    }
+
+    // 重新測驗：回到輸入名字的頁面 (刷新當前頁)
+    function resetToQuizHome() {
+        window.location.href = window.location.pathname + window.location.search;
+    }
+
     function closeModal() { document.getElementById('nav-modal').style.display = 'none'; }
-    function resetQuiz() { window.location.href = window.location.pathname + window.location.search; }
     function closeRoleModal() { document.getElementById('role-modal').style.display = 'none'; }
 </script>
 
