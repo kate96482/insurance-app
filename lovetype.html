@@ -90,7 +90,7 @@
             padding: 40px 25px;
             position: relative;
             overflow: hidden;
-            min-height: auto; /* 移除固定比例，讓手機版能根據內容延展 */
+            min-height: auto;
         }
 
         .result-name { font-size: 14px; color: #7f8c8d; margin-bottom: 5px; }
@@ -150,7 +150,7 @@
 </head>
 <body>
 
-<div class="nav-header">
+<div id="nav-header" class="nav-header">
     <button class="btn-nav" onclick="handleNavHome()">🏠 返回首頁</button>
 </div>
 
@@ -252,7 +252,7 @@
         { q: "關於金錢觀：", options: [{ t: "帳目分明或有計畫的存錢很重要。", s: "R" }, { t: "為了開心的體驗，偶爾豪擲千金也沒關係。", s: "P" }] },
         { q: "關於承諾：", options: [{ t: "順其自然，不想太早討論結婚或長遠束縛。", s: "O" }, { t: "一旦交往就是以結婚為前前提長往。", s: "E" }] },
         { q: "對於伴侶的隱私（如看手機）：", options: [{ t: "彼此都要有絕對的自由，不查勤不干涉。", s: "O" }, { t: "因為在乎，所以會想了解對方的所有動向。", s: "E" }] },
-        { q: "當對方沒回訊息時：", options: [{ t: "我會去做自己的事，不會想太多。", s: "O" }, { t: "我會開始焦慮，反省自己是不是說錯話。", s: "E" }] },
+        { q: "當對方沒回訊息時：", options: [{ t: "我會進去做自己的事，不會想太多。", s: "O" }, { t: "我會開始焦慮，反省自己是不是說錯話。", s: "E" }] },
         { q: "關於「戀愛」在生活中的佔比：", options: [{ t: "愛情只是生活的一部分，朋友和工作同樣重要。", s: "O" }, { t: "愛情是我的重心，會願意為此調整其他計畫。", s: "E" }] },
         { q: "對於「前任」的看法：", options: [{ t: "分手了還是可以當朋友，沒什麼大不了。", s: "O" }, { t: "徹底斷聯，那是對下一任最基本的尊重。", s: "E" }] },
         { q: "關於變動與驚喜：", options: [{ t: "喜歡說走就走的旅行，不按牌理出牌。", s: "O" }, { t: "討厭計畫被臨時改變，會感到不安。", s: "E" }] },
@@ -262,7 +262,7 @@
     const resultsData = {
         "LCRO": { name: "老闆貓 (Boss Cat)", img: "https://i.postimg.cc/xCxkDjhX/LAPE.jpg", tags: ["#主導權", "#反差萌", "#務實派"], analysis: "你在外面可能是獨當一面的領導者，但在伴侶面前，你會立刻切換成「討摸模式」。你對感情的需求很直接：你要聽我的，但你要寵我。你不喜歡無謂的感性內耗，認為愛就是一起吃好吃的、過好日子。", warning: "當你的指令被無視或對方表現得比你更強勢時，你會鬧彆扭或變得冷漠。", match: "FARE 能幹經理" },
         "LCRE": { name: "隱藏寶貝 (Hidden Treasure)", img: "https://i.postimg.cc/nzRsbVg7/LCRE.jpg", tags: ["#悶騷", "#計畫通", "#深情"], analysis: "你的愛是帶有「權限」的，只有進入核心圈的人才能看到你的軟弱。你極度追求穩定，會為了給對方更好的生活而瘋狂努力。你把對方的未來視為自己的責任，甚至會幫對方規劃職涯或財務。", warning: "最討厭「不確定性」。如果對方臨時改行程或對未來沒計畫，會讓你大發雷霆。", match: "FCPE 忠犬八公" },
-        "LCPO": { name: "主角體質 (Main Character)", img: "https://i.postimg.cc/gJSwFcQh/LCPO.jpg", tags: ["#聚光燈", "#浪漫大師", "#情緒反饋"], analysis: "戀愛對你來說是一場華麗的演出，你必須是絕對的主角。你很會營造氣氛，送禮物、驚喜樣樣精通，但前提是對方必須表現出「被感動到哭」的回饋。你需要的不是伴侶，是一個頭號粉絲。", warning: "當對方反應平淡或忘記稱讚你時，你會覺得這段感情死去了。", match: "FCPO 戀愛怪獸" },
+        "LCPO": { name: "主角體體 (Main Character)", img: "https://i.postimg.cc/gJSwFcQh/LCPO.jpg", tags: ["#聚光燈", "#浪漫大師", "#情緒反饋"], analysis: "戀愛對你來說是一場華麗的演出，你必須是絕對的主角。你很會營造氣氛，送禮物、驚喜樣樣精通，但前提是對方必須表現出「被感動到哭」的回饋。你需要的不是伴侶，是一個頭號粉絲。", warning: "當對方反應平淡或忘記稱讚你時，你會覺得這段感情死去了。", match: "FCPO 戀愛怪獸" },
         "LCPE": { name: "傲嬌不良 (Tsundere Delinquent)", img: "https://i.postimg.cc/rmndXy3r/LCPE.jpg", tags: ["#口嫌體正直", "#保護欲", "#純愛"], analysis: "你習慣用凶巴巴或嫌棄的口吻來掩飾害羞。你會一邊唸對方「笨手笨腳」，一邊把對方的家務全部做完。你的主導是為了保護，你認為這個世界上只有你才有資格欺負對方。", warning: "對方如果真的被你氣走，或是對方太脆弱聽不懂你的反話，關係會崩潰。", match: "FAPE 最後的戀人" },
         "LARO": { name: "憧憬的前輩 (Admired Senior)", img: "https://i.postimg.cc/qRbtVBSC/LARO.jpg", tags: ["#成熟魅力", "#解決問題", "#穩定感"], analysis: "你在感情中像是一個精神支柱。你很少情緒崩潰，總能冷靜地幫對方分析利弊。你追求的是一種「有品質的樂觀」，不喜歡小情小愛的糾纏，更看重雙方是否能一起變優秀。", warning: "容易顯得太像「說教」，讓伴侶覺得你是在教訓學生而不是在談戀愛。", match: "FCRE 精明兔子" },
         "LARE": { name: "魅力平衡者 (Charming Balancer)", img: "https://i.postimg.cc/26cqRjML/LARE.jpg", tags: ["#理性感性並行", "#高標準", "#精確"], analysis: "你對伴侶的挑選非常嚴苛。你認為感情需要經營，像是一台精密儀器。你會主動引導對方修正缺點，追求一種「對等」且「進步」的關係。你出門絕對體面，是伴侶帶得出場的驕傲。", warning: "過度追求完美，會讓對方在你面前不敢出錯，感到精疲力竭。", match: "FARO 不可思議生命體" },
@@ -297,7 +297,6 @@
         document.getElementById('question-text').innerText = q.q;
         document.getElementById('progress-inner').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
         
-        // 問題 1: 第一題隱藏返回按鈕
         document.getElementById('prev-btn').style.visibility = (currentIdx === 0) ? 'hidden' : 'visible';
 
         const container = document.getElementById('options-container');
@@ -358,13 +357,17 @@
         document.getElementById('warning-text').innerText = data.warning;
         document.getElementById('match-text').innerText = data.match;
 
-        // 等待圖片載入後截圖
         setTimeout(captureResult, 800);
     }
 
+    // --- 修改重點：在截圖時暫時隱藏返回按鈕 ---
     function captureResult() {
         const target = document.getElementById('result-capture');
-        // 問題 2: 優化截圖邏輯，確保高度適配
+        const navHeader = document.getElementById('nav-header');
+
+        // 1. 截圖前：隱藏按鈕
+        navHeader.style.display = 'none';
+
         html2canvas(target, { 
             useCORS: true, 
             scale: 2, 
@@ -379,6 +382,9 @@
             const container = document.getElementById('image-overlay-container');
             container.innerHTML = "";
             container.appendChild(overlay);
+
+            // 2. 截圖後：還原按鈕顯示
+            navHeader.style.display = 'block';
         });
     }
 
@@ -386,7 +392,7 @@
         if(document.getElementById('quiz-view').style.display === 'block') {
             document.getElementById('nav-modal').style.display = 'flex';
         } else {
-            location.href = 'index.html';
+            location.reload(); 
         }
     }
     function closeModal() { document.getElementById('nav-modal').style.display = 'none'; }
