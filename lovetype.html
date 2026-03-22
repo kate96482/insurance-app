@@ -89,6 +89,13 @@
         .back-btn { margin-top: 10px; background: none; border: none; color: #95a5a6; cursor: pointer; text-decoration: underline; font-size: 14px; }
 
         /* 結果頁樣式 */
+.role-title { 
+    font-size: 28px; 
+    font-weight: bold; 
+    color: var(--primary-color); 
+    margin-bottom: 10px;
+    line-height: 1.2; /* 加入這一行，讓換行後的間距更自然 */
+}
         .result-view { display: none; text-align: center; padding-bottom: 50px; }
         #result-capture {
             width: 100%; background: white; border-radius: 20px; box-shadow: var(--card-shadow);
@@ -356,8 +363,13 @@
             type = dim1 + dim2 + dim3 + dim4;
         }
 
-        const data = resultsData[type];
-        document.getElementById('role-title').innerText = data.name;
+      const data = resultsData[type];
+        
+        // 這裡改用 replace 將「空格+左括號」替換成「換行標籤+左括號」
+        // 並將 .innerText 改為 .innerHTML 才能觸發換行
+        const formattedName = data.name.replace(" (", "<br>(");
+        document.getElementById('role-title').innerHTML = formattedName;
+
         document.getElementById('role-tags').innerHTML = data.tags.map(t => `<span class="tag">${t}</span>`).join('');
         document.getElementById('analysis-text').innerText = data.analysis;
         document.getElementById('warning-text').innerText = data.warning;
