@@ -120,8 +120,10 @@
         .box-match { background: #f0fff4; color: #48bb78; }
         .box-title { font-weight: bold; margin-bottom: 4px; }
 
-        #image-overlay-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 99; }
-        .screenshot-overlay { width: 100%; height: 100%; object-fit: fill; opacity: 0.01; cursor: pointer; }
+        /* 修正點：將 opacity 設為 1，並讓它成為主要顯示層 */
+        #image-overlay-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; display: none; }
+        .screenshot-overlay { width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
+        
         .save-tip { color: #95a5a6; font-size: 13px; margin: 25px 0; animation: pulse 2s infinite; }
 
         .modal {
@@ -166,33 +168,35 @@
 
     <div id="result-view" class="result-view">
         <div id="result-capture">
-            <div class="result-header">
-                <div class="result-name"><span id="display-name">使用者</span> 的戀愛角色是：</div>
-                <div id="role-title" class="role-title">角色名稱</div>
-                <div id="role-tags" class="role-tags"></div>
-            </div>
-            
-            <div class="role-img-wrapper">
-                <div class="role-img">
-                    <img id="role-pic" src="" alt="角色圖片" crossorigin="anonymous">
+            <div id="html-content-to-hide">
+                <div class="result-header">
+                    <div class="result-name"><span id="display-name">使用者</span> 的戀愛角色是：</div>
+                    <div id="role-title" class="role-title">角色名稱</div>
+                    <div id="role-tags" class="role-tags"></div>
                 </div>
-            </div>
+                
+                <div class="role-img-wrapper">
+                    <div class="role-img">
+                        <img id="role-pic" src="" alt="角色圖片" crossorigin="anonymous">
+                    </div>
+                </div>
 
-            <div class="analysis-container">
-                <div class="analysis-section-title">🌟 靈魂解析</div>
-                <div id="analysis-text" class="analysis-text"></div>
-                <div class="grid-info">
-                    <div class="info-box box-warning">
-                        <div class="box-title">⚠️ 戀愛雷區</div>
-                        <div id="warning-text" class="box-content"></div>
-                    </div>
-                    <div class="info-box box-match">
-                        <div class="box-title">💖 最佳合適</div>
-                        <div id="match-text" class="box-content"></div>
+                <div class="analysis-container">
+                    <div class="analysis-section-title">🌟 靈魂解析</div>
+                    <div id="analysis-text" class="analysis-text"></div>
+                    <div class="grid-info">
+                        <div class="info-box box-warning">
+                            <div class="box-title">⚠️ 戀愛雷區</div>
+                            <div id="warning-text" class="box-content"></div>
+                        </div>
+                        <div class="info-box box-match">
+                            <div class="box-title">💖 最佳合適</div>
+                            <div id="match-text" class="box-content"></div>
+                        </div>
                     </div>
                 </div>
+                <div style="font-size: 11px; color: #bdc3c7; margin-top: 15px;">@LoveType16小幫手</div>
             </div>
-            <div style="font-size: 11px; color: #bdc3c7; margin-top: 15px;">@LoveType16小幫手</div>
             <div id="image-overlay-container"></div>
         </div>
         <div class="save-tip">💡 長按上方海報即可儲存，直接發 IG Story！</div>
@@ -218,7 +222,6 @@
 </div>
 
 <script>
-    // 題目與結果資料維持不變
     const questions = [
         { q: "關於約會地點：", options: [{ t: "我通常會主動提議或決定去哪裡。", s: "L" }, { t: "我偏向讓對方決定，我配合就好。", s: "F" }] },
         { q: "當兩個人意見不合時：", options: [{ t: "我會試著說服對方接受我的想法。", s: "L" }, { t: "我通常會退一步，順著對方的意思。", s: "F" }] },
@@ -272,7 +275,6 @@
     let userScores = { L:0, F:0, C:0, A:0, R:0, P:0, O:0, E:0 };
     let history = [];
 
-    // 修改：開始測驗必須檢查名字
     function startQuiz() {
         const inputName = document.getElementById('user-name').value.trim();
         if(!inputName) { alert("請輸入稱呼再開始喔！"); return; }
@@ -282,7 +284,6 @@
         showQuestion();
     }
 
-    // 修改：直接看分析也必須檢查名字
     function showRolePicker() {
         const inputName = document.getElementById('user-name').value.trim();
         if(!inputName) { alert("請輸入稱呼再查看分析喔！"); return; }
@@ -337,14 +338,16 @@
         }
     }
 
-    // 優化：顯示結果時開啟轉圈，確保圖片下載完畢
     function showResult(forcedType = null) {
-        // 開啟轉圈
         document.getElementById('loading-overlay').style.display = 'flex';
-
         document.getElementById('quiz-view').style.display = 'none';
         document.getElementById('home-view').style.display = 'none';
         document.getElementById('result-view').style.display = 'block';
+        
+        // 重置顯示狀態，確保截圖前 HTML 是可見的
+        document.getElementById('html-content-to-hide').style.visibility = 'visible';
+        document.getElementById('image-overlay-container').style.display = 'none';
+
         document.getElementById('display-name').innerText = userName;
 
         let type = forcedType;
@@ -364,7 +367,6 @@
         document.getElementById('match-text').innerText = data.match;
 
         const rolePic = document.getElementById('role-pic');
-        // 當圖片下載完成後才執行截圖
         rolePic.onload = function() {
             setTimeout(captureResult, 800); 
         };
@@ -380,9 +382,7 @@
         html2canvas(target, { 
             useCORS: true, 
             scale: 2, 
-            backgroundColor: "#ffffff",
-            windowHeight: target.scrollHeight,
-            height: target.scrollHeight
+            backgroundColor: "#ffffff"
         }).then(canvas => {
             const imgData = canvas.toDataURL("image/png");
             const overlay = document.createElement('img');
@@ -393,8 +393,11 @@
             container.innerHTML = "";
             container.appendChild(overlay);
 
+            // 修正重點：截圖完成後，隱藏 HTML 內容，顯示圖片容器
+            document.getElementById('html-content-to-hide').style.visibility = 'hidden';
+            container.style.display = 'block';
+
             navHeader.style.display = 'block';
-            // 關閉轉圈
             document.getElementById('loading-overlay').style.display = 'none';
         });
     }
