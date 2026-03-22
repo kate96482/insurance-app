@@ -35,8 +35,8 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* 左上角導航 */
-        .nav-header { position: fixed; top: 15px; left: 15px; z-index: 100; }
+        /* 左上角導航 - 提升 z-index 確保點擊 */
+        .nav-header { position: fixed; top: 15px; left: 15px; z-index: 1000; }
         .btn-nav {
             background: rgba(255, 255, 255, 0.9); border: 1px solid #ddd;
             padding: 10px 16px; border-radius: 25px; cursor: pointer; font-size: 14px;
@@ -120,7 +120,7 @@
         .box-match { background: #f0fff4; color: #48bb78; }
         .box-title { font-weight: bold; margin-bottom: 4px; }
 
-        /* 修正點：將 opacity 設為 1，並讓它成為主要顯示層 */
+        /* 圖片覆蓋層 */
         #image-overlay-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; display: none; }
         .screenshot-overlay { width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
         
@@ -128,7 +128,7 @@
 
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 200; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center;
         }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 380px; text-align: center; }
         .modal-btn { padding: 12px 24px; margin: 8px; border-radius: 8px; border: none; cursor: pointer; font-size: 15px; font-weight: bold; }
@@ -174,13 +174,11 @@
                     <div id="role-title" class="role-title">角色名稱</div>
                     <div id="role-tags" class="role-tags"></div>
                 </div>
-                
                 <div class="role-img-wrapper">
                     <div class="role-img">
                         <img id="role-pic" src="" alt="角色圖片" crossorigin="anonymous">
                     </div>
                 </div>
-
                 <div class="analysis-container">
                     <div class="analysis-section-title">🌟 靈魂解析</div>
                     <div id="analysis-text" class="analysis-text"></div>
@@ -344,10 +342,8 @@
         document.getElementById('home-view').style.display = 'none';
         document.getElementById('result-view').style.display = 'block';
         
-        // 重置顯示狀態，確保截圖前 HTML 是可見的
         document.getElementById('html-content-to-hide').style.visibility = 'visible';
         document.getElementById('image-overlay-container').style.display = 'none';
-
         document.getElementById('display-name').innerText = userName;
 
         let type = forcedType;
@@ -377,7 +373,7 @@
         const target = document.getElementById('result-capture');
         const navHeader = document.getElementById('nav-header');
 
-        navHeader.style.display = 'none';
+        navHeader.style.visibility = 'hidden'; // 截圖時隱藏導航按鈕
 
         html2canvas(target, { 
             useCORS: true, 
@@ -393,24 +389,24 @@
             container.innerHTML = "";
             container.appendChild(overlay);
 
-            // 修正重點：截圖完成後，隱藏 HTML 內容，顯示圖片容器
             document.getElementById('html-content-to-hide').style.visibility = 'hidden';
             container.style.display = 'block';
 
-            navHeader.style.display = 'block';
+            navHeader.style.visibility = 'visible'; // 截圖完成後恢復導航按鈕
             document.getElementById('loading-overlay').style.display = 'none';
         });
     }
 
+    // 修正點：點擊返回首頁直接強制跳轉刷新
     function handleNavHome() {
         if(document.getElementById('quiz-view').style.display === 'block') {
             document.getElementById('nav-modal').style.display = 'flex';
         } else {
-            location.reload(); 
+            window.location.href = window.location.pathname + window.location.search; 
         }
     }
     function closeModal() { document.getElementById('nav-modal').style.display = 'none'; }
-    function resetQuiz() { location.reload(); }
+    function resetQuiz() { window.location.href = window.location.pathname + window.location.search; }
     function closeRoleModal() { document.getElementById('role-modal').style.display = 'none'; }
 </script>
 
