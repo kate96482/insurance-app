@@ -29,14 +29,15 @@
         /* 主容器 */
         .container {
             max-width: 500px; margin: 0 auto; min-height: 100vh;
-            display: flex; flex-direction: column; justify-content: center; padding: 30px;
+            display: flex; flex-direction: column; justify-content: center; padding: 20px;
         }
 
         /* 卡片通用樣式 (首頁 & 測驗中) */
         .card {
-            background: var(--card-bg); border-radius: 25px; padding: 40px;
+            background: var(--card-bg); border-radius: 25px; padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center;
             transition: all 0.5s ease;
+            width: 100%;
         }
 
         /* 首頁樣式 */
@@ -66,31 +67,30 @@
         .progress-inner {
             height: 100%; background: var(--primary-color); border-radius: 4px; width: 0%; transition: 0.3s;
         }
-        .question-text { font-size: 22px; font-weight: bold; margin-bottom: 40px; line-height: 1.6; }
+        .question-text { font-size: 20px; font-weight: bold; margin-bottom: 30px; line-height: 1.6; min-height: 3em; display: flex; align-items: center; justify-content: center; }
         .option-btn {
             background: #f8f9fa; border: 2px solid #eee; width: 100%;
-            padding: 18px; border-radius: 15px; margin-bottom: 20px;
+            padding: 18px; border-radius: 15px; margin-bottom: 15px;
             cursor: pointer; text-align: left; font-size: 16px; transition: 0.2s;
         }
         .option-btn:hover { border-color: var(--secondary-color); background: #e0f7f6; }
-        .back-btn { margin-top: 20px; background: none; border: none; color: #95a5a6; cursor: pointer; text-decoration: underline; }
+        .back-btn { margin-top: 10px; background: none; border: none; color: #95a5a6; cursor: pointer; text-decoration: underline; font-size: 14px; }
 
         /* --- 結果頁 & 圖片優化邏輯 --- */
         .result-view { display: none; text-align: center; padding-bottom: 50px; }
         
         #result-capture {
             width: 100%; 
-            aspect-ratio: 9 / 16;
             background: white;
             border-radius: 20px;
             box-shadow: var(--card-shadow);
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             padding: 40px 25px;
             position: relative;
             overflow: hidden;
+            min-height: auto; /* 移除固定比例，讓手機版能根據內容延展 */
         }
 
         .result-name { font-size: 14px; color: #7f8c8d; margin-bottom: 5px; }
@@ -101,15 +101,15 @@
         .tag { background: #ffebeb; color: #ff6b6b; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; }
 
         .role-img-wrapper {
-            flex: 1;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 10px 0;
+            margin: 15px 0;
         }
         .role-img {
             width: 100%; max-width: 220px; aspect-ratio: 1/1;
-            background: #f0f0f0; margin: 0 auto; border-radius: 15px;
+            background: #f0f0f0; border-radius: 15px;
             display: flex; align-items: center; justify-content: center; overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
@@ -117,22 +117,22 @@
         
         /* 詳細分析區塊 */
         .analysis-container { text-align: left; margin-top: 15px; }
-        .analysis-section-title { font-weight: bold; color: #333; font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; }
-        .analysis-text { color: #555; font-size: 13px; line-height: 1.6; margin-bottom: 12px; }
+        .analysis-section-title { font-weight: bold; color: #333; font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; }
+        .analysis-text { color: #555; font-size: 13px; line-height: 1.6; margin-bottom: 15px; }
         
         .grid-info { display: flex; gap: 10px; margin-top: 5px; }
-        .info-box { flex: 1; padding: 10px; border-radius: 12px; font-size: 11px; line-height: 1.4; }
+        .info-box { flex: 1; padding: 12px; border-radius: 12px; font-size: 11px; line-height: 1.4; }
         .box-warning { background: #fff5f5; color: #ff6b6b; }
         .box-match { background: #f0fff4; color: #48bb78; }
-        .box-title { font-weight: bold; margin-bottom: 3px; font-size: 11px; }
+        .box-title { font-weight: bold; margin-bottom: 4px; font-size: 11px; }
         .box-content { color: #666; }
 
         #image-overlay-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center;
+            display: flex; justify-content: center; align-items: flex-start;
         }
         .screenshot-overlay {
-            width: 100%; height: 100%;
+            width: 100%; height: auto;
             opacity: 0; z-index: 10; cursor: pointer;
         }
         .save-tip { color: #95a5a6; font-size: 13px; margin: 25px 0; animation: pulse 2s infinite; }
@@ -170,7 +170,7 @@
         <div id="question-index" style="color: #95a5a6; font-size: 14px; margin-bottom: 10px;">Question 1/26</div>
         <div id="question-text" class="question-text">題目載入中...</div>
         <div id="options-container"></div>
-        <button class="back-btn" onclick="prevQuestion()">← 返回上一題</button>
+        <button id="prev-btn" class="back-btn" onclick="prevQuestion()">← 返回上一題</button>
     </div>
 
     <div id="result-view" class="result-view">
@@ -204,9 +204,8 @@
             </div>
             
             <div style="font-size: 11px; color: #bdc3c7; margin-top: 15px;">@LoveType16小幫手</div>
+            <div id="image-overlay-container"></div>
         </div>
-        
-        <div id="image-overlay-container"></div>
         
         <div class="save-tip">💡 長按上方海報即可儲存，直接發 IG Story！</div>
         <button class="btn-main" style="margin-top: 20px;" onclick="location.reload()">重新測驗</button>
@@ -231,7 +230,6 @@
 </div>
 
 <script>
-    // --- 1. 資料定義 (26 題完整題目) ---
     const questions = [
         { q: "關於約會地點：", options: [{ t: "我通常會主動提議或決定去哪裡。", s: "L" }, { t: "我偏向讓對方決定，我配合就好。", s: "F" }] },
         { q: "當兩個人意見不合時：", options: [{ t: "我會試著說服對方接受我的想法。", s: "L" }, { t: "我通常會退一步，順著對方的意思。", s: "F" }] },
@@ -252,7 +250,7 @@
         { q: "對於「一見鍾情」：", options: [{ t: "我不太相信，感情需要時間觀察條件。", s: "R" }, { t: "我相信第一眼的火花，感覺對了最重要。", s: "P" }] },
         { q: "吵架時的重點：", options: [{ t: "把邏輯講清楚，解決實際發生的問題。", s: "R" }, { t: "先處理情緒，確認對方是否還愛我。", s: "P" }] },
         { q: "關於金錢觀：", options: [{ t: "帳目分明或有計畫的存錢很重要。", s: "R" }, { t: "為了開心的體驗，偶爾豪擲千金也沒關係。", s: "P" }] },
-        { q: "關於承諾：", options: [{ t: "順其自然，不想太早討論結婚或長遠束縛。", s: "O" }, { t: "一旦交往就是以結婚為前提交往。", s: "E" }] },
+        { q: "關於承諾：", options: [{ t: "順其自然，不想太早討論結婚或長遠束縛。", s: "O" }, { t: "一旦交往就是以結婚為前前提長往。", s: "E" }] },
         { q: "對於伴侶的隱私（如看手機）：", options: [{ t: "彼此都要有絕對的自由，不查勤不干涉。", s: "O" }, { t: "因為在乎，所以會想了解對方的所有動向。", s: "E" }] },
         { q: "當對方沒回訊息時：", options: [{ t: "我會去做自己的事，不會想太多。", s: "O" }, { t: "我會開始焦慮，反省自己是不是說錯話。", s: "E" }] },
         { q: "關於「戀愛」在生活中的佔比：", options: [{ t: "愛情只是生活的一部分，朋友和工作同樣重要。", s: "O" }, { t: "愛情是我的重心，會願意為此調整其他計畫。", s: "E" }] },
@@ -299,6 +297,9 @@
         document.getElementById('question-text').innerText = q.q;
         document.getElementById('progress-inner').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
         
+        // 問題 1: 第一題隱藏返回按鈕
+        document.getElementById('prev-btn').style.visibility = (currentIdx === 0) ? 'hidden' : 'visible';
+
         const container = document.getElementById('options-container');
         container.innerHTML = "";
         q.options.forEach(opt => {
@@ -347,25 +348,30 @@
 
         const data = resultsData[type] || { name: "神秘人格", img: "", tags: [], analysis: "分析內容建置中...", warning: "無", match: "無" };
         
-        // 更新標題與圖片
         document.getElementById('role-title').innerText = data.name;
         document.getElementById('role-pic').src = data.img;
         
-        // 更新標籤
         const tagsContainer = document.getElementById('role-tags');
         tagsContainer.innerHTML = data.tags.map(t => `<span class="tag">${t}</span>`).join('');
         
-        // 更新詳細文本
         document.getElementById('analysis-text').innerText = data.analysis;
         document.getElementById('warning-text').innerText = data.warning;
         document.getElementById('match-text').innerText = data.match;
 
+        // 等待圖片載入後截圖
         setTimeout(captureResult, 800);
     }
 
     function captureResult() {
         const target = document.getElementById('result-capture');
-        html2canvas(target, { useCORS: true, scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+        // 問題 2: 優化截圖邏輯，確保高度適配
+        html2canvas(target, { 
+            useCORS: true, 
+            scale: 2, 
+            backgroundColor: "#ffffff",
+            windowHeight: target.scrollHeight,
+            height: target.scrollHeight
+        }).then(canvas => {
             const imgData = canvas.toDataURL("image/png");
             const overlay = document.createElement('img');
             overlay.src = imgData;
