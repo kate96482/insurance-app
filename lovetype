@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Love Type 16 戀愛人格測驗 (IG Story版)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --bg-color: #f7f9fc;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+            --card-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        * { box-sizing: border-box; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; overflow-x: hidden; }
+
+        /* 左上角導航 */
+        .nav-header { position: fixed; top: 15px; left: 15px; z-index: 100; }
+        .btn-nav {
+            background: rgba(255, 255, 255, 0.9); border: 1px solid #ddd;
+            padding: 10px 16px; border-radius: 25px; cursor: pointer; font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 500px; margin: 0 auto; min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; padding: 30px;
+        }
+
+        /* 卡片通用樣式 (首頁 & 測驗中) */
+        .card {
+            background: var(--card-bg); border-radius: 25px; padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        /* 首頁樣式 */
+        .home-view h1 { color: var(--primary-color); font-size: 32px; margin-bottom: 10px; }
+        .input-group { margin: 30px 0; }
+        input[type="text"] {
+            width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px;
+            font-size: 16px; outline: none; transition: 0.3s;
+        }
+        input[type="text"]:focus { border-color: var(--primary-color); }
+
+        .btn-main {
+            background: var(--primary-color); color: white; border: none;
+            width: 100%; padding: 18px; border-radius: 12px; font-size: 18px;
+            font-weight: bold; cursor: pointer; margin-bottom: 15px;
+        }
+        .btn-sub {
+            background: none; color: #7f8c8d; border: 1px solid #bdc3c7;
+            width: 100%; padding: 14px; border-radius: 12px; cursor: pointer;
+        }
+
+        /* 測驗中樣式 */
+        .quiz-view { display: none; }
+        .progress-bar {
+            width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-bottom: 30px;
+        }
+        .progress-inner {
+            height: 100%; background: var(--primary-color); border-radius: 4px; width: 0%; transition: 0.3s;
+        }
+        .question-text { font-size: 22px; font-weight: bold; margin-bottom: 40px; line-height: 1.6; }
+        .option-btn {
+            background: #f8f9fa; border: 2px solid #eee; width: 100%;
+            padding: 18px; border-radius: 15px; margin-bottom: 20px;
+            cursor: pointer; text-align: left; font-size: 16px; transition: 0.2s;
+        }
+        .option-btn:hover { border-color: var(--secondary-color); background: #e0f7f6; }
+        .back-btn { margin-top: 20px; background: none; border: none; color: #95a5a6; cursor: pointer; text-decoration: underline; }
+
+        /* --- 結果頁 & 圖片優化邏輯 --- */
+        .result-view { display: none; text-align: center; padding-bottom: 50px; }
+        
+        #result-capture {
+            width: 100%; 
+            aspect-ratio: 9 / 16;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-name { font-size: 14px; color: #7f8c8d; margin-bottom: 5px; }
+        .role-title { font-size: 28px; font-weight: bold; color: var(--primary-color); margin-bottom: 10px; }
+        
+        /* 標籤樣式 */
+        .role-tags { display: flex; justify-content: center; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tag { background: #ffebeb; color: #ff6b6b; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+
+        .role-img-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .role-img {
+            width: 100%; max-width: 220px; aspect-ratio: 1/1;
+            background: #f0f0f0; margin: 0 auto; border-radius: 15px;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .role-img img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* 詳細分析區塊 */
+        .analysis-container { text-align: left; margin-top: 15px; }
+        .analysis-section-title { font-weight: bold; color: #333; font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; }
+        .analysis-text { color: #555; font-size: 13px; line-height: 1.6; margin-bottom: 12px; }
+        
+        .grid-info { display: flex; gap: 10px; margin-top: 5px; }
+        .info-box { flex: 1; padding: 10px; border-radius: 12px; font-size: 11px; line-height: 1.4; }
+        .box-warning { background: #fff5f5; color: #ff6b6b; }
+        .box-match { background: #f0fff4; color: #48bb78; }
+        .box-title { font-weight: bold; margin-bottom: 3px; font-size: 11px; }
+        .box-content { color: #666; }
+
+        #image-overlay-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .screenshot-overlay {
+            width: 100%; height: 100%;
+            opacity: 0; z-index: 10; cursor: pointer;
+        }
+        .save-tip { color: #95a5a6; font-size: 13px; margin: 25px 0; animation: pulse 2s infinite; }
+
+        /* 彈窗樣式 */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 200; justify-content: center; align-items: center;
+        }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 380px; text-align: center; }
+        .modal-btn { padding: 12px 24px; margin: 8px; border-radius: 8px; border: none; cursor: pointer; font-size: 15px; font-weight: bold; }
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+<div class="nav-header">
+    <button class="btn-nav" onclick="handleNavHome()">🏠 返回首頁</button>
+</div>
+
+<div class="container">
+    <div id="home-view" class="card home-view">
+        <h1>Love Type 16</h1>
+        <p>探索你的戀愛靈魂角色</p>
+        <div class="input-group">
+            <input type="text" id="user-name" placeholder="請輸入您的稱呼" maxlength="10">
+        </div>
+        <button class="btn-main" onclick="startQuiz()">開始測驗</button>
+        <button class="btn-sub" onclick="showRolePicker()">直接看分析 (已測過)</button>
+    </div>
+
+    <div id="quiz-view" class="card quiz-view">
+        <div class="progress-bar"><div id="progress-inner" class="progress-inner"></div></div>
+        <div id="question-index" style="color: #95a5a6; font-size: 14px; margin-bottom: 10px;">Question 1/26</div>
+        <div id="question-text" class="question-text">題目載入中...</div>
+        <div id="options-container"></div>
+        <button class="back-btn" onclick="prevQuestion()">← 返回上一題</button>
+    </div>
+
+    <div id="result-view" class="result-view">
+        <div id="result-capture">
+            <div class="result-header">
+                <div class="result-name"><span id="display-name">使用者</span> 的戀愛角色是：</div>
+                <div id="role-title" class="role-title">角色名稱</div>
+                <div id="role-tags" class="role-tags"></div>
+            </div>
+            
+            <div class="role-img-wrapper">
+                <div class="role-img">
+                    <img id="role-pic" src="" alt="角色圖片">
+                </div>
+            </div>
+
+            <div class="analysis-container">
+                <div class="analysis-section-title">🌟 靈魂解析</div>
+                <div id="analysis-text" class="analysis-text"></div>
+                
+                <div class="grid-info">
+                    <div class="info-box box-warning">
+                        <div class="box-title">⚠️ 戀愛雷區</div>
+                        <div id="warning-text" class="box-content"></div>
+                    </div>
+                    <div class="info-box box-match">
+                        <div class="box-title">💖 最佳合適</div>
+                        <div id="match-text" class="box-content"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="font-size: 11px; color: #bdc3c7; margin-top: 15px;">@LoveType16小幫手</div>
+        </div>
+        
+        <div id="image-overlay-container"></div>
+        
+        <div class="save-tip">💡 長按上方海報即可儲存，直接發 IG Story！</div>
+        <button class="btn-main" style="margin-top: 20px;" onclick="location.reload()">重新測驗</button>
+    </div>
+</div>
+
+<div id="nav-modal" class="modal">
+    <div class="modal-content">
+        <h3>確定要離開測驗嗎？</h3>
+        <button class="modal-btn" style="background: #eee;" onclick="closeModal()">取消</button>
+        <button class="modal-btn" style="background: var(--primary-color); color: white;" onclick="resetQuiz()">重新測驗</button>
+        <button class="modal-btn" style="background: var(--secondary-color); color: white;" onclick="location.href='index.html'">返回首頁</button>
+    </div>
+</div>
+
+<div id="role-modal" class="modal">
+    <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+        <h3>選擇要查看的角色</h3>
+        <div id="role-list"></div>
+        <button class="modal-btn" onclick="closeRoleModal()">關閉</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. 資料定義 (26 題完整題目) ---
+    const questions = [
+        { q: "關於約會地點：", options: [{ t: "我通常會主動提議或決定去哪裡。", s: "L" }, { t: "我偏向讓對方決定，我配合就好。", s: "F" }] },
+        { q: "當兩個人意見不合時：", options: [{ t: "我會試著說服對方接受我的想法。", s: "L" }, { t: "我通常會退一步，順著對方的意思。", s: "F" }] },
+        { q: "在感情進度上（如告白、見家長）：", options: [{ t: "我傾向由我來掌控節奏或主動發起。", s: "L" }, { t: "我會觀察對方的步調再做回應。", s: "F" }] },
+        { q: "當對方遲到或出錯時：", options: [{ t: "我會直接指出問題並要求改進。", s: "L" }, { t: "我會先安撫對方，不希望氣氛尷尬。", s: "F" }] },
+        { q: "在日常瑣事決策上（如午餐吃什麼）：", options: [{ t: "我很快就能做出決定。", s: "L" }, { t: "我常會說「都可以」、「看你」。", s: "F" }] },
+        { q: "關於對方的社交圈：", options: [{ t: "我會希望對方介紹他的朋友給我認識（主動介入）。", s: "L" }, { t: "等對方主動邀請，我才會參加。", s: "F" }] },
+        { q: "當你工作壓力很大時：", options: [{ t: "我會想找對方討抱抱或訴苦。", s: "C" }, { t: "我會先自己消化，並詢問對方需不需要幫忙。", s: "A" }] },
+        { q: "關於「被需要」的感覺：", options: [{ t: "我喜歡被對方寵愛、當個小孩子的感覺。", s: "C" }, { t: "我喜歡被對方依賴、照顧對方的感覺。", s: "A" }] },
+        { q: "當對方情緒低落時：", options: [{ t: "我會不知所措，希望對方趕快好起來陪我。", s: "C" }, { t: "我會冷靜陪伴，成為對方的避風港。", s: "A" }] },
+        { q: "關於肢體接觸：", options: [{ t: "我隨時都想黏在對方身邊。", s: "C" }, { t: "我比較內斂，通常是回應對方的索求。", s: "A" }] },
+        { q: "在禮物挑選上：", options: [{ t: "我喜歡收到能代表對方心意的驚喜。", s: "C" }, { t: "我喜歡送對方他一直想要的東西。", s: "A" }] },
+        { q: "關於撒嬌：", options: [{ t: "我很擅長且頻繁地向對方撒嬌。", s: "C" }, { t: "撒嬌對我來說有點難，我比較常扮演「守護者」。", s: "A" }] },
+        { q: "理想的約會形式：", options: [{ t: "實用主義（吃飽、逛生活百貨、看電影）。", s: "R" }, { t: "浪漫主義（看夜景、燭光晚餐、冒險）。", s: "P" }] },
+        { q: "關於節日（如紀念日、情人節）：", options: [{ t: "覺得只是平常的一天，不需要過度慶祝。", s: "R" }, { t: "非常重視儀式感，必須要精心規劃。", s: "P" }] },
+        { q: "當談論未來時：", options: [{ t: "我會先考慮存款、房貸與工作穩定性。", s: "R" }, { t: "我會想像兩個人一起環遊世界或夢想生活。", s: "P" }] },
+        { q: "愛的表達方式：", options: [{ t: "幫忙做家事、給予經濟支持等實際行動。", s: "R" }, { t: "情書、情話、時刻表達「我愛你」。", s: "P" }] },
+        { q: "對於「一見鍾情」：", options: [{ t: "我不太相信，感情需要時間觀察條件。", s: "R" }, { t: "我相信第一眼的火花，感覺對了最重要。", s: "P" }] },
+        { q: "吵架時的重點：", options: [{ t: "把邏輯講清楚，解決實際發生的問題。", s: "R" }, { t: "先處理情緒，確認對方是否還愛我。", s: "P" }] },
+        { q: "關於金錢觀：", options: [{ t: "帳目分明或有計畫的存錢很重要。", s: "R" }, { t: "為了開心的體驗，偶爾豪擲千金也沒關係。", s: "P" }] },
+        { q: "關於承諾：", options: [{ t: "順其自然，不想太早討論結婚或長遠束縛。", s: "O" }, { t: "一旦交往就是以結婚為前提交往。", s: "E" }] },
+        { q: "對於伴侶的隱私（如看手機）：", options: [{ t: "彼此都要有絕對的自由，不查勤不干涉。", s: "O" }, { t: "因為在乎，所以會想了解對方的所有動向。", s: "E" }] },
+        { q: "當對方沒回訊息時：", options: [{ t: "我會去做自己的事，不會想太多。", s: "O" }, { t: "我會開始焦慮，反省自己是不是說錯話。", s: "E" }] },
+        { q: "關於「戀愛」在生活中的佔比：", options: [{ t: "愛情只是生活的一部分，朋友和工作同樣重要。", s: "O" }, { t: "愛情是我的重心，會願意為此調整其他計畫。", s: "E" }] },
+        { q: "對於「前任」的看法：", options: [{ t: "分手了還是可以當朋友，沒什麼大不了。", s: "O" }, { t: "徹底斷聯，那是對下一任最基本的尊重。", s: "E" }] },
+        { q: "關於變動與驚喜：", options: [{ t: "喜歡說走就走的旅行，不按牌理出牌。", s: "O" }, { t: "討厭計畫被臨時改變，會感到不安。", s: "E" }] },
+        { q: "對於這段關係的穩定感：", options: [{ t: "即使分開也能過得很好，心態豁達。", s: "O" }, { t: "投入極深，非常害怕失去對方。", s: "E" }] }
+    ];
+
+    const resultsData = {
+        "LCRO": { name: "老闆貓 (Boss Cat)", img: "images/lcro.png", tags: ["#主導權", "#反差萌", "#務實派"], analysis: "你在外面可能是獨當一面的領導者，但在伴侶面前，你會立刻切換成「討摸模式」。你對感情的需求很直接：你要聽我的，但你要寵我。你不喜歡無謂的感性內耗，認為愛就是一起吃好吃的、過好日子。", warning: "當你的指令被無視或對方表現得比你更強勢時，你會鬧彆扭或變得冷漠。", match: "FARE 能幹經理" },
+        "LCRE": { name: "隱藏寶貝 (Hidden Treasure)", img: "images/lcre.png", tags: ["#悶騷", "#計畫通", "#深情"], analysis: "你的愛是帶有「權限」的，只有進入核心圈的人才能看到你的軟弱。你極度追求穩定，會為了給對方更好的生活而瘋狂努力。你把對方的未來視為自己的責任，甚至會幫對方規劃職涯或財務。", warning: "最討厭「不確定性」。如果對方臨時改行程或對未來沒計畫，會讓你大發雷霆。", match: "FCPE 忠犬八公" },
+        "LCPO": { name: "主角體質 (Main Character)", img: "images/lcpo.png", tags: ["#聚光燈", "#浪漫大師", "#情緒反饋"], analysis: "戀愛對你來說是一場華麗的演出，你必須是絕對的主角。你很會營造氣氛，送禮物、驚喜樣樣精通，但前提是對方必須表現出「被感動到哭」的回饋。你需要的不是伴侶，是一個頭號粉絲。", warning: "當對方反應平淡或忘記稱讚你時，你會覺得這段感情死去了。", match: "FCPO 戀愛怪獸" },
+        "LCPE": { name: "傲嬌不良 (Tsundere Delinquent)", img: "images/lcpe.png", tags: ["#口嫌體正直", "#保護欲", "#純愛"], analysis: "你習慣用凶巴巴或嫌棄的口吻來掩飾害羞。你會一邊唸對方「笨手笨腳」，一邊把對方的家務全部做完。你的主導是為了保護，你認為這個世界上只有你才有資格欺負對方。", warning: "對方如果真的被你氣走，或是對方太脆弱聽不懂你的反話，關係會崩潰。", match: "FAPE 最後的戀人" },
+        "LARO": { name: "憧憬的前輩 (Admired Senior)", img: "images/laro.png", tags: ["#成熟魅力", "#解決問題", "#穩定感"], analysis: "你在感情中像是一個精神支柱。你很少情緒崩潰，總能冷靜地幫對方分析利弊。你追求的是一種「有品質的樂觀」，不喜歡小情小愛的糾纏，更看重雙方是否能一起變優秀。", warning: "容易顯得太像「說教」，讓伴侶覺得你是在教訓學生而不是在談戀愛。", match: "FCRE 精明兔子" },
+        "LARE": { name: "魅力平衡者 (Charming Balancer)", img: "images/lare.png", tags: ["#理性感性並行", "#高標準", "#精確"], analysis: "你對伴侶的挑選非常嚴苛。你認為感情需要經營，像是一台精密儀器。你會主動引導對方修正缺點，追求一種「對等」且「進步」的關係。你出門絕對體面，是伴侶帶得出場的驕傲。", warning: "過度追求完美，會讓對方在你面前不敢出錯，感到精疲力竭。", match: "FARO 不可思議生命體" },
+        "LAPO": { name: "完美變色龍 (Perfect Chameleon)", img: "images/lapo.png", tags: ["#高情商", "#適應力", "#活潑"], analysis: "你能根據對方的性格切換自己的面貌。對方喜歡安靜你就陪著看書，對方喜歡夜店你就陪著跳舞。你習慣主導局勢讓大家開心，但這種熱情有時會讓你感到內心空虛。", warning: "為了和諧而隱瞞真實感受，累積到最後會突然爆發式消失。", match: "FCRO 戀愛魔法師" },
+        "LAPE": { name: "隊長獅子 (Captain Lion)", img: "images/lape.png", tags: ["#領地意識", "#英雄主義", "#絕對正義"], analysis: "你對愛情的定義是「守護」。你非常有責任感，會為了對方跟全世界對抗。你的熱情是明火，不隱藏、不退縮。你會要求對方報備行程，因為你必須確定對方在你的保護範圍內。", warning: "嫉妒心重。對方只要跟異性多說兩句話，你的小宇宙就會爆發。", match: "FAPO 惡魔天使" },
+        "FCRO": { name: "戀愛魔法師 (Love Magician)", img: "images/fcro.png", tags: ["#小聰明", "#氣氛營造", "#輕鬆感"], analysis: "你知道什麼時候該撒嬌、什麼時候該閉嘴。你配合度高是因為你懶得吵架。你總能用幽默感化解尷尬，讓另一半覺得跟你在一起非常放鬆。", warning: "當遇到需要負責任的大事時，你傾向於躲在對方身後，讓對方覺得你沒擔當。", match: "LARO 憧憬的前輩" },
+        "FCRE": { name: "精明兔子 (Smart Rabbit)", img: "images/fcre.png", tags: ["#觀察者", "#精明內在", "#可愛外殼"], analysis: "你看起來柔弱好說話，但其實心裡有一台計算機。你會觀察對方的價值、性格缺陷和對你的好，再決定要投入多少。你的撒嬌通常是有目的的「戰略性示弱」。", warning: "如果對方讓你覺得無利可圖或看不到未來，你會冷酷地迅速撤離。", match: "LARE 魅力平衡者" },
+        "FCPO": { name: "戀愛怪獸 (Love Monster)", img: "images/fcpo.png", tags: ["#燃燒自我", "#極致熱情", "#感性至上"], analysis: "你的愛情是毀滅性的。一旦愛上，你可以拋棄工作、朋友、家人。你渴望與對方合而為一，追求那種電擊般的火花。你的配合不是因為沒主見，是因為你愛對方愛到沒了自己。", warning: "窒息的愛。你的黏人程度會讓普通人想要逃跑。", match: "LCPO 主角體質" },
+        "FCPE": { name: "忠犬八公 (Loyal Hachiko)", img: "images/fcpe.png", tags: ["#奉獻", "#耐心", "#純粹"], analysis: "你的愛是一場馬拉松。你對另一半的要求極低，只要對方回頭時你還在就行。你非常認真對待每一句諾言，即使對方忘了，你也會守著。你是那種會為了等對方下班而在門口等三小時的人。", warning: "容易遇到渣男/渣女，因為你太好欺負且不會設底線。", match: "LCRE 隱藏寶貝" },
+        "FARO": { name: "不可思議生命體 (Mysterious Creature)", img: "images/faro.png", tags: ["#腦洞大開", "#隨性", "#佛系"], analysis: "你的戀愛觀很奇特，有時像在修仙。你配合度高是因為你覺得「什麼都行」，你務實是因為你覺得「生活就是那樣」。對方生氣時，你可能會一臉茫然地問：「那要吃麥當勞嗎？」", warning: "缺乏共情力。對方哭得半死，你可能還在研究客廳的牆壁為什麼是白的。", match: "LAPO 完美變色龍" },
+        "FARE": { name: "能幹經理 (Capable Manager)", img: "images/fare.png", tags: ["#後勤部長", "#無聲的愛", "#細節控"], analysis: "你不擅長甜言蜜語，但你會幫對方把車加滿油、把報稅單填好、把感冒藥買好。你覺得被依賴是一種榮幸，你默默支持對方的夢想，並以此為榮。", warning: "過度忽視自己的需求。當你累到崩潰時，對方甚至不知道你做了這麼多。", match: "LCRO 老闆貓" },
+        "FAPO": { name: "惡魔天使 (Demon Angel)", img: "images/fapo.png", tags: ["#反差魅力", "#情緒包容", "#神祕感"], analysis: "你有一顆包容萬物的心，卻長了一張勾人的臉。你樂於配合對方的奇思妙想，甚至會陪對方一起冒險。你的熱情是內斂的火，只有靠近你的人才會被灼傷。", warning: "忽冷忽熱。當你進入自己的精神世界時，會完全切斷聯繫，讓對方發瘋。", match: "LAPE 隊長獅子" },
+        "FAPE": { name: "最後的戀人 (The Last Lover)", img: "images/fape.png", tags: ["#療癒", "#靈魂伴侶", "#終極宿命"], analysis: "你認為戀愛是一場神聖的儀式。你追求的是一種「懂」。你不主導，但你承接對方所有的痛苦與快樂。你是那種會讓對方感嘆「這輩子再也遇不到對我這麼好的人」的終結者。", warning: "容易陷入自我感動，或因為對方一點點的不忠誠而心碎到無法復原。", match: "LCPE 傲嬌不良" }
+    };
+
+    let currentIdx = 0;
+    let userName = "";
+    let userScores = { L:0, F:0, C:0, A:0, R:0, P:0, O:0, E:0 };
+    let history = [];
+
+    function startQuiz() {
+        userName = document.getElementById('user-name').value.trim();
+        if(!userName) { alert("請輸入稱呼再開始喔！"); return; }
+        document.getElementById('home-view').style.display = 'none';
+        document.getElementById('quiz-view').style.display = 'block';
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('question-index').innerText = `Question ${currentIdx + 1}/${questions.length}`;
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('progress-inner').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = "";
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "option-btn";
+            btn.innerText = opt.t;
+            btn.onclick = () => nextQuestion(opt.s);
+            container.appendChild(btn);
+        });
+    }
+
+    function nextQuestion(scoreKey) {
+        userScores[scoreKey]++;
+        history.push(scoreKey);
+        if(currentIdx < questions.length - 1) {
+            currentIdx++;
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function prevQuestion() {
+        if(currentIdx > 0) {
+            const lastScore = history.pop();
+            userScores[lastScore]--;
+            currentIdx--;
+            showQuestion();
+        }
+    }
+
+    function showResult(forcedType = null) {
+        document.getElementById('quiz-view').style.display = 'none';
+        document.getElementById('home-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'block';
+        document.getElementById('display-name').innerText = userName || "測驗者";
+
+        let type = forcedType;
+        if(!type) {
+            const dim1 = userScores.L >= userScores.F ? "L" : "F";
+            const dim2 = userScores.C >= userScores.A ? "C" : "A";
+            const dim3 = userScores.R >= userScores.P ? "R" : "P";
+            const dim4 = userScores.O >= userScores.E ? "O" : "E";
+            type = dim1 + dim2 + dim3 + dim4;
+        }
+
+        const data = resultsData[type] || { name: "神秘人格", img: "", tags: [], analysis: "分析內容建置中...", warning: "無", match: "無" };
+        
+        // 更新標題與圖片
+        document.getElementById('role-title').innerText = data.name;
+        document.getElementById('role-pic').src = data.img;
+        
+        // 更新標籤
+        const tagsContainer = document.getElementById('role-tags');
+        tagsContainer.innerHTML = data.tags.map(t => `<span class="tag">${t}</span>`).join('');
+        
+        // 更新詳細文本
+        document.getElementById('analysis-text').innerText = data.analysis;
+        document.getElementById('warning-text').innerText = data.warning;
+        document.getElementById('match-text').innerText = data.match;
+
+        setTimeout(captureResult, 800);
+    }
+
+    function captureResult() {
+        const target = document.getElementById('result-capture');
+        html2canvas(target, { useCORS: true, scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+            const imgData = canvas.toDataURL("image/png");
+            const overlay = document.createElement('img');
+            overlay.src = imgData;
+            overlay.className = "screenshot-overlay";
+            const container = document.getElementById('image-overlay-container');
+            container.innerHTML = "";
+            container.appendChild(overlay);
+        });
+    }
+
+    function handleNavHome() {
+        if(document.getElementById('quiz-view').style.display === 'block') {
+            document.getElementById('nav-modal').style.display = 'flex';
+        } else {
+            location.href = 'index.html';
+        }
+    }
+    function closeModal() { document.getElementById('nav-modal').style.display = 'none'; }
+    function resetQuiz() { location.reload(); }
+    function showRolePicker() {
+        document.getElementById('role-modal').style.display = 'flex';
+        const list = document.getElementById('role-list');
+        list.innerHTML = "";
+        Object.keys(resultsData).forEach(key => {
+            const btn = document.createElement('button');
+            btn.className = "option-btn";
+            btn.innerText = resultsData[key].name;
+            btn.onclick = () => { closeRoleModal(); showResult(key); };
+            list.appendChild(btn);
+        });
+    }
+    function closeRoleModal() { document.getElementById('role-modal').style.display = 'none'; }
+</script>
+
+</body>
+</html>
